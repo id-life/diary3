@@ -29,7 +29,7 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
         return;
       }
       persistor.pause();
-      // const loadMsg = toast.loading('Loading...');
+      const loadMsg = toast.loading('Loading...');
 
       const octokit = new Octokit({
         auth: loginUser.githubSecret,
@@ -43,7 +43,7 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
 
         if (Array.isArray(file.data)) {
           // If file.data is an array, it's a directory object
-          // toast.update(loadMsg, { render: 'Cannot download directory', type: 'error', isLoading: false, autoClose: 2000 });
+          toast.update(loadMsg, { render: 'Cannot download directory', type: 'error', isLoading: false, autoClose: 2000 });
           return;
         } else {
           // If file.data is an object, it's a file object
@@ -56,14 +56,14 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
           const stateToLoad = await fileResponse.json();
           localStorage.setItem('persist:diary', JSON.stringify(stateToLoad));
         } else {
-          // toast.update(loadMsg, { render: 'Download URL is not available', type: 'error', isLoading: false, autoClose: 2000 });
+          toast.update(loadMsg, { render: 'Download URL is not available', type: 'error', isLoading: false, autoClose: 2000 });
           return;
         }
-        // toast.update(loadMsg, { render: 'Loaded Successfully', type: 'success', isLoading: false, autoClose: 2000 });
+        toast.update(loadMsg, { render: 'Loaded Successfully', type: 'success', isLoading: false, autoClose: 2000 });
         setOpen(false);
         window?.location?.reload();
       } catch (e: any) {
-        // toast.update(loadMsg, { render: e?.message ?? 'Loaded Error', type: 'error', isLoading: false, autoClose: 2000 });
+        toast.update(loadMsg, { render: e?.message ?? 'Loaded Error', type: 'error', isLoading: false, autoClose: 2000 });
       }
     },
     [loginUser, setOpen],

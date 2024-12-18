@@ -72,28 +72,31 @@ export const saveStateToGithub = (loginUser: LoginUserState) => {
     toast.error('Not logged in');
     return;
   }
-  // const saveMsg = toast.loading('Saving...');
+  const saveMsg = toast.loading('Saving...');
 
-  return persistor.flush().then(() => {
-    const state = localStorage.getItem('persist:diary');
+  return persistor
+    .flush()
+    .then(() => {
+      const state = localStorage.getItem('persist:diary');
 
-    const octokit = new Octokit({
-      auth: loginUser.githubSecret,
-      userAgent: 'diary-app',
-    });
-    const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
-    octokit.rest.repos.createOrUpdateFileContents({
-      owner: loginUser.uid!,
-      repo: loginUser.repo!,
-      path,
-      message: `${path}`,
-      content: Buffer.from(state || '').toString('base64'),
-      'committer.name': loginUser.uid,
-      'committer.email': loginUser.email,
-      'author.name': loginUser.uid,
-      'author.email': loginUser.email,
-    });
-    // .then(() => toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 }));
-  });
-  // .catch((e) => toast.update(saveMsg, { render: e?.message, type: 'error', isLoading: false, autoClose: 3000 }));
+      const octokit = new Octokit({
+        auth: loginUser.githubSecret,
+        userAgent: 'diary-app',
+      });
+      const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
+      octokit.rest.repos
+        .createOrUpdateFileContents({
+          owner: loginUser.uid!,
+          repo: loginUser.repo!,
+          path,
+          message: `${path}`,
+          content: Buffer.from(state || '').toString('base64'),
+          'committer.name': loginUser.uid,
+          'committer.email': loginUser.email,
+          'author.name': loginUser.uid,
+          'author.email': loginUser.email,
+        })
+        .then(() => toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 }));
+    })
+    .catch((e) => toast.update(saveMsg, { render: e?.message, type: 'error', isLoading: false, autoClose: 3000 }));
 };
