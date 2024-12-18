@@ -1,5 +1,5 @@
-import { createEntryInstance } from '../../../app/entry-instances-slice';
-import { useAppDispatch } from '../../../app/store';
+import { createEntryInstance } from '../../../entry/entry-instances-slice';
+import { useAppDispatch } from '../../../entry/store';
 import historyJson from '../../../scripts/entry-instances-history-20230211-0106.json';
 import Button from '../../button';
 

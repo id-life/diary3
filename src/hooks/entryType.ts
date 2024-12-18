@@ -1,5 +1,5 @@
-import { selectEntryInstancesMap, useAppSelector } from '@/app/store';
-import { EntryType, RoutineEnum, StreakStatus } from '@/app/types-constants';
+import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
+import { EntryType, RoutineEnum, StreakStatus } from '@/entry/types-constants';
 import dayjs from 'dayjs';
 import { useCallback } from 'react';
 

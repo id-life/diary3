@@ -1,4 +1,4 @@
-import { selectEntryInstancesMap, selectLoginUser, useAppSelector } from '@/app/store';
+import { selectEntryInstancesMap, selectLoginUser, useAppSelector } from '@/entry/store';
 import { GlobalState, globalStateAtom } from '@/store/app';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 import dayjs from 'dayjs';

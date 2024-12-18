@@ -1,6 +1,6 @@
 import { Form, Input } from 'antd';
-import { firstLogin } from '../../app/login-user-slice';
-import { useAppDispatch } from '../../app/store';
+import { firstLogin } from '../../entry/login-user-slice';
+import { useAppDispatch } from '../../entry/store';
 import { AiFillGithub } from 'react-icons/ai';
 import Button from '../button';
 import clsx from 'clsx';

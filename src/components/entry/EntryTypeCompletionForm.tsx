@@ -1,9 +1,9 @@
 import { InputNumber } from 'antd';
 import dayjs from 'dayjs';
 import { Controller, useForm } from 'react-hook-form';
-import { createEntryInstance } from '../../app/entry-instances-slice';
-import { useAppDispatch } from '../../app/store';
-import { EntryType, getEntryInstanceIdFromEntryType } from '../../app/types-constants';
+import { createEntryInstance } from '../../entry/entry-instances-slice';
+import { useAppDispatch } from '../../entry/store';
+import { EntryType, getEntryInstanceIdFromEntryType } from '../../entry/types-constants';
 import Button from '../button';
 import { CheckIcon } from '../icon/DiaryIcons';
 

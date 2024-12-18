@@ -1,5 +1,5 @@
-import { onLogoutClickClearState } from '@/app/login-user-slice';
-import { selectLoginUser, useAppDispatch, useAppSelector } from '@/app/store';
+import { onLogoutClickClearState } from '@/entry/login-user-slice';
+import { selectLoginUser, useAppDispatch, useAppSelector } from '@/entry/store';
 import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';

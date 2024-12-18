@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { selectLoginUser, useAppSelector } from '../app/store';
+import { selectLoginUser, useAppSelector } from '../entry/store';
 import LoginForm from '@/components/my/LoginForm';
 import GlobalStats from '@/components/my/GlobalStats';
 

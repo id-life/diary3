@@ -1,7 +1,7 @@
-import { selectEntryTypeIds, selectEntryTypesArray, useAppSelector } from '../app/store';
+import { selectEntryTypeIds, selectEntryTypesArray, useAppSelector } from '../entry/store';
 import EntryTypeForm from '../components/entry/EntryTypeForm';
 import StreaksTable from '../components/entry/StreaksTable';
-import { RoutineEnum } from '../app/types-constants';
+import { RoutineEnum } from '../entry/types-constants';
 import EntryAllInOneTable from 'src/components/entry/EntryAllInOneTable';
 
 export default function AddPage() {

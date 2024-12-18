@@ -1,13 +1,13 @@
-import { deleteReminder } from '@/app/reminder-records-slice';
-import { useAppDispatch } from '@/app/store';
-import { enterReminderEdit } from '@/app/ui-slice';
+import { deleteReminder } from '@/entry/reminder-records-slice';
+import { useAppDispatch } from '@/entry/store';
+import { enterReminderEdit } from '@/entry/ui-slice';
 import { formatDate } from '@/utils/date';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { BiSolidBellRing } from 'react-icons/bi';
 import { twMerge } from 'tailwind-merge';
-import { ReminderRecord, ReminderType } from '../../app/types-constants';
+import { ReminderRecord, ReminderType } from '../../entry/types-constants';
 import Button from '../button';
 
 export type EntryTypeCardProps = {

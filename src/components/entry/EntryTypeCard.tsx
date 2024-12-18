@@ -1,12 +1,12 @@
-import { deleteEntryInstanceByEntryTypeId } from '@/app/entry-instances-slice';
+import { deleteEntryInstanceByEntryTypeId } from '@/entry/entry-instances-slice';
 import { formatDate } from '@/utils/date';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { PiStepsDuotone } from 'react-icons/pi';
 import { twMerge } from 'tailwind-merge';
-import { deleteEntryType } from '../../app/entry-types-slice';
-import { useAppDispatch } from '../../app/store';
-import { EntryType } from '../../app/types-constants';
-import { enterEntryTypeEdit } from '../../app/ui-slice';
+import { deleteEntryType } from '../../entry/entry-types-slice';
+import { useAppDispatch } from '../../entry/store';
+import { EntryType } from '../../entry/types-constants';
+import { enterEntryTypeEdit } from '../../entry/ui-slice';
 import Button from '../button';
 import { CheckIcon } from '../icon/DiaryIcons';
 import Tooltip from '../tooltip';

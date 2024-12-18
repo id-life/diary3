@@ -1,7 +1,7 @@
-import { createReminder, updateReminder } from '@/app/reminder-records-slice';
-import { selectReminderRecordArray, useAppDispatch, useAppSelector } from '@/app/store';
-import { ReminderConstructor, ReminderRecord, ReminderType } from '@/app/types-constants';
-import { exitReminderEdit } from '@/app/ui-slice';
+import { createReminder, updateReminder } from '@/entry/reminder-records-slice';
+import { selectReminderRecordArray, useAppDispatch, useAppSelector } from '@/entry/store';
+import { ReminderConstructor, ReminderRecord, ReminderType } from '@/entry/types-constants';
+import { exitReminderEdit } from '@/entry/ui-slice';
 import { cn } from '@/utils';
 import { formatDate } from '@/utils/date';
 import { zodResolver } from '@hookform/resolvers/zod';

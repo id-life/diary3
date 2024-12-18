@@ -1,4 +1,4 @@
-import { selectLoginUser, useAppSelector } from '@/app/store';
+import { selectLoginUser, useAppSelector } from '@/entry/store';
 import { Octokit } from '@octokit/rest';
 import { useQuery } from '@tanstack/react-query';
 

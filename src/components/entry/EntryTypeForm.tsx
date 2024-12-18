@@ -1,12 +1,12 @@
-import { updateChangeEntryIdEntryInstance } from '@/app/entry-instances-slice';
+import { updateChangeEntryIdEntryInstance } from '@/entry/entry-instances-slice';
 import { Form, Input, InputNumber, Radio } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { createEntryType, updateEntryType, updateEntryTypeId } from '../../app/entry-types-slice';
-import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '../../app/store';
-import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../app/types-constants';
-import { exitEntryTypeEdit } from '../../app/ui-slice';
+import { createEntryType, updateEntryType, updateEntryTypeId } from '../../entry/entry-types-slice';
+import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '../../entry/store';
+import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../entry/types-constants';
+import { exitEntryTypeEdit } from '../../entry/ui-slice';
 import Button from '../button';
 import { EditNavIcon, EntryNavIcon } from '../icon/DiaryIcons';
 

@@ -1,9 +1,9 @@
-import { selectEntryInstancesMap, useAppSelector } from '@/app/store';
+import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import _ from 'lodash-es';
 import { Fragment, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
-import { EntryType, RoutineEnum, StreakStatus, getDatePeriods } from '../../app/types-constants';
+import { EntryType, RoutineEnum, StreakStatus, getDatePeriods } from '../../entry/types-constants';
 import { calcEntryTypeLongestStreaks } from '@/utils/entry';
 import EntryTypeCard from './EntryTypeCard';
 import { useEntryStreakGetters } from '@/hooks/entryType';

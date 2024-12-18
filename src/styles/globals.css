@@ -1,4 +1,4 @@
-@import './theme.less';
+@import './theme.css';
 
 @tailwind base;
 @tailwind components;
@@ -92,11 +92,6 @@
   }
   * {
     outline: none;
-  }
-  @font-face {
-    font-family: 'D-DIN';
-    font-weight: bold;
-    src: url('../assets/font/D-DIN-Bold.ttf');
   }
 }
 

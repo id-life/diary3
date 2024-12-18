@@ -1,4 +1,4 @@
-import { DateRange, EntryInstance, EntryType, RoutineEnum } from '@/app/types-constants';
+import { DateRange, EntryInstance, EntryType, RoutineEnum } from '@/entry/types-constants';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { getDaysFromDateToDateNow, getMonthsFromDateToDateNow, getWeeksFromDateToDateNow } from './date';

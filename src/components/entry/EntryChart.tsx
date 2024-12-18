@@ -1,4 +1,4 @@
-import { selectEntryTypesArray, useAppSelector } from '@/app/store';
+import { selectEntryTypesArray, useAppSelector } from '@/entry/store';
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/store/app';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
@@ -14,7 +14,7 @@ import {
   barHighValue,
   barLowColor,
   barLowValue,
-} from '../../app/types-constants';
+} from '../../entry/types-constants';
 import Segmented from '../segmented';
 import EntryChartTooltip, { TooltipPayload } from './EntryChartTooltip';
 import { HiOutlineRefresh } from 'react-icons/hi';

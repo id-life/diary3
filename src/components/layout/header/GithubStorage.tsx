@@ -2,8 +2,8 @@ import { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-import { LoginUserState } from '../../../app/login-user-slice';
-import { persistor } from '../../../app/store';
+import { LoginUserState } from '../../../entry/login-user-slice';
+import { persistor } from '../../../entry/store';
 
 export const isIncompleteGithubInfo = (loginUser: LoginUserState) => {
   return !loginUser.githubSecret || !loginUser.uid || !loginUser.repo || !loginUser.email;

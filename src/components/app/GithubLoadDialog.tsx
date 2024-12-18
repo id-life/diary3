@@ -1,5 +1,5 @@
 import { useFetchCommits } from '@/api/github';
-import { persistor, selectLoginUser, useAppSelector } from '@/app/store';
+import { persistor, selectLoginUser, useAppSelector } from '@/entry/store';
 import { loadDialogOpenAtom } from '@/store/app';
 import { Octokit } from '@octokit/rest';
 import { useAtom } from 'jotai';

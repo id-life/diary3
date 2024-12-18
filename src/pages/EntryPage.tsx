@@ -3,7 +3,7 @@ import { selectedChartDateAtom } from '@/store/app';
 import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
-import { selectEntryInstancesMap, useAppSelector } from '../app/store';
+import { selectEntryInstancesMap, useAppSelector } from '../entry/store';
 import EntryChart from '../components/entry/EntryChart';
 import EntryInstanceList from '../components/entry/EntryInstanceList';
 import EntryProgressBar from '../components/entry/EntryProgressBar';

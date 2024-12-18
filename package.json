@@ -3,26 +3,23 @@
   "version": "0.1.195",
   "private": true,
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test-all": "craco test a --watchAll=false --passWithNoTests",
-    "test": "craco test --watchAll=false --passWithNoTests",
-    "eject": "craco eject",
-    "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx src/ --fix",
-    "prettier": "prettier --write src/",
-    "prepare": "husky install"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/pro-components": "^2.3.54",
     "@floating-ui/react": "^0.25.0",
     "@hookform/resolvers": "^3.3.2",
+    "@million/lint": "^1.0.14",
     "@octokit/rest": "^19.0.11",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-switch": "^1.0.3",
     "@reduxjs/toolkit": "^1.9.2",
+    "@svgr/webpack": "^8.1.0",
     "@tanstack/react-query": "^4.32.6",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.0.1",
@@ -46,16 +43,16 @@
     "lint-staged": "^13.2.3",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.292.0",
-    "react": "^18.2.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-beforeunload": "^2.6.0",
     "react-day-picker": "^8.9.1",
-    "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.48.2",
     "react-icons": "^4.10.1",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.0",
-    "react-scripts": "5.0.1",
     "react-toastify": "^9.1.3",
     "recharts": "^2.3.2",
     "redux-persist": "^6.0.0",
@@ -63,11 +60,10 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.1",
-    "typescript": "^4.6.0",
+    "typescript": "^5.7.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
     "@types/lodash-es": "^4.17.8",
     "@types/react-beforeunload": "^2.1.1",
     "autoprefixer": "^10.4.14",
@@ -106,5 +102,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.0.0-rc.0+sha256.57703626082eb6cde4a0eddd7a406172265c8509b6442396dbcc513eef3d0841"
 }
