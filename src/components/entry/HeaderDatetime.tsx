@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import { formatDateTime } from '@/utils/date';
+import { useEffect, useState } from 'react';
 
 function HeaderDatetime() {
   const [time, setTime] = useState(Number(new Date()));
