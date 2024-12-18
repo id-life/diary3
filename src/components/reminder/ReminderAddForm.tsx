@@ -7,7 +7,7 @@ import { formatDate } from '@/utils/date';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AddToCalendarButton } from 'add-to-calendar-button-react';
 import dayjs from 'dayjs';
-import _ from 'lodash-es';
+import { range } from 'lodash-es';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiFillCalendar } from 'react-icons/ai';
@@ -118,15 +118,15 @@ export default function ReminderAddForm() {
   console.log({ startDate, recurrenceRule });
 
   const renderPushConfig = useCallback(() => {
-    const weekOpts = _.range(0, 7).map((value) => ({
+    const weekOpts = range(0, 7).map((value) => ({
       label: dayjs().day(value).format('ddd'),
       value,
     }));
-    const monthDayOpts = _.range(0, 31).map((value) => ({
+    const monthDayOpts = range(0, 31).map((value) => ({
       label: (value + 1).toString(),
       value,
     }));
-    const yearMonthOpts = _.range(0, 12).map((value) => ({
+    const yearMonthOpts = range(0, 12).map((value) => ({
       label: dayjs().month(value).format('MMM'),
       value,
     }));
