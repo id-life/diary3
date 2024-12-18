@@ -107,8 +107,6 @@ export interface EntryDay extends DiaryDate {
   totalPoints: number;
 }
 
-export const PAGES = ['entry', 'add', 'reminder', 'settings'];
-
 export const EntryTypeThemeColors = [
   ['FF5912', 'FC3650'],
   ['FC8D3C', 'FF5912'],

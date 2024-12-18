@@ -1,12 +1,13 @@
-import { Form, Input } from 'antd';
+'use client';
+
+import clsx from 'clsx';
+import { useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { AiFillGithub } from 'react-icons/ai';
 import { firstLogin } from '../../entry/login-user-slice';
 import { useAppDispatch } from '../../entry/store';
-import { AiFillGithub } from 'react-icons/ai';
 import Button from '../button';
-import clsx from 'clsx';
 import { toast } from 'react-toastify';
-import { useForm } from 'react-hook-form';
-import { useCallback } from 'react';
 
 const LoginForm = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
@@ -17,20 +18,28 @@ const LoginForm = ({ className }: { className?: string }) => {
   } = useForm();
 
   const onSubmit = (values: any) => {
-    console.log('Success:', values);
-    toast.success(`${values?.uid} Login successfully!`);
-    dispatch(firstLogin(values));
+    try {
+      console.log('Success:', values);
+      dispatch(firstLogin(values));
+      toast.success(`${values?.uid} Login successfully!`);
+    } catch (error) {
+      console.log('Login Error:', error);
+      toast.error('Login Error!');
+    }
   };
 
   const onError = useCallback((errors: any) => {
-    for (let field in errors) {
-      if (errors?.[field]?.message) {
-        toast.error(errors?.[field]?.message?.toString() as string);
-        return;
+    try {
+      for (let field in errors) {
+        if (errors?.[field]?.message) {
+          toast.error(errors?.[field]?.message?.toString() as string);
+          return;
+        }
       }
+    } catch (error) {
+      console.log('Login Error:', error);
+      toast.error('Login Error!');
     }
-
-    toast.error('Login Error!');
   }, []);
 
   return (
@@ -75,31 +84,6 @@ const LoginForm = ({ className }: { className?: string }) => {
         <AiFillGithub className="h-6 w-6" /> Login with Github
       </Button>
     </form>
-    // <Form
-    //   name="login-form"
-    //   className={clsx('flex flex-col justify-end', className)}
-    //   initialValues={{}}
-    //   onFinish={onFinish}
-    //   onFinishFailed={onFinishFailed}
-    // >
-    //   <Form.Item label="github-username" name="uid" rules={[{ required: true }]}>
-    //     <Input />
-    //   </Form.Item>
-    //   <Form.Item label="github-secret" name="githubSecret" rules={[{ required: true }]}>
-    //     <Input />
-    //   </Form.Item>
-    //   <Form.Item label="github-repo" name="repo" rules={[{ required: true }]}>
-    //     <Input />
-    //   </Form.Item>
-    //   <Form.Item label="email" name="email" rules={[{ required: true }]}>
-    //     <Input />
-    //   </Form.Item>
-    //   <Form.Item>
-    //     <Button htmlType="submit" className="flex w-full items-center justify-center gap-2 py-3">
-    //       <AiFillGithub className="h-6 w-6" /> Login with Github
-    //     </Button>
-    //   </Form.Item>
-    // </Form>
   );
 };
 

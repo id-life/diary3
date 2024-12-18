@@ -12,7 +12,7 @@ import { LoginUserState, onCloseUpdateLastUseTime, onLogoutClickClearState } fro
 import { useAppDispatch, useAppSelector } from '../../../entry/store';
 import Button from '../../button';
 import Collapse from '../../collapse';
-import { saveStateToGithub } from './GithubStorage';
+import { saveStateToGithub } from '../../../lib/GithubStorage';
 import { formatDateTime } from '@/utils/date';
 
 function UserHeader(props: { loginUser: LoginUserState; className?: string }) {

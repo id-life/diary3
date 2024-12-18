@@ -1,16 +1,16 @@
 'use client';
 
-import React, { PropsWithChildren, JSX } from 'react';
-import { JotaiStoreProvider } from '@/providers/jotai-provider';
 import { ProviderComposer } from '@/components/common/ProviderComposer';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider as ReduxProvider } from 'react-redux';
 import { persistor, store } from '@/entry/store';
+import { JotaiStoreProvider } from '@/providers/jotai-provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PropsWithChildren } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 
-const contexts: JSX.Element[] = [
+const contexts = [
   <ReduxProvider key="reduxProvider" store={store} children={undefined} />,
   <JotaiStoreProvider key="jotaiStoreProvider" />,
   <QueryClientProvider key="queryClientProvider" client={queryClient} />,

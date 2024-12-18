@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { atom } from 'jotai';
 
 export const selectedChartDateAtom = atom<string | null>(null);
@@ -15,3 +14,16 @@ export type GlobalState = {
 export const globalStateAtom = atom<GlobalState | null>(null);
 
 export const chartDateRangeAtom = atom<string[]>([]);
+
+export const themeNames = [
+  'diary-theme-1',
+  'diary-theme-1',
+  'diary-theme-2',
+  'diary-theme-2',
+  'diary-theme-2',
+  'diary-theme-3',
+  'diary-theme-3',
+  'diary-theme-4',
+];
+
+export const themeAtom = atom(themeNames[0]);

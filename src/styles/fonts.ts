@@ -8,7 +8,7 @@ const poppins = Poppins({
 });
 
 const ddin = localFont({
-  src: './fonts/D-DIN-Bold.ttf',
+  src: './font/D-DIN-Bold.ttf',
   variable: '--font-ddin',
   weight: '700',
 });

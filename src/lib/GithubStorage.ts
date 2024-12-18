@@ -1,9 +1,11 @@
+'use client';
+
 import { Octokit } from '@octokit/rest';
 import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-import { LoginUserState } from '../../../entry/login-user-slice';
-import { persistor } from '../../../entry/store';
+import { LoginUserState } from '../entry/login-user-slice';
+import { persistor } from '../entry/store';
 
 export const isIncompleteGithubInfo = (loginUser: LoginUserState) => {
   return !loginUser.githubSecret || !loginUser.uid || !loginUser.repo || !loginUser.email;
@@ -56,6 +58,7 @@ export const loadStateFromGithub = async (loginUser: LoginUserState) => {
     toast.update(loadMsg, { render: 'Loaded Successfully', type: 'success', isLoading: false, autoClose: 3000 });
   } catch (e: any) {
     toast.update(loadMsg, { render: e?.message ?? 'Loaded Error', type: 'error', isLoading: false, autoClose: 3000 });
+    console.log({ e });
   }
 };
 
@@ -69,37 +72,28 @@ export const saveStateToGithub = (loginUser: LoginUserState) => {
     toast.error('Not logged in');
     return;
   }
-  const saveMsg = toast.loading('Saving...');
+  // const saveMsg = toast.loading('Saving...');
 
-  return persistor
-    .flush()
-    .then(() => {
-      const state = localStorage.getItem('persist:diary');
+  return persistor.flush().then(() => {
+    const state = localStorage.getItem('persist:diary');
 
-      const octokit = new Octokit({
-        auth: loginUser.githubSecret,
-        userAgent: 'diary-app',
-      });
-      const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
-      octokit.rest.repos
-        .createOrUpdateFileContents({
-          owner: loginUser.uid!,
-          repo: loginUser.repo!,
-          path,
-          message: `${path}`,
-          content: Buffer.from(state || '').toString('base64'),
-          'committer.name': loginUser.uid,
-          'committer.email': loginUser.email,
-          'author.name': loginUser.uid,
-          'author.email': loginUser.email,
-        })
-        .then(() => toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 }));
-    })
-    .catch((e) => toast.update(saveMsg, { render: e?.message, type: 'error', isLoading: false, autoClose: 3000 }));
+    const octokit = new Octokit({
+      auth: loginUser.githubSecret,
+      userAgent: 'diary-app',
+    });
+    const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
+    octokit.rest.repos.createOrUpdateFileContents({
+      owner: loginUser.uid!,
+      repo: loginUser.repo!,
+      path,
+      message: `${path}`,
+      content: Buffer.from(state || '').toString('base64'),
+      'committer.name': loginUser.uid,
+      'committer.email': loginUser.email,
+      'author.name': loginUser.uid,
+      'author.email': loginUser.email,
+    });
+    // .then(() => toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 }));
+  });
+  // .catch((e) => toast.update(saveMsg, { render: e?.message, type: 'error', isLoading: false, autoClose: 3000 }));
 };
-
-const TestGithubStorage = () => {
-  return <>TestGithubStorage</>;
-};
-
-export default TestGithubStorage;

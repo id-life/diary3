@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import App from '../pages/App';
-import AddPage from '../pages/AddPage';
-import EntryPage from '../pages/EntryPage';
-import ReminderPage from '../pages/ReminderPage';
-import SettingsPage from '../pages/SettingsPage';
-import PlaygroundPage from '../pages/PlaygroundPage';
+import App from '../oldpage/App';
+import AddPage from '../oldpage/AddPage';
+import EntryPage from '../oldpage/EntryPage';
+import ReminderPage from '../oldpage/ReminderPage';
+import SettingsPage from '../oldpage/SettingsPage';
+import PlaygroundPage from '../oldpage/PlaygroundPage';
 
 const router = createBrowserRouter([
   {
