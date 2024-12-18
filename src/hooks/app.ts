@@ -1,4 +1,7 @@
-import { selectEntryInstancesMap, selectLoginUser, useAppSelector } from '@/entry/store';
+import { initDayEntryInstances } from '@/entry/entry-instances-slice';
+import { selectEntryInstancesMap, selectLoginUser, useAppDispatch, useAppSelector } from '@/entry/store';
+import { getDateStringFromNow } from '@/entry/types-constants';
+import { initDateStr } from '@/entry/ui-slice';
 import { GlobalState, globalStateAtom } from '@/store/app';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 import dayjs from 'dayjs';
@@ -9,6 +12,7 @@ export const useInitGlobalState = () => {
   const loginUser = useAppSelector(selectLoginUser);
   const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
   const setGlobalState = useSetAtom(globalStateAtom);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const now = dayjs();
@@ -22,6 +26,11 @@ export const useInitGlobalState = () => {
       historicalLongestStreakByEntry: calcRecordedLongestStreaks(entryInstancesMap),
       currentStreakByEntry: calcRecordedCurrentStreaks(entryInstancesMap),
     };
+
     setGlobalState(states);
+
+    const dateStrNow = getDateStringFromNow();
+    dispatch(initDateStr({ dateStr: dateStrNow }));
+    dispatch(initDayEntryInstances({ dateStr: dateStrNow }));
   }, [entryInstancesMap, loginUser.loginTime, setGlobalState]);
 };

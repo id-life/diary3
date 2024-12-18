@@ -1,6 +1,7 @@
 import Theme from '@/components/app/Theme';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import Header from '@/components/layout/Header';
 import Navbar from '@/components/layout/Navbar';
 import Providers from '@/providers/root';
 import { ddin, poppins } from '@/styles/fonts';
@@ -10,6 +11,7 @@ import type { Metadata } from 'next';
 import { ToastContainer } from 'react-toastify';
 
 import '@/styles/globals.css';
+import DialogComponents from '@/components/dialog/DialogComponents';
 
 export const metadata: Metadata = {
   title: 'Diary',
@@ -38,14 +40,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Providers>
           <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
             <ErrorBoundary>
-              <ClientOnly></ClientOnly>
+              <ClientOnly>
+                <Header />
+              </ClientOnly>
               <main className="min relative flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
             </ErrorBoundary>
             <Navbar />
+            <DialogComponents />
           </div>
-          <ToastContainer
-          //  autoClose={3000} position="top-center"
-          />
+          <ToastContainer autoClose={3000} position="top-center" />
           <Theme />
         </Providers>
       </body>

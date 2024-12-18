@@ -8,13 +8,12 @@ import { getDateStringFromNow } from '../entry/types-constants';
 import { initDateStr } from '../entry/ui-slice';
 import Navbar from '../components/layout/Navbar';
 import { ToastContainer } from 'react-toastify';
-import UserHeader from '@/components/layout/header/HeaderUser';
 import GithubLoadDialog from '@/components/app/GithubLoadDialog';
 import { useInitGlobalState } from '@/hooks/app';
+import { Header } from 'antd/es/layout/layout';
 
 function App() {
   const location = useLocation();
-  const loginUser = useAppSelector(selectLoginUser);
   const dispatch = useAppDispatch();
   const appDivRef = useRef<HTMLDivElement>(null);
   useInitGlobalState();
@@ -44,7 +43,7 @@ function App() {
       </Helmet>
       <div ref={appDivRef} className={clsx('flex flex-col overflow-hidden')}>
         <ToastContainer autoClose={3000} position="top-center" />
-        {location.pathname !== '/settings' && <UserHeader loginUser={loginUser} />}
+        {location.pathname !== '/settings' && <Header />}
         <main className="min relative flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">
           <Outlet />
         </main>

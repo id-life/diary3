@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createElement, FC, SVGProps, useMemo } from 'react';
 import DiaryIcons from '../icon/DiaryIcons';
+import { useInitGlobalState } from '@/hooks/app';
 
 export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>> }[] = [
   { key: 'entry', icon: DiaryIcons.HomeSvg },
@@ -29,6 +30,9 @@ function Navbar() {
     const path = pathname.slice(1);
     return PAGES.find((page) => page.key === path)?.key || '';
   }, [pathname]);
+
+  useInitGlobalState();
+
   return (
     <nav className="flex w-full items-center rounded-xl bg-white/90 px-8 shadow-xl backdrop-blur">
       {PAGES.map((page) => {

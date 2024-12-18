@@ -1,23 +1,25 @@
+'use client';
+
 import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
+import { formatDateTime } from '@/utils/date';
 import clsx from 'clsx';
-import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { useBeforeunload } from 'react-beforeunload';
 import { MdExpandMore } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-import { twMerge } from 'tailwind-merge';
-import packageJson from '../../../../package.json';
-import { LoginUserState, onCloseUpdateLastUseTime, onLogoutClickClearState } from '../../../entry/login-user-slice';
-import { useAppDispatch, useAppSelector } from '../../../entry/store';
-import Button from '../../button';
-import Collapse from '../../collapse';
-import { saveStateToGithub } from '../../../lib/GithubStorage';
-import { formatDateTime } from '@/utils/date';
+import packageJson from '../../../package.json';
+import { onCloseUpdateLastUseTime, onLogoutClickClearState } from '../../entry/login-user-slice';
+import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '../../entry/store';
+import { saveStateToGithub } from '../../lib/GithubStorage';
+import Button from '../button';
+import Collapse from '../collapse';
 
-function UserHeader(props: { loginUser: LoginUserState; className?: string }) {
-  const dispatch = useAppDispatch();
-  const { loginUser, className } = props;
+function UserHeader() {
+  const loginUser = useAppSelector(selectLoginUser);
+
+  const dispatch: AppDispatch = useAppDispatch();
   const globalState = useAtomValue(globalStateAtom);
 
   useBeforeunload(() => {
@@ -31,6 +33,7 @@ function UserHeader(props: { loginUser: LoginUserState; className?: string }) {
   const save = useCallback(() => saveStateToGithub(state.loginUser), [state.loginUser]);
   const setLoadOpen = useSetAtom(loadDialogOpenAtom);
   const logged = useMemo(() => !!loginUser?.uid, [loginUser]);
+
   return (
     <Collapse
       initOpen={logged}
@@ -69,12 +72,7 @@ function UserHeader(props: { loginUser: LoginUserState; className?: string }) {
       )}
     >
       {logged && (
-        <div
-          className={twMerge(
-            'flex flex-wrap items-center justify-center gap-2 rounded-b-2xl bg-white px-4 pb-4 transition',
-            className,
-          )}
-        >
+        <div className="flex flex-wrap items-center justify-center gap-2 rounded-b-2xl bg-white px-4 pb-4 transition">
           <div className="flex items-center gap-2 text-sm">
             <h1>Diary</h1>
             <p className="text-base font-bold">v{packageJson.version}</p>
@@ -92,12 +90,17 @@ function UserHeader(props: { loginUser: LoginUserState; className?: string }) {
               </Button>
             </div>
           </div>
-          {/* <ImportHistoryButton />
-            <EmptyHistoryButton /> */}
         </div>
       )}
     </Collapse>
   );
 }
 
-export default UserHeader;
+function Header() {
+  const pathname = usePathname();
+  const isSettings = pathname === '/settings';
+
+  return isSettings ? null : <UserHeader />;
+}
+
+export default Header;
