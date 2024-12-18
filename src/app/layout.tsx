@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   keywords: ['Diary', 'Time'],
   manifest: '/manifest.json',
   icons: {
-    apple: '/favicon.png',
-    icon: '/favicon.png',
+    apple: '/favicon.ico',
+    icon: '/favicon.ico',
   },
   viewport: {
     width: 'device-width',
