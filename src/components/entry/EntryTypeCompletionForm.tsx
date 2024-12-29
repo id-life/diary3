@@ -1,11 +1,11 @@
 import { InputNumber } from 'antd';
 import dayjs from 'dayjs';
 import { Controller, useForm } from 'react-hook-form';
-import { createEntryInstance } from '../../app/entry-instances-slice';
-import { useAppDispatch } from '../../app/store';
-import { EntryType, getEntryInstanceIdFromEntryType } from '../../app/types-constants';
+import { createEntryInstance } from '../../entry/entry-instances-slice';
+import { useAppDispatch } from '../../entry/store';
+import { EntryType, getEntryInstanceIdFromEntryType } from '../../entry/types-constants';
 import Button from '../button';
-import { CheckIcon } from '../icon/DiaryIcons';
+import DiaryIcons from '../icon/DiaryIcons';
 
 function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?: string }) {
   const { selectedDayStr } = props;
@@ -64,7 +64,7 @@ function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?:
         {errors?.points && <span className="text-red-500">{errors.points.message}</span>}
       </label>
       <Button htmlType="submit" type="unstyle" className="absolute left-4 top-4 flex w-10 items-center justify-center">
-        <CheckIcon className="text-xl" />
+        <DiaryIcons.CheckSvg className="text-xl" />
       </Button>
     </form>
   );

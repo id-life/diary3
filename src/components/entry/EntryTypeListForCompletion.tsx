@@ -1,10 +1,10 @@
-import { selectEntryInstancesMap, selectEntryTypesArray, useAppSelector } from '@/app/store';
+import { selectEntryInstancesMap, selectEntryTypesArray, useAppSelector } from '@/entry/store';
 import { useInput } from '@/hooks/useInput';
 import { sortEntryTypesArray } from '@/utils/entry';
 import { useMemo, useState } from 'react';
 import EntryTypeCard from './EntryTypeCard';
 import Segmented from '../segmented';
-import { RoutineEnum } from '@/app/types-constants';
+import { RoutineEnum } from '@/entry/types-constants';
 
 const options = [
   {

@@ -1,4 +1,4 @@
-import { EntryInstance } from '@/app/types-constants';
+import { EntryInstance } from '@/entry/types-constants';
 import EntryInstanceForm from './EntryInstanceForm';
 
 const EntryInstanceList = ({ entryInstancesArray }: { entryInstancesArray: EntryInstance[] }) => {

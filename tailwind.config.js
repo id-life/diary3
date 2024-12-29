@@ -3,23 +3,30 @@ const { fontFamily } = require('tailwindcss/defaultTheme');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
-  content: [
-    './src/app/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}',
-    './src/pages/**/*.{ts,tsx}',
-    './src/hook/**/*.{ts,tsx}',
-  ],
+  content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}', './src/hook/**/*.{ts,tsx}'],
   theme: {
     extend: {
       container: {
         center: true,
       },
       screens: {
-        xs: { max: '480px' },
-        sm: { max: '640px' },
-        md: { max: '768px' },
-        lg: { min: '769px', max: '1024px' },
-        xl: { min: '1025px', max: '1365px' },
+        xs: {
+          max: '480px',
+        },
+        sm: {
+          max: '640px',
+        },
+        md: {
+          max: '768px',
+        },
+        lg: {
+          min: '769px',
+          max: '1024px',
+        },
+        xl: {
+          min: '1025px',
+          max: '1365px',
+        },
         '2xl': '1366px',
         '4xl': '1920px',
       },
@@ -32,6 +39,7 @@ module.exports = {
         },
         blue: '#376BED',
         'gradient-home-from': 'var(--gradient-home-from)',
+
         // shadcn
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -66,6 +74,13 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
+        },
       },
       backgroundImage: {
         gradient: 'var(--gradient)',
@@ -79,20 +94,27 @@ module.exports = {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         DDin: ['D-DIN'],
       },
-
       borderRadius: {
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
         'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
         },
         'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
         },
       },
       animation: {

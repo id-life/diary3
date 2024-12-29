@@ -1,11 +1,13 @@
-import { onLogoutClickClearState } from '@/app/login-user-slice';
-import { selectLoginUser, useAppDispatch, useAppSelector } from '@/app/store';
+'use client';
+
+import { onLogoutClickClearState } from '@/entry/login-user-slice';
+import { selectLoginUser, useAppDispatch, useAppSelector } from '@/entry/store';
 import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import Button from '../button';
-import { saveStateToGithub } from '../layout/header/GithubStorage';
+import { saveStateToGithub } from '@/lib/GithubStorage';
 
 function GlobalStats({ className }: { className?: string }) {
   const loginUser = useAppSelector(selectLoginUser);

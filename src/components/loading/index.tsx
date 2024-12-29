@@ -18,7 +18,7 @@ export type LoadingProps = {
   iconStyle?: React.CSSProperties;
 };
 
-const Loading = ({ show, renderIcon, className, style, iconClassName, iconStyle }: LoadingProps) => {
+const Loading: React.FC<LoadingProps> = ({ show, renderIcon, className, style, iconClassName, iconStyle }) => {
   const _renderIcon = (): ReactNode => {
     if (renderIcon) return renderIcon();
     return <AiOutlineLoading className={twMerge('h-5 w-5 animate-spin', iconClassName)} style={iconStyle} />;

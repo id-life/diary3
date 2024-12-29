@@ -1,4 +1,4 @@
-import { selectReminderRecordArray, useAppSelector } from '@/app/store';
+import { selectReminderRecordArray, useAppSelector } from '@/entry/store';
 import ReminderRecordCard from './ReminderRecordCard';
 
 export default function ReminderRecords() {

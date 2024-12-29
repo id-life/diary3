@@ -3,7 +3,7 @@ const prettierOptions = require(path.resolve(__dirname, '.prettierrc.js'));
 
 /* eslint-env node */
 module.exports = {
-  extends: ['react-app', 'alloy', 'alloy/react', 'alloy/typescript'],
+  extends: ['react-app', 'alloy', 'alloy/react', 'alloy/typescript', 'next/core-web-vitals', 'next/typescript'],
   plugins: ['react-hooks', 'prettier', 'alloy'],
   root: true,
   ignorePatterns: ['*.test.tsx', 'node_modules/'],
@@ -25,6 +25,10 @@ module.exports = {
     ],
     'prefer-promise-reject-errors': 'off',
     'prettier/prettier': ['error', prettierOptions],
+    '@next/next/no-img-element': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
   },
   globals: {
     JSX: false,

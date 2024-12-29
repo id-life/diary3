@@ -1,12 +1,10 @@
-import { selectEntryInstancesMap, useAppSelector } from '@/app/store';
-import clsx from 'clsx';
-import dayjs from 'dayjs';
-import _ from 'lodash-es';
-import { Fragment, useCallback, useLayoutEffect, useMemo, useRef } from 'react';
-import { EntryType, RoutineEnum, StreakStatus, getDatePeriods } from '../../app/types-constants';
-import { calcEntryTypeLongestStreaks } from '@/utils/entry';
-import EntryTypeCard from './EntryTypeCard';
+import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
 import { useEntryStreakGetters } from '@/hooks/entryType';
+import { calcEntryTypeLongestStreaks } from '@/utils/entry';
+import clsx from 'clsx';
+import { Fragment, useLayoutEffect, useMemo, useRef } from 'react';
+import { EntryType, RoutineEnum, StreakStatus, getDatePeriods } from '../../entry/types-constants';
+import EntryTypeCard from './EntryTypeCard';
 
 const statusColor: { [key in StreakStatus]: string } = {
   [StreakStatus.UNCREATED]: 'bg-white/80',

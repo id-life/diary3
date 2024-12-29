@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { deleteEntryInstance, updateEntryInstance } from '../../app/entry-instances-slice';
-import { useAppDispatch } from '../../app/store';
-import { EntryInstance } from '../../app/types-constants';
+import { deleteEntryInstance, updateEntryInstance } from '../../entry/entry-instances-slice';
+import { useAppDispatch } from '../../entry/store';
+import { EntryInstance } from '../../entry/types-constants';
 import Button from '../button';
 import dayjs from 'dayjs';
 import { InputNumber } from 'antd';

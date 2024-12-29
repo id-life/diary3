@@ -1,14 +1,14 @@
-import { updateChangeEntryIdEntryInstance } from '@/app/entry-instances-slice';
+import { updateChangeEntryIdEntryInstance } from '@/entry/entry-instances-slice';
 import { Form, Input, InputNumber, Radio } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { createEntryType, updateEntryType, updateEntryTypeId } from '../../app/entry-types-slice';
-import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '../../app/store';
-import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../app/types-constants';
-import { exitEntryTypeEdit } from '../../app/ui-slice';
+import { createEntryType, updateEntryType, updateEntryTypeId } from '../../entry/entry-types-slice';
+import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '../../entry/store';
+import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../entry/types-constants';
+import { exitEntryTypeEdit } from '../../entry/ui-slice';
 import Button from '../button';
-import { EditNavIcon, EntryNavIcon } from '../icon/DiaryIcons';
+import DiaryIcons from '../icon/DiaryIcons';
 
 const addInitialValues = {
   routine: RoutineEnum.adhoc,
@@ -146,7 +146,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
         </Form.Item>
 
         <Form.Item name="title" label="Title" rules={[{ required: true, message: 'title is required' }]}>
-          <Input placeholder="Title" prefix={<EntryNavIcon />} />
+          <Input placeholder="Title" prefix={<DiaryIcons.EditSvg />} />
         </Form.Item>
 
         <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
         </Form.Item>
         <div className="mt-4 flex items-center justify-center gap-4">
           <Button type="primary" className="rounded-full font-bold" size="large" htmlType="submit">
-            <EditNavIcon /> {props.isUpdate ? 'Update' : 'Create'}
+            <DiaryIcons.EditSvg /> {props.isUpdate ? 'Update' : 'Create'}
           </Button>
           {props.isUpdate && (
             <Button size="large" className="rounded-full font-bold" onClick={onCancelUpdateClick}>

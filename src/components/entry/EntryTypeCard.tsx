@@ -1,16 +1,18 @@
-import { deleteEntryInstanceByEntryTypeId } from '@/app/entry-instances-slice';
+'use client';
+import { deleteEntryInstanceByEntryTypeId } from '@/entry/entry-instances-slice';
 import { formatDate } from '@/utils/date';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { PiStepsDuotone } from 'react-icons/pi';
 import { twMerge } from 'tailwind-merge';
-import { deleteEntryType } from '../../app/entry-types-slice';
-import { useAppDispatch } from '../../app/store';
-import { EntryType } from '../../app/types-constants';
-import { enterEntryTypeEdit } from '../../app/ui-slice';
+import { deleteEntryType } from '../../entry/entry-types-slice';
+import { useAppDispatch } from '../../entry/store';
+import { EntryType } from '../../entry/types-constants';
+import { enterEntryTypeEdit } from '../../entry/ui-slice';
 import Button from '../button';
-import { CheckIcon } from '../icon/DiaryIcons';
 import Tooltip from '../tooltip';
 import EntryTypeCompletionForm from './EntryTypeCompletionForm';
+import DiaryIcons from '../icon/DiaryIcons';
+
 const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
   const dispatch = useAppDispatch();
 
@@ -87,7 +89,7 @@ const EntryTypeCard = (props: EntryTypeCardProps) => {
       style={{ background: `linear-gradient(90deg, #${themeColors[0]} 0%, #${themeColors[1]} 100%)` }}
     >
       <div className="flex w-10 items-center justify-center">
-        <CheckIcon className="text-xl opacity-0" />
+        <DiaryIcons.CheckSvg className="text-xl opacity-0" />
       </div>
       <div className="flex flex-grow flex-col gap-2">
         <div className="flex items-center gap-1.5 text-xl font-medium">

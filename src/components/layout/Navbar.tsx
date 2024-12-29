@@ -1,31 +1,51 @@
-import { Link, useLocation, useMatches } from 'react-router-dom';
-import { PAGES } from '../../app/types-constants';
-import DiaryIcons from '../icon/DiaryIcons';
+'use client';
+
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { createElement, FC, SVGProps, useMemo } from 'react';
+import DiaryIcons from '../icon/DiaryIcons';
+import { useInitGlobalState } from '@/hooks/app';
+
+export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>> }[] = [
+  { key: 'entry', icon: DiaryIcons.HomeSvg },
+  {
+    key: 'add',
+    icon: DiaryIcons.AddSvg,
+  },
+  {
+    key: 'reminder',
+    icon: DiaryIcons.ReminderSvg,
+  },
+  {
+    key: 'settings',
+    icon: DiaryIcons.SettingsSvg,
+  },
+];
 
 function Navbar() {
-  const location = useLocation();
+  const pathname = usePathname();
   const activeKey = useMemo(() => {
-    const path = location.pathname.slice(1);
-    return PAGES.includes(path) ? path : '';
-  }, [location]);
+    if (!pathname) return '';
+    const path = pathname.slice(1);
+    return PAGES.find((page) => page.key === path)?.key || '';
+  }, [pathname]);
+
+  useInitGlobalState();
+
   return (
     <nav className="flex w-full items-center rounded-xl bg-white/90 px-8 shadow-xl backdrop-blur">
       {PAGES.map((page) => {
-        const iconKey = `${page[0].toUpperCase()}${page.slice(1)}NavIcon` as keyof typeof DiaryIcons;
-        const IconComponent = DiaryIcons[iconKey] || null;
-
         return (
           <Link
-            key={page.toLowerCase()}
+            key={page.key.toUpperCase()}
             className={clsx(
               'flex flex-grow items-center justify-center rounded-t-lg py-4',
-              activeKey === page ? 'text-blue' : 'text-[#9FC2D7]',
+              activeKey === page.key ? 'text-blue' : 'text-[#9FC2D7]',
             )}
-            to={`/${page.toLowerCase()}`}
+            href={`/${page.key.toLowerCase()}`}
           >
-            <IconComponent className="text-2xl" />
+            {createElement(page?.icon, { className: 'text-2xl' })}
           </Link>
         );
       })}
