@@ -1,10 +1,11 @@
-import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider, useFormContext } from 'react-hook-form';
 
 import { cn } from '@/utils';
 import { Label } from '@/components/ui/label';
+import { createContext, forwardRef, useContext, useId, useMemo } from 'react';
+import React from 'react';
 
 const Form = FormProvider;
 
@@ -16,7 +17,7 @@ type FormFieldContextValue<
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
+const FormFieldContext = createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
@@ -25,7 +26,7 @@ const FormField = <
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
   // Memoize the context value
-  const contextValue = React.useMemo(() => {
+  const contextValue = useMemo(() => {
     return { name: props.name };
   }, [props.name]); // Only recompute if props.name changes
 
@@ -37,8 +38,8 @@ const FormField = <
 };
 
 const useFormField = () => {
-  const fieldContext = React.useContext(FormFieldContext);
-  const itemContext = React.useContext(FormItemContext);
+  const fieldContext = useContext(FormFieldContext);
+  const itemContext = useContext(FormItemContext);
   const { getFieldState, formState } = useFormContext();
 
   const fieldState = getFieldState(fieldContext.name, formState);
@@ -64,11 +65,11 @@ type FormItemContextValue = {
 };
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
+const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue);
 
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => {
-  const id = React.useId();
-  const value = React.useMemo(() => ({ id }), [id]);
+const FormItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => {
+  const id = useId();
+  const value = useMemo(() => ({ id }), [id]);
   return (
     <FormItemContext.Provider value={value}>
       <div ref={ref} className={cn('space-y-2', className)} {...props} />
