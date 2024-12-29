@@ -114,4 +114,5 @@ Button.defaultProps = {
   loading: false,
   disabled: false,
 };
+Button.displayName = 'Button';
 export default Button;

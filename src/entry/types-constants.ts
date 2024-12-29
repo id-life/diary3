@@ -63,7 +63,7 @@ export const EntryTypeConstructor = ({
 
 export type Year = number;
 export type Month = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-// eslint-disable-next-line prettier/prettier
+
 export type Day =
   | 1
   | 2

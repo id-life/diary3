@@ -6,10 +6,6 @@
   ],
   "settings": {
     "prettier.configPath": ".prettierrc.js",
-    "eslint.validate": ["typescript", "typescriptreact"],
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    },
     "cSpell.words": [
       "beforeunload",
       "craco",

@@ -16,7 +16,6 @@ type FormFieldContextValue<
   name: TName;
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const FormFieldContext = createContext<FormFieldContextValue>({} as FormFieldContextValue);
 
 const FormField = <
@@ -25,7 +24,6 @@ const FormField = <
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => {
-  // Memoize the context value
   const contextValue = useMemo(() => {
     return { name: props.name };
   }, [props.name]); // Only recompute if props.name changes
@@ -64,7 +62,6 @@ type FormItemContextValue = {
   id: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue);
 
 const FormItem = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => {

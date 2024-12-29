@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 'use client';
 
 import { ProviderComposer } from '@/components/common/ProviderComposer';
@@ -9,7 +10,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
-
 const contexts = [
   <ReduxProvider key="reduxProvider" store={store} children={undefined} />,
   <JotaiStoreProvider key="jotaiStoreProvider" />,

@@ -47,7 +47,7 @@ rl.on('line', (line: string) => {
     points: -1,
     notes: '',
   };
-  // eslint-disable-next-line @typescript-eslint/prefer-for-of
+
   for (let i = 0; i < headers.length; i++) {
     const dateComponents = row[0].split('/');
     const createDate = new Date(2000 + Number(dateComponents[2]), Number(dateComponents[1]) - 1, Number(dateComponents[0]));
