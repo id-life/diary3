@@ -9,9 +9,15 @@ import { cn } from '@/utils';
 import { clsx } from 'clsx';
 import type { Metadata } from 'next';
 import { ToastContainer } from 'react-toastify';
+import type { Viewport } from 'next';
+import DialogComponents from '@/components/dialog/DialogComponents';
 
 import '@/styles/globals.css';
-import DialogComponents from '@/components/dialog/DialogComponents';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: 'Diary',
@@ -21,10 +27,6 @@ export const metadata: Metadata = {
   icons: {
     apple: '/favicon.ico',
     icon: '/favicon.ico',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
   },
   openGraph: {
     title: 'Diary',
