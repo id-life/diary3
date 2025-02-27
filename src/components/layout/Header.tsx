@@ -2,13 +2,14 @@
 
 import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
 import { formatDateTime } from '@/utils/date';
+import { safeNumberValue } from '@/utils';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
 import { useBeforeunload } from 'react-beforeunload';
 import { MdExpandMore } from 'react-icons/md';
-import { Link } from 'react-router-dom';
 import packageJson from '../../../package.json';
 import { onCloseUpdateLastUseTime, onLogoutClickClearState } from '../../entry/login-user-slice';
 import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '../../entry/store';
@@ -29,8 +30,8 @@ function UserHeader() {
   const onLogoutClick = () => {
     dispatch(onLogoutClickClearState());
   };
-  const state = useAppSelector((state) => state);
-  const save = useCallback(() => saveStateToGithub(state.loginUser), [state.loginUser]);
+  const loginUserState = useAppSelector((state) => state.loginUser);
+  const save = useCallback(() => saveStateToGithub(loginUserState), [loginUserState]);
   const setLoadOpen = useSetAtom(loadDialogOpenAtom);
   const logged = useMemo(() => !!loginUser?.uid, [loginUser]);
 
@@ -50,20 +51,20 @@ function UserHeader() {
               <div className="flex flex-col gap-2 text-sm">
                 <p className="text-base">
                   <span className="font-semibold">{loginUser.uid}</span>
-                  {' ‘s Diary'}
+                  {" 's Diary"}
                 </p>
                 <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p>
               </div>
               <div className="flex items-center gap-1">
                 <div className="text-right text-xs">STREAK DAYS</div>
-                <div className="font-DDin text-2xl/8 font-bold">{globalState?.currentStreakByEntry ?? 0}</div>
+                <div className="font-DDin text-2xl/8 font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</div>
                 <MdExpandMore className={clsx('z-[1] h-9 w-9 cursor-pointer text-black', isOpen ? 'rotate-180' : 'rotate-0')} />
               </div>
             </>
           ) : (
             <div className="w-full text-center text-xl">
               Not logged in, Let&apos;s{' '}
-              <Link className="text-blue" to="/settings">
+              <Link className="text-blue" href="/settings">
                 Get Started
               </Link>
             </div>

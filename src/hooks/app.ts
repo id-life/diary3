@@ -15,6 +15,10 @@ export const useInitGlobalState = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    if (!loginUser || loginUser.loginTime === null) {
+      return;
+    }
+
     const now = dayjs();
     const registeredSince = now.diff(dayjs(loginUser.loginTime), 'day');
     const entryKeys = Object.keys(entryInstancesMap);
@@ -32,5 +36,5 @@ export const useInitGlobalState = () => {
     const dateStrNow = getDateStringFromNow();
     dispatch(initDateStr({ dateStr: dateStrNow }));
     dispatch(initDayEntryInstances({ dateStr: dateStrNow }));
-  }, [entryInstancesMap, loginUser.loginTime, setGlobalState]);
+  }, [entryInstancesMap, loginUser, setGlobalState, dispatch]);
 };

@@ -3,6 +3,7 @@
 import { onLogoutClickClearState } from '@/entry/login-user-slice';
 import { selectLoginUser, useAppDispatch, useAppSelector } from '@/entry/store';
 import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
+import { safeNumberValue } from '@/utils';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
@@ -31,22 +32,25 @@ function GlobalStats({ className }: { className?: string }) {
       </div>
       <div className="flex flex-col gap-4 text-lg">
         <p>
-          You have signed up for Diary for <span className="font-DDin text-2xl font-bold">{globalState?.registeredSince}</span>{' '}
-          days.
+          You have signed up for Diary for{' '}
+          <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.registeredSince)}</span> days.
         </p>
         <p>
-          You recorded entries in Diary for <span className="font-DDin text-2xl font-bold">{globalState?.entryDays}</span> days.
+          You recorded entries in Diary for{' '}
+          <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.entryDays)}</span> days.
         </p>
         <p>
-          You recorded in total <span className="font-DDin text-2xl font-bold">{globalState?.totalEntries}</span> entries.
+          You recorded in total{' '}
+          <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.totalEntries)}</span> entries.
         </p>
         <p>
           In your historical longest streak, you recorded entries for{' '}
-          <span className="font-DDin text-2xl font-bold">{globalState?.historicalLongestStreakByEntry}</span> days.
+          <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.historicalLongestStreakByEntry)}</span>{' '}
+          days.
         </p>
         <p>
           In your current streak, you recorded entries for{' '}
-          <span className="font-DDin text-2xl font-bold">{globalState?.currentStreakByEntry}</span> days.
+          <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</span> days.
         </p>
       </div>
       <div className="mt-auto flex flex-col gap-2">

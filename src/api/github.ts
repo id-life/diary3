@@ -8,12 +8,16 @@ export const useFetchCommits = () => {
   return useQuery(
     ['fetch_commits', loginUser],
     async () => {
+      if (!loginUser?.uid || !loginUser?.repo || !loginUser?.githubSecret) {
+        return [];
+      }
+
       const octokit = new Octokit({
         auth: loginUser.githubSecret,
         userAgent: 'diary-app',
       });
-      const owner = loginUser.uid!;
-      const repo = loginUser.repo!;
+      const owner = loginUser.uid;
+      const repo = loginUser.repo;
       const commits = await octokit.rest.repos.listCommits({
         owner,
         repo,
@@ -21,7 +25,7 @@ export const useFetchCommits = () => {
       return commits.data.filter(({ commit }) => commit?.message?.startsWith(`dairy-save-`)).map((item) => item.commit);
     },
     {
-      enabled: !!loginUser,
+      enabled: !!(loginUser?.uid && loginUser?.repo && loginUser?.githubSecret),
     },
   );
 };
