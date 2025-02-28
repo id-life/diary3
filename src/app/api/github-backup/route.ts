@@ -20,6 +20,18 @@ export async function POST(request: Request) {
       return new NextResponse('缺少必要参数', { status: 400 });
     }
 
+    // 检查是否已经存在相同的备份
+    const existingBackup = await prisma.githubBackup.findFirst({
+      where: {
+        userId,
+        fileName,
+      },
+    });
+
+    if (existingBackup) {
+      return new NextResponse('备份已存在', { status: 409 });
+    }
+
     // 保存到数据库
     const backup = await prisma.githubBackup.create({
       data: {

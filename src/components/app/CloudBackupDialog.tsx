@@ -80,12 +80,15 @@ const CloudBackupDialog: FunctionComponent = () => {
           ) : (
             <div className="flex max-h-[500px] flex-col gap-3 overflow-auto">
               {backups.map((backup) => (
-                <div key={backup.id} className="flex items-center justify-between rounded-lg bg-zinc-800 p-4">
+                <div key={backup.id} className="flex items-center justify-between gap-2 rounded-lg bg-zinc-700 p-4 shadow-md">
                   <div className="flex flex-col">
-                    <span className="text-sm text-zinc-300">{backup.fileName}</span>
-                    <span className="text-xs text-zinc-500">{new Date(backup.createdAt).toLocaleString()}</span>
+                    <span className="text-sm font-medium text-zinc-200">{backup.fileName}</span>
+                    <span className="text-xs text-zinc-400">{new Date(backup.createdAt).toLocaleString()}</span>
                   </div>
-                  <Button onClick={() => restoreBackup(backup)} className="bg-blue-600 hover:bg-blue-700">
+                  <Button
+                    onClick={() => restoreBackup(backup)}
+                    className="rounded-full border border-gray-300 bg-white px-4 py-2 font-semibold text-black shadow-sm transition-all duration-300 hover:bg-gray-100"
+                  >
                     恢复此备份
                   </Button>
                 </div>
@@ -95,9 +98,15 @@ const CloudBackupDialog: FunctionComponent = () => {
         </div>
       )}
       renderFooter={({ close }) => (
-        <div className="flex justify-end gap-2">
-          <Button onClick={close}>关闭</Button>
-          <Button onClick={fetchBackups} type="primary">
+        <div className="mt-4 flex justify-end gap-2">
+          <Button onClick={close} className="rounded bg-gray-500 px-3 py-1 font-semibold text-white hover:bg-gray-600">
+            关闭
+          </Button>
+          <Button
+            onClick={fetchBackups}
+            type="primary"
+            className="rounded bg-green-500 px-3 py-1 font-semibold text-white hover:bg-green-600"
+          >
             刷新列表
           </Button>
         </div>

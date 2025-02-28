@@ -25,8 +25,9 @@ export default function SettingsPage() {
       </SignedOut>
       <SignedIn>
         <UserButton />
-
         <Button
+          size="large"
+          className="h-12 rounded-full border-none hover:opacity-90"
           onClick={() => {
             setCloudBackupOpen(true);
           }}

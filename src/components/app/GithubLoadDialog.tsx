@@ -59,7 +59,7 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
 
           // 保存到数据库
           try {
-            await fetch('/api/github-backup', {
+            const response = await fetch('/api/github-backup', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -69,6 +69,9 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
                 fileName: path,
               }),
             });
+            if (response.status === 409) {
+              console.log('Backup already exists');
+            }
           } catch (error) {
             console.error('Failed to save to database:', error);
           }
