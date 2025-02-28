@@ -33,6 +33,7 @@ export const loginUserSlice = createSlice({
       state.lastUseTime = now.valueOf();
     },
     onLogoutClickClearState: (state) => {
+      // logout clerk
       state.uid = null;
     },
   },

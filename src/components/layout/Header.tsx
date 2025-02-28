@@ -16,12 +16,14 @@ import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '..
 import { saveStateToGithub } from '../../lib/GithubStorage';
 import Button from '../button';
 import Collapse from '../collapse';
+import { useClerk, useUser } from '@clerk/nextjs';
 
 function UserHeader() {
   const loginUser = useAppSelector(selectLoginUser);
 
   const dispatch: AppDispatch = useAppDispatch();
   const globalState = useAtomValue(globalStateAtom);
+  const { signOut } = useClerk();
 
   useBeforeunload(() => {
     dispatch(onCloseUpdateLastUseTime());
@@ -29,11 +31,13 @@ function UserHeader() {
 
   const onLogoutClick = () => {
     dispatch(onLogoutClickClearState());
+    signOut();
   };
   const loginUserState = useAppSelector((state) => state.loginUser);
   const save = useCallback(() => saveStateToGithub(loginUserState), [loginUserState]);
   const setLoadOpen = useSetAtom(loadDialogOpenAtom);
-  const logged = useMemo(() => !!loginUser?.uid, [loginUser]);
+  const { user } = useUser();
+  const logged = useMemo(() => !!loginUser?.uid || !!user, [loginUser, user]);
 
   return (
     <Collapse
@@ -50,7 +54,7 @@ function UserHeader() {
             <>
               <div className="flex flex-col gap-2 text-sm">
                 <p className="text-base">
-                  <span className="font-semibold">{loginUser.uid}</span>
+                  <span className="font-semibold">{loginUser?.uid || user?.username}</span>
                   {" 's Diary"}
                 </p>
                 <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p>

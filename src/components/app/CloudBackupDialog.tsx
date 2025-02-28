@@ -78,7 +78,7 @@ const CloudBackupDialog: FunctionComponent = () => {
           ) : backups.length === 0 ? (
             <div className="py-4 text-center">暂无备份数据</div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex max-h-[500px] flex-col gap-3 overflow-auto">
               {backups.map((backup) => (
                 <div key={backup.id} className="flex items-center justify-between rounded-lg bg-zinc-800 p-4">
                   <div className="flex flex-col">
