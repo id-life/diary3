@@ -1,6 +1,6 @@
 import { useFetchCommits } from '@/api/github';
 import { persistor, selectLoginUser, useAppSelector } from '@/entry/store';
-import { loadDialogOpenAtom } from '@/store/app';
+import { loadDialogOpenAtom, cloudBackupDialogOpenAtom } from '@/store/app';
 import { Octokit } from '@octokit/rest';
 import { useAtom } from 'jotai';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
@@ -10,11 +10,13 @@ import Dialog from '../dialog';
 import { isIncompleteGithubInfo } from '../../lib/GithubStorage';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import CloudBackupDialog from './CloudBackupDialog';
 
 export type GithubLoadDialogProps = {};
 
 const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
   const [isOpen, setOpen] = useAtom(loadDialogOpenAtom);
+  const [isCloudBackupOpen, setCloudBackupOpen] = useAtom(cloudBackupDialogOpenAtom);
   const loginUser = useAppSelector(selectLoginUser);
   const { data, isLoading } = useFetchCommits();
   const [path, setPath] = useState<string | null>(null);
@@ -54,14 +56,37 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
         if (downloadUrl) {
           const fileResponse = await fetch(downloadUrl);
           const stateToLoad = await fileResponse.json();
+
+          // 保存到数据库
+          try {
+            await fetch('/api/github-backup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                content: stateToLoad,
+                fileName: path,
+              }),
+            });
+          } catch (error) {
+            console.error('Failed to save to database:', error);
+          }
+
           localStorage.setItem('persist:diary', JSON.stringify(stateToLoad));
         } else {
           toast.update(loadMsg, { render: 'Download URL is not available', type: 'error', isLoading: false, autoClose: 2000 });
           return;
         }
-        toast.update(loadMsg, { render: 'Loaded Successfully', type: 'success', isLoading: false, autoClose: 2000 });
+        toast.update(loadMsg, {
+          render: 'Loaded Successfully, Refreshing...',
+          type: 'success',
+          isLoading: false,
+        });
         setOpen(false);
-        window?.location?.reload();
+        setTimeout(() => {
+          window?.location?.reload();
+        }, 1000);
       } catch (e: any) {
         toast.update(loadMsg, { render: e?.message ?? 'Loaded Error', type: 'error', isLoading: false, autoClose: 2000 });
       }
@@ -103,14 +128,29 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
         </div>
       )}
       renderFooter={({ close }) => (
-        <div className="flex items-center justify-center gap-4">
-          <Button onClick={close}>Cancel</Button>
-          <Button onClick={() => loaded(path)} type="primary">
-            Confirm
+        <div className="flex items-center justify-between gap-4">
+          <Button onClick={() => setOpen(false)} type="default">
+            取消
           </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => {
+                setOpen(false);
+                setCloudBackupOpen(true);
+              }}
+              type="default"
+            >
+              查看云端备份
+            </Button>
+            <Button onClick={() => loaded(path)} type="primary">
+              确认
+            </Button>
+          </div>
         </div>
       )}
-    />
+    >
+      <CloudBackupDialog />
+    </Dialog>
   );
 };
 

@@ -13,6 +13,7 @@ import type { Viewport } from 'next';
 import DialogComponents from '@/components/dialog/DialogComponents';
 
 import '@/styles/globals.css';
+import { ClerkProvider } from '@clerk/nextjs';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -37,23 +38,25 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={clsx(poppins.variable, ddin.variable)} suppressHydrationWarning>
-        <Providers>
-          <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
-            <ErrorBoundary>
-              <ClientOnly>
-                <Header />
-              </ClientOnly>
-              <main className="min relative flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
-            </ErrorBoundary>
-            <Navbar />
-            <DialogComponents />
-          </div>
-          <ToastContainer autoClose={3000} position="top-center" />
-          <Theme />
-        </Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={clsx(poppins.variable, ddin.variable)} suppressHydrationWarning>
+          <Providers>
+            <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
+              <ErrorBoundary>
+                <ClientOnly>
+                  <Header />
+                </ClientOnly>
+                <main className="min relative flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
+              </ErrorBoundary>
+              <Navbar />
+              <DialogComponents />
+            </div>
+            <ToastContainer autoClose={3000} position="top-center" />
+            <Theme />
+          </Providers>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
