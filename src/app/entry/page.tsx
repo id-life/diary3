@@ -6,7 +6,7 @@ import EntryProgressBar from '@/components/entry/EntryProgressBar';
 import EntryTypeListForCompletion from '@/components/entry/EntryTypeListForCompletion';
 import HeaderDatetime from '@/components/entry/HeaderDatetime';
 import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
-import { selectedChartDateAtom } from '@/store/app';
+import { selectedChartDateAtom } from '@/atoms/app';
 import { formatDate } from '@/utils/date';
 import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';

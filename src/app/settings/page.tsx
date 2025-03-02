@@ -5,7 +5,7 @@ import { ClientOnly } from '@/components/common/ClientOnly';
 import GlobalStats from '@/components/my/GlobalStats';
 import LoginForm from '@/components/my/LoginForm';
 import { selectLoginUser, useAppSelector } from '@/entry/store';
-import { cloudBackupDialogOpenAtom } from '@/store/app';
+import { cloudBackupDialogOpenAtom } from '@/atoms/app';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import clsx from 'clsx';
 import { useSetAtom } from 'jotai';

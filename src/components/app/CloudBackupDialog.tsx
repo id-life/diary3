@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { FunctionComponent, useEffect, useState } from 'react';
 import Dialog from '../dialog';
-import { cloudBackupDialogOpenAtom } from '@/store/app';
+import { cloudBackupDialogOpenAtom } from '@/atoms/app';
 import Button from '../button';
 import { toast } from 'react-toastify';
 import { persistor } from '@/entry/store';

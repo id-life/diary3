@@ -1,6 +1,6 @@
 import { useFetchCommits } from '@/api/github';
 import { persistor, selectLoginUser, useAppSelector } from '@/entry/store';
-import { loadDialogOpenAtom, cloudBackupDialogOpenAtom } from '@/store/app';
+import { loadDialogOpenAtom, cloudBackupDialogOpenAtom } from '@/atoms/app';
 import { Octokit } from '@octokit/rest';
 import { useAtom } from 'jotai';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';

@@ -1,5 +1,5 @@
 import { selectEntryTypesArray, useAppSelector } from '@/entry/store';
-import { chartDateRangeAtom, selectedChartDateAtom } from '@/store/app';
+import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
 import { useAtom } from 'jotai';

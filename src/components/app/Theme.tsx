@@ -1,7 +1,7 @@
 'use client';
 
 import { useIsMounted } from '@/hooks/useIsMounted';
-import { themeAtom, themeNames } from '@/store/app';
+import { themeAtom, themeNames } from '@/atoms/app';
 import { useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 

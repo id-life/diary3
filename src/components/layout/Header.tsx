@@ -1,6 +1,6 @@
 'use client';
 
-import { globalStateAtom, loadDialogOpenAtom } from '@/store/app';
+import { globalStateAtom, loadDialogOpenAtom } from '@/atoms/app';
 import { formatDateTime } from '@/utils/date';
 import { safeNumberValue } from '@/utils';
 import clsx from 'clsx';

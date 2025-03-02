@@ -2,7 +2,7 @@ import { initDayEntryInstances } from '@/entry/entry-instances-slice';
 import { selectEntryInstancesMap, selectLoginUser, useAppDispatch, useAppSelector } from '@/entry/store';
 import { getDateStringFromNow } from '@/entry/types-constants';
 import { initDateStr } from '@/entry/ui-slice';
-import { GlobalState, globalStateAtom } from '@/store/app';
+import { GlobalState, globalStateAtom } from '@/atoms/app';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 import dayjs from 'dayjs';
 import { useSetAtom } from 'jotai';
