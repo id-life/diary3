@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import Button from '../button';
-import { saveStateToGithub } from '@/lib/GithubStorage';
+import { saveStateToGithub } from '@/utils/GithubStorage';
 import { useClerk } from '@clerk/nextjs';
 
 function GlobalStats({ className }: { className?: string }) {
