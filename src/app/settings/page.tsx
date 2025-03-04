@@ -1,13 +1,12 @@
 'use client';
 
+import { cloudBackupDialogOpenAtom } from '@/atoms/app';
 import Button from '@/components/button';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import GlobalStats from '@/components/my/GlobalStats';
 import LoginForm from '@/components/my/LoginForm';
 import { selectLoginUser, useAppSelector } from '@/entry/store';
-import { cloudBackupDialogOpenAtom } from '@/atoms/app';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
-import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
 
 export default function SettingsPage() {
@@ -17,7 +16,7 @@ export default function SettingsPage() {
   console.log({ loginUser, isSignedIn, user });
 
   return (
-    <div className={clsx('flex h-full flex-col items-center justify-end gap-4 bg-gradient-home px-5 py-10 text-center')}>
+    <>
       <ClientOnly>{loginUser?.uid ? <GlobalStats /> : <LoginForm />}</ClientOnly>
       <SignedOut>
         <SignInButton>登录</SignInButton>
@@ -36,6 +35,6 @@ export default function SettingsPage() {
           查看云端备份
         </Button>
       </SignedIn>
-    </div>
+    </>
   );
 }
