@@ -7,7 +7,7 @@ import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Button from '../button';
 import Dialog from '../dialog';
-import { isIncompleteGithubInfo } from '../../lib/GithubStorage';
+import { isIncompleteGithubInfo } from '../../utils/GithubStorage';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import CloudBackupDialog from './CloudBackupDialog';

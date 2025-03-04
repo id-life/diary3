@@ -13,7 +13,7 @@ import { MdExpandMore } from 'react-icons/md';
 import packageJson from '../../../package.json';
 import { onCloseUpdateLastUseTime, onLogoutClickClearState } from '../../entry/login-user-slice';
 import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '../../entry/store';
-import { saveStateToGithub } from '../../lib/GithubStorage';
+import { saveStateToGithub } from '../../utils/GithubStorage';
 import Button from '../button';
 import Collapse from '../collapse';
 import { useClerk, useUser } from '@clerk/nextjs';
