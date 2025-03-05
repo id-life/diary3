@@ -1,15 +1,17 @@
 import Theme from '@/components/app/Theme';
+import { ClientOnly } from '@/components/common/ClientOnly';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import DialogComponents from '@/components/dialog/DialogComponents';
+import GlobalClientComp from '@/components/layout/GlobalClientComp';
+import Header from '@/components/layout/Header';
 import Providers from '@/providers/root';
 import { ddin, poppins } from '@/styles/fonts';
+import { ClerkProvider } from '@clerk/nextjs';
 import { clsx } from 'clsx';
 import type { Metadata, Viewport } from 'next';
 import { ToastContainer } from 'react-toastify';
 
 import '@/styles/globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
-import Header from '@/components/layout/Header';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -44,6 +46,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <main className="min-h-screen bg-gradient-to-br from-white to-purple-100">
                 <Header />
                 {children}
+                <ClientOnly>
+                  <GlobalClientComp />
+                </ClientOnly>
               </main>
             </ErrorBoundary>
             <DialogComponents />

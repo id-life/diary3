@@ -1,12 +1,12 @@
 'use client';
 
+import { chevronVariants, menuContainerVariants, menuItemVariants, sidebarNavVariants } from '@/constants/anim';
 import { selectLoginUser, useAppSelector } from '@/entry/store';
 import { useUser } from '@clerk/nextjs';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Calendar, ChevronDown, Clock, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { chevronVariants, menuContainerVariants, menuItemVariants, sidebarNavVariants } from '@/constants/anim';
 
 export function Sidebar() {
   const loginUser = useAppSelector(selectLoginUser);
@@ -15,10 +15,10 @@ export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="flex min-w-64 flex-col">
+    <div className="flex min-w-64 flex-col pt-7.5">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between rounded-md p-4 transition hover:bg-gray-50"
+        className="-mt-4 flex w-full items-center justify-between rounded-md p-4 transition hover:bg-gray-50"
       >
         {username ? (
           <div className="text-lg/5">
