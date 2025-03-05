@@ -30,7 +30,7 @@ export default function EntryPage() {
 
   // console.log({ selectedDay, selectedChartDate, selectedTotalPoints });
   return (
-    <>
+    <div className="flex grow flex-col gap-4 pr-2">
       <HeaderDatetime />
       <EntryProgressBar points={selectedTotalPoints} />
       <h2 className="mt-4 flex items-center justify-center pt-2 text-xl font-semibold">
@@ -39,6 +39,6 @@ export default function EntryPage() {
       <EntryChart entryInstancesMap={entryInstancesMap} />
       <EntryInstanceList entryInstancesArray={entryInstancesArray} />
       <EntryTypeListForCompletion selectedDateStr={selectedDay} />
-    </>
+    </div>
   );
 }

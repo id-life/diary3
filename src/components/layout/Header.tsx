@@ -13,6 +13,9 @@ export default function Header() {
           <Link href="/entry" className="text-sm/4 font-medium">
             Entry
           </Link>
+          <Link href="/add" className="text-sm/4 font-medium">
+            Add
+          </Link>
           <Link href="/reminder" className="text-sm/4 font-medium">
             Reminder
           </Link>
