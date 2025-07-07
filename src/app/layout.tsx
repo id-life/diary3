@@ -47,7 +47,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <ClientOnly>
                   <Header />
                 </ClientOnly>
-                <main className="min relative flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
+                <main className="relative h-full flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
               </ErrorBoundary>
               <Navbar />
               <DialogComponents />

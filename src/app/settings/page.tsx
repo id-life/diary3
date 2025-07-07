@@ -29,12 +29,8 @@ export default function SettingsPage() {
     gitHubAuth.logout();
   };
 
-  const handleTestProtectedRoute = async () => {
-    await gitHubAuth.testProtectedRoute();
-  };
-
   return (
-    <div className={clsx('flex h-full flex-col items-center justify-end gap-4 bg-gradient-home px-5 py-10 text-center')}>
+    <div className={clsx('flex flex-col items-center justify-end gap-4 bg-gradient-home px-5 py-10 text-center')}>
       <ClientOnly>{loginUser?.uid ? <GlobalStats /> : <LoginForm />}</ClientOnly>
       <SignedOut>
         <SignInButton>登录</SignInButton>
@@ -69,7 +65,7 @@ export default function SettingsPage() {
             </div>
           </div>
         ) : gitHubAuth.isAuthenticated && gitHubAuth.user ? (
-          <GitHubUserCard user={gitHubAuth.user} onTestApi={handleTestProtectedRoute} onLogout={handleGitHubLogout} />
+          <GitHubUserCard user={gitHubAuth.user} onLogout={handleGitHubLogout} />
         ) : (
           <div className="space-y-3">
             <Button className="flex w-full items-center justify-center gap-2 py-3" onClick={handleGitHubLogin} type="primary">

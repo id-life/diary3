@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { authApi, GitHubUser } from '@/api/auth';
+import { getUserProfile, GitHubUser } from '@/api/auth';
+import { StorageKey } from '@/constants/storage';
+import { useAtom } from 'jotai';
+import { githubUserStateAtom } from '@/atoms/user';
+import { NEXT_PUBLIC_AUTH_URL } from '@/constants/env';
 
 export interface GitHubOAuthState {
   isAuthenticated: boolean;
@@ -12,12 +16,7 @@ export interface GitHubOAuthState {
 
 export const useGitHubOAuth = () => {
   const router = useRouter();
-  const [state, setState] = useState<GitHubOAuthState>({
-    isAuthenticated: false,
-    user: null,
-    token: null,
-    isLoading: true,
-  });
+  const [state, setState] = useAtom(githubUserStateAtom);
 
   // Initialize and check for token in URL or localStorage
   useEffect(() => {
@@ -29,7 +28,7 @@ export const useGitHubOAuth = () => {
 
         if (tokenFromUrl) {
           // Store token and remove from URL
-          localStorage.setItem('authToken', tokenFromUrl);
+          localStorage.setItem(StorageKey.AUTH_TOKEN, tokenFromUrl);
           window.history.replaceState({}, document.title, window.location.pathname);
 
           // Show success message
@@ -42,7 +41,7 @@ export const useGitHubOAuth = () => {
           await fetchUserProfile(tokenFromUrl);
         } else {
           // Check for existing token in localStorage
-          const storedToken = localStorage.getItem('authToken');
+          const storedToken = localStorage.getItem(StorageKey.AUTH_TOKEN);
           if (storedToken) {
             await fetchUserProfile(storedToken);
           } else {
@@ -59,8 +58,8 @@ export const useGitHubOAuth = () => {
   }, []);
 
   // Fetch user profile using token
-  const fetchUserProfile = async (token?: string) => {
-    const authToken = token || localStorage.getItem('authToken');
+  const fetchUserProfile = useCallback(async (token?: string) => {
+    const authToken = token || localStorage.getItem(StorageKey.AUTH_TOKEN);
 
     if (!authToken) {
       setState({
@@ -74,7 +73,7 @@ export const useGitHubOAuth = () => {
 
     try {
       setState((prev) => ({ ...prev, isLoading: true }));
-      const user = await authApi.getUserProfile();
+      const user = await getUserProfile();
 
       setState({
         isAuthenticated: true,
@@ -87,7 +86,7 @@ export const useGitHubOAuth = () => {
 
       // If token is invalid, clear it
       if (error.response?.status === 401) {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem(StorageKey.AUTH_TOKEN);
         toast.error('认证已过期，请重新登录');
       } else {
         toast.error('获取用户信息失败');
@@ -100,21 +99,21 @@ export const useGitHubOAuth = () => {
         isLoading: false,
       });
     }
-  };
+  }, []);
 
   // Initiate GitHub OAuth login
   const login = useCallback(() => {
     try {
-      authApi.initiateGitHubLogin();
+      router.push(NEXT_PUBLIC_AUTH_URL + '/auth/github');
     } catch (error) {
-      console.error('启动GitHub登录失败:', error);
-      toast.error('启动GitHub登录失败');
+      console.error('GitHub OAuth Login Failed:', error);
+      toast.error('GitHub OAuth Login Failed');
     }
   }, []);
 
   // Logout
   const logout = useCallback(() => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(StorageKey.AUTH_TOKEN);
     setState({
       isAuthenticated: false,
       user: null,
@@ -123,38 +122,6 @@ export const useGitHubOAuth = () => {
     });
     toast.success('已成功登出');
   }, []);
-
-  // Test protected API call
-  const testProtectedRoute = useCallback(async () => {
-    if (!state.isAuthenticated) {
-      toast.error('请先登录');
-      return;
-    }
-
-    try {
-      const result = await authApi.testProtectedRoute();
-      toast.success('受保护路由测试成功！', {
-        position: 'top-center',
-        autoClose: 2000,
-      });
-      console.log('受保护路由测试结果:', result);
-      return result;
-    } catch (error: any) {
-      console.error('受保护路由测试失败:', error);
-      if (error.response?.status === 404) {
-        toast.info('受保护路由端点不存在，但认证正常工作', {
-          position: 'top-center',
-          autoClose: 3000,
-        });
-      } else if (error.response?.status === 401) {
-        toast.error('认证失败，请重新登录');
-        localStorage.removeItem('authToken');
-        setState((prev) => ({ ...prev, isAuthenticated: false, user: null, token: null }));
-      } else {
-        toast.error(`API测试失败: ${error.response?.status || '网络错误'}`);
-      }
-    }
-  }, [state.isAuthenticated]);
 
   // Refresh user profile
   const refreshProfile = useCallback(async () => {
@@ -167,7 +134,6 @@ export const useGitHubOAuth = () => {
     ...state,
     login,
     logout,
-    testProtectedRoute,
     refreshProfile,
   };
 };
