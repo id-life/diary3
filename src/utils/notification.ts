@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 export const notify = async ({ title, msg }: { title: string; msg?: string }) => {
   if (window.Notification && Notification.permission !== 'granted') {
     Notification.requestPermission((status) => {
-      // 这将使我们能在 Chrome/Safari 中使用 Notification.permission
+      // this will allow us to use Notification.permission in Chrome/Safari
       if (Notification.permission !== status) {
         // @ts-ignore
         Notification.permission = status;

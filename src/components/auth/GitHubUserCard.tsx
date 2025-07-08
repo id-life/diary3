@@ -45,8 +45,8 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, 
 
       {/* User Details */}
       <div className="mb-4 space-y-2">
-        {user.email && <div className="text-sm text-gray-600">📧 {user.email}</div>}
-        <div className="text-sm text-gray-600">🆔 {user.id}</div>
+        {user.email && <div className="text-sm text-gray-600">email: {user.email}</div>}
+        <div className="text-sm text-gray-600">uid: {user.id}</div>
       </div>
 
       {/* Action Buttons */}

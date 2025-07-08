@@ -32,7 +32,7 @@ export default function SettingsPage() {
           New GitHub OAuth
         </h3>
 
-        {gitHubAuth.isLoading ? (
+        {gitHubAuth?.token && gitHubAuth.isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="flex animate-pulse items-center gap-2 text-white/70">
               <div className="h-4 w-4 animate-bounce rounded-full bg-white/20"></div>
