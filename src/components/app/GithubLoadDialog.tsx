@@ -58,7 +58,6 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
           const fileResponse = await fetch(downloadUrl);
           const stateToLoad = await fileResponse.json();
 
-          // 保存到数据库
           try {
             saveBackupList({
               content: stateToLoad,

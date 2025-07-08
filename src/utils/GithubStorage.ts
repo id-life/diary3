@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { LoginUserState } from '../entry/login-user-slice';
 import { persistor } from '../entry/store';
+import { saveBackupList } from '@/api/github';
 
 export const isIncompleteGithubInfo = (loginUser: LoginUserState) => {
   return !loginUser.githubSecret || !loginUser.uid || !loginUser.repo || !loginUser.email;
@@ -101,17 +102,7 @@ export const saveStateToGithub = async (loginUser: LoginUserState) => {
     const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
 
     try {
-      // 同时保存到数据库
-      await fetch('/api/github-backup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: JSON.parse(state || '{}'),
-          fileName: path,
-        }),
-      });
+      await saveBackupList({ content: JSON.parse(state || '{}'), fileName: path });
     } catch (error) {
       console.error('Failed to save to database:', error);
     }

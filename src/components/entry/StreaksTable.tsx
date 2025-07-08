@@ -24,7 +24,8 @@ function StreaksTable(props: { entryTypesArray: EntryType[]; routine: RoutineEnu
   const filterEntryTypes = useMemo(() => {
     const routineTypes = entryTypesArray.filter((item) => item.routine === routine);
     routineTypes.sort((a: EntryType, b: EntryType) => {
-      // 先按照连胜,从多到少 streak 相同的,就 defaultPoints 从高到底排序
+      // sort by streak, from high to low
+      // if streak is the same, sort by defaultPoints, from high to low
       const maxA = entryTypeMaxStreaks?.[a.id] ?? 0;
       const maxB = entryTypeMaxStreaks?.[b.id] ?? 0;
       if (maxA > maxB) return -1;

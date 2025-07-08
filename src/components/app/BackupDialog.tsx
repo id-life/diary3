@@ -21,25 +21,23 @@ const BackupDialog: FunctionComponent = () => {
   const restoreBackup = async (backup: BackupInfo) => {
     try {
       persistor.pause();
-      const loadMsg = toast.loading('正在恢复数据...');
+      const loadMsg = toast.loading('Recovering data...');
 
-      // 恢复数据到本地存储
       localStorage.setItem('persist:diary', JSON.stringify(backup.content));
 
       toast.update(loadMsg, {
-        render: '数据恢复成功，即将刷新页面',
+        render: 'Data recovered, refreshing...',
         type: 'success',
         isLoading: false,
         autoClose: 2000,
       });
 
-      // 延迟刷新页面
       setTimeout(() => {
         window?.location?.reload();
       }, 2000);
     } catch (error) {
-      console.error('恢复备份失败:', error);
-      toast.error('恢复备份失败');
+      console.error('Restore backup failed:', error);
+      toast.error('Restore backup failed');
     }
   };
 
@@ -47,7 +45,7 @@ const BackupDialog: FunctionComponent = () => {
     <Dialog
       open={isOpen}
       onOpenChange={(open) => setOpen(open)}
-      title="云端备份数据"
+      title="Cloud Backup Data"
       render={() => (
         <div className="flex flex-col gap-4 p-4">
           {isLoading ? (

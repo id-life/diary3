@@ -37,7 +37,7 @@ export enum StreakStatus {
   UNCREATED = 'uncreated',
   INCOMPLETE = 'incomplete',
   COMPLETED = 'completed',
-  WARNING = 'warning', // 本周期还未完成 快失败了
+  WARNING = 'warning', // not completed in a cycle, almost failed
 }
 
 export const EntryTypeConstructor = ({
@@ -210,10 +210,10 @@ export type ReminderRecord = {
   content?: string;
   type: ReminderType;
   // ReminderPushConfig;
-  weekDay?: number; // ReminderType.weekly 0~6 星期里的第几天
-  monthDay?: number; // ReminderType.monthly 月份里的几号 0～31
-  month?: number; // ReminderType.annual 年里的第几月进行提醒 0～11
-  sinceStartTime?: number; // ReminderType.since 从什么时候开始记录
+  weekDay?: number; // ReminderType.weekly 0~6 which day of week
+  monthDay?: number; // ReminderType.monthly 0~31 which day of month
+  month?: number; // ReminderType.annual 0~11 which month of year
+  sinceStartTime?: number; // ReminderType.since when to start
   isSendReminderEmail?: boolean;
 
   createdAt: number;

@@ -24,7 +24,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
       const e = dayjs(end);
       switch (routine) {
         case RoutineEnum.daily: {
-          // s~e 这一天有过一次就是胜利
+          // s~e day have one entry is completed
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           const entries = entryInstancesMap[s.format('YYYY-MM-DD')];
           if (!entries?.length) return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
@@ -33,7 +33,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           else return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
         }
         case RoutineEnum.weekly: {
-          // s~e 这一周有过一次就是胜利
+          // s~e week have one entry is completed
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           for (let day = s; day.isBefore(e) || day.isSame(e); day = day.add(1, 'day')) {
             const entries = entryInstancesMap[day.format('YYYY-MM-DD')];
@@ -44,7 +44,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
         }
         case RoutineEnum.monthly: {
-          // s~e 这一月有过一次就是胜利
+          // s~e month have one entry is completed
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           for (let day = s; day.isBefore(e) || day.isSame(e); day = day.add(1, 'day')) {
             const entries = entryInstancesMap[day.format('YYYY-MM-DD')];

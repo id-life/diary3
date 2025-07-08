@@ -69,7 +69,7 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
         const { entryTypeId, points } = entry;
         allKeys.add(entryTypeId);
         let nowPoints = points;
-        if (typeof points === 'string') nowPoints = parseFloat(points); // 兼容 points 为 string 的老数据
+        if (typeof points === 'string') nowPoints = parseFloat(points); // because points string old data
         res[entryTypeId] = res[entryTypeId] ? Number(res[entryTypeId]) + nowPoints : nowPoints;
       });
       return res;
