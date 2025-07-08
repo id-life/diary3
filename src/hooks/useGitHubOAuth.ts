@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
 import { getUserProfile, GitHubUser } from '@/api/auth';
-import { StorageKey } from '@/constants/storage';
-import { useAtom } from 'jotai';
 import { githubUserStateAtom } from '@/atoms/user';
 import { NEXT_PUBLIC_AUTH_URL } from '@/constants/env';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useAccessToken } from './app';
 
 export interface GitHubOAuthState {
   isAuthenticated: boolean;
@@ -13,93 +14,80 @@ export interface GitHubOAuthState {
   token: string | null;
   isLoading: boolean;
 }
-
+const userQueryKey = 'fetch_user_profile';
 export const useGitHubOAuth = () => {
   const router = useRouter();
-  const [state, setState] = useAtom(githubUserStateAtom);
+  const queryClient = useQueryClient();
+  const [githubUserState, setGithubUserState] = useAtom(githubUserStateAtom);
+  const { accessToken, setAccessToken } = useAccessToken();
 
-  // Initialize and check for token in URL or localStorage
+  // Query for user profile
+  const userQuery = useQuery({
+    queryKey: [userQueryKey, accessToken],
+    queryFn: async () => {
+      if (!accessToken) {
+        throw new Error('No access token');
+      }
+      return await getUserProfile();
+    },
+    enabled: !!accessToken, // Only run when we have a token
+    retry: (failureCount, error: any) => {
+      // Don't retry for 401 errors (invalid token)
+      if (error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+
+  // Mutation for logout
+  const logoutMutation = useMutation(
+    async () => {
+      // Clear access token
+      setAccessToken(null);
+      // Clear all queries
+      queryClient.clear();
+    },
+    {
+      onSuccess: () => {
+        toast.success('Logout success');
+      },
+      onError: (error) => {
+        console.error('Logout failed:', error);
+        toast.error('Logout failed');
+      },
+    },
+  );
+  const { mutate: logout } = logoutMutation;
+  // Update atom state based on query state
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // Check for token in URL parameters (OAuth callback)
-        const urlParams = new URLSearchParams(window.location.search);
-        const tokenFromUrl = urlParams.get('token');
+    const isLoading = userQuery.isLoading;
+    const user = userQuery.data || null;
+    const isAuthenticated = !!accessToken && !!user && !userQuery.isError;
 
-        if (tokenFromUrl) {
-          // Store token and remove from URL
-          localStorage.setItem(StorageKey.AUTH_TOKEN, tokenFromUrl);
-          window.history.replaceState({}, document.title, window.location.pathname);
+    setGithubUserState({
+      isAuthenticated,
+      user,
+      token: accessToken,
+      isLoading,
+    });
+  }, [userQuery.isLoading, userQuery.data, userQuery.isError, accessToken, setGithubUserState]);
 
-          // Show success message
-          toast.success('GitHub登录成功！', {
-            position: 'top-center',
-            autoClose: 3000,
-          });
+  // Handle query errors
+  useEffect(() => {
+    if (userQuery.isError) {
+      const error = userQuery.error as any;
+      console.error('Get user profile failed:', error);
 
-          // Fetch user profile
-          await fetchUserProfile(tokenFromUrl);
-        } else {
-          // Check for existing token in localStorage
-          const storedToken = localStorage.getItem(StorageKey.AUTH_TOKEN);
-          if (storedToken) {
-            await fetchUserProfile(storedToken);
-          } else {
-            setState((prev) => ({ ...prev, isLoading: false }));
-          }
-        }
-      } catch (error) {
-        console.error('初始化认证失败:', error);
-        setState((prev) => ({ ...prev, isLoading: false }));
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
-  // Fetch user profile using token
-  const fetchUserProfile = useCallback(async (token?: string) => {
-    const authToken = token || localStorage.getItem(StorageKey.AUTH_TOKEN);
-
-    if (!authToken) {
-      setState({
-        isAuthenticated: false,
-        user: null,
-        token: null,
-        isLoading: false,
-      });
-      return;
-    }
-
-    try {
-      setState((prev) => ({ ...prev, isLoading: true }));
-      const user = await getUserProfile();
-
-      setState({
-        isAuthenticated: true,
-        user,
-        token: authToken,
-        isLoading: false,
-      });
-    } catch (error: any) {
-      console.error('获取用户信息失败:', error);
-
-      // If token is invalid, clear it
-      if (error.response?.status === 401) {
-        localStorage.removeItem(StorageKey.AUTH_TOKEN);
-        toast.error('认证已过期，请重新登录');
+      // Handle different error scenarios
+      if (error?.response?.status === 401) {
+        toast.error('Authentication expired, please login again');
+        logout();
       } else {
-        toast.error('获取用户信息失败');
+        toast.error('Get user profile failed');
       }
-
-      setState({
-        isAuthenticated: false,
-        user: null,
-        token: null,
-        isLoading: false,
-      });
     }
-  }, []);
+  }, [userQuery.isError, userQuery.error, setAccessToken, queryClient]);
 
   // Initiate GitHub OAuth login
   const login = useCallback(() => {
@@ -109,31 +97,23 @@ export const useGitHubOAuth = () => {
       console.error('GitHub OAuth Login Failed:', error);
       toast.error('GitHub OAuth Login Failed');
     }
-  }, []);
-
-  // Logout
-  const logout = useCallback(() => {
-    localStorage.removeItem(StorageKey.AUTH_TOKEN);
-    setState({
-      isAuthenticated: false,
-      user: null,
-      token: null,
-      isLoading: false,
-    });
-    toast.success('已成功登出');
-  }, []);
+  }, [router]);
 
   // Refresh user profile
   const refreshProfile = useCallback(async () => {
-    if (state.token) {
-      await fetchUserProfile(state.token);
+    if (accessToken) {
+      await queryClient.invalidateQueries({ queryKey: [userQueryKey] });
     }
-  }, [state.token]);
+  }, [accessToken, queryClient]);
 
   return {
-    ...state,
+    ...githubUserState,
     login,
     logout,
     refreshProfile,
+    // Expose additional React Query states for advanced usage
+    isRefreshing: userQuery.isFetching,
+    isError: userQuery.isError,
+    error: userQuery.error,
   };
 };

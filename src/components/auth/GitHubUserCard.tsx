@@ -3,6 +3,8 @@ import Button from '@/components/button';
 import { AiFillGithub } from 'react-icons/ai';
 import { BiTestTube, BiLogOut } from 'react-icons/bi';
 import clsx from 'clsx';
+import { backupDialogOpenAtom } from '@/atoms/app';
+import { useSetAtom } from 'jotai';
 
 interface GitHubUserCardProps {
   user: GitHubUser;
@@ -11,6 +13,8 @@ interface GitHubUserCardProps {
 }
 
 export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, className }) => {
+  const setBackupDialogOpen = useSetAtom(backupDialogOpenAtom);
+
   return (
     <div className={clsx('rounded-lg border border-gray-200/50 bg-white/95 p-4 shadow-lg backdrop-blur-sm', className)}>
       <div className="mb-3 flex items-center gap-3">
@@ -46,10 +50,18 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, 
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-2">
-        <Button size="small" className="flex flex-1 items-center justify-center gap-2" onClick={onLogout} type="default" danger>
+      <div className="flex flex-col items-center gap-4">
+        <Button
+          className="flex flex-1 items-center justify-center gap-2"
+          onClick={() => setBackupDialogOpen(true)}
+          type="primary"
+        >
+          <BiTestTube className="h-4 w-4" />
+          Backup List
+        </Button>
+        <Button className="flex flex-1 items-center justify-center gap-2" onClick={onLogout} type="default" danger>
           <BiLogOut className="h-4 w-4" />
-          登出
+          Logout
         </Button>
       </div>
     </div>

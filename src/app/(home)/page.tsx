@@ -1,21 +1,25 @@
 'use client';
 import { StorageKey } from '@/constants/storage';
+import { useAccessToken } from '@/hooks/app';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { setAccessToken } = useAccessToken();
 
   useEffect(() => {
-    if (searchParams.get('token')) {
-      console.log('token:', searchParams.get('token'));
-      localStorage.setItem(StorageKey.AUTH_TOKEN, searchParams.get('token') as string);
+    const token = searchParams.get('token');
+    if (token) {
+      // Only use setAccessToken, it will handle localStorage properly
+      setAccessToken(token);
       router.push('/settings');
       return;
     }
+    console.log('no token');
     router.push('/entry');
-  }, [searchParams, router]);
+  }, [searchParams, router, setAccessToken]);
 
   return <div></div>;
 }

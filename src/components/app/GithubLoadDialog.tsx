@@ -1,25 +1,26 @@
-import { useFetchCommits } from '@/api/github';
+import { useFetchCommits, useSaveBackupList } from '@/api/github';
+import { backupDialogOpenAtom, loadDialogOpenAtom } from '@/atoms/app';
 import { persistor, selectLoginUser, useAppSelector } from '@/entry/store';
-import { loadDialogOpenAtom, cloudBackupDialogOpenAtom } from '@/atoms/app';
 import { Octokit } from '@octokit/rest';
-import { useAtom } from 'jotai';
+import clsx from 'clsx';
+import { useAtom, useSetAtom } from 'jotai';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { twMerge } from 'tailwind-merge';
+import { isIncompleteGithubInfo } from '../../utils/GithubStorage';
 import Button from '../button';
 import Dialog from '../dialog';
-import { isIncompleteGithubInfo } from '../../utils/GithubStorage';
-import clsx from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import CloudBackupDialog from './CloudBackupDialog';
 
 export type GithubLoadDialogProps = {};
 
 const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
   const [isOpen, setOpen] = useAtom(loadDialogOpenAtom);
-  const [isCloudBackupOpen, setCloudBackupOpen] = useAtom(cloudBackupDialogOpenAtom);
+  const setBackupDialogOpen = useSetAtom(backupDialogOpenAtom);
   const loginUser = useAppSelector(selectLoginUser);
   const { data, isLoading } = useFetchCommits();
   const [path, setPath] = useState<string | null>(null);
+  const { mutate: saveBackupList } = useSaveBackupList();
+
   const loaded = useCallback(
     async (path: string | null) => {
       if (isIncompleteGithubInfo(loginUser)) {
@@ -59,19 +60,23 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
 
           // 保存到数据库
           try {
-            const response = await fetch('/api/github-backup', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                content: stateToLoad,
-                fileName: path,
-              }),
+            saveBackupList({
+              content: stateToLoad,
+              fileName: path,
             });
-            if (response.status === 409) {
-              console.log('Backup already exists');
-            }
+            // const response = await fetch('/api/github-backup', {
+            //   method: 'POST',
+            //   headers: {
+            //     'Content-Type': 'application/json',
+            //   },
+            //   body: JSON.stringify({
+            //     content: stateToLoad,
+            //     fileName: path,
+            //   }),
+            // });
+            // if (response.status === 409) {
+            //   console.log('Backup already exists');
+            // }
           } catch (error) {
             console.error('Failed to save to database:', error);
           }
@@ -133,27 +138,25 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
       renderFooter={({ close }) => (
         <div className="flex items-center justify-between gap-4">
           <Button onClick={() => setOpen(false)} type="default">
-            取消
+            Cancel
           </Button>
           <div className="flex items-center gap-2">
             <Button
               onClick={() => {
                 setOpen(false);
-                setCloudBackupOpen(true);
+                setBackupDialogOpen(true);
               }}
               type="default"
             >
-              查看云端备份
+              Show Cloud Backup
             </Button>
             <Button onClick={() => loaded(path)} type="primary">
-              确认
+              Confirm
             </Button>
           </div>
         </div>
       )}
-    >
-      <CloudBackupDialog />
-    </Dialog>
+    ></Dialog>
   );
 };
 
