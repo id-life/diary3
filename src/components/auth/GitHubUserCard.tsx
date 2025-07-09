@@ -7,7 +7,6 @@ import { backupDialogOpenAtom } from '@/atoms/app';
 import { useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import { saveStateToGithub } from '@/utils/GithubStorage';
-import { useAppSelector } from '@/entry/store';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { SaveIcon } from 'lucide-react';
 
@@ -19,9 +18,8 @@ interface GitHubUserCardProps {
 
 export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, className }) => {
   const setBackupDialogOpen = useSetAtom(backupDialogOpenAtom);
-  const loginUserState = useAppSelector((state) => state.loginUser);
   const { user: githubUser } = useGitHubOAuth();
-  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [loginUserState, githubUser]);
+  const save = useCallback(() => saveStateToGithub(null, true, githubUser), [githubUser]);
 
   return (
     <div className={clsx('rounded-lg border border-gray-200/50 bg-white/95 p-4 shadow-lg backdrop-blur-sm', className)}>

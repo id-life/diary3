@@ -4,14 +4,11 @@ import GitHubUserCard from '@/components/auth/GitHubUserCard';
 import Button from '@/components/button';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import GlobalStats from '@/components/my/GlobalStats';
-import LoginForm from '@/components/my/LoginForm';
-import { selectLoginUser, useAppSelector } from '@/entry/store';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import clsx from 'clsx';
 import { AiFillGithub } from 'react-icons/ai';
 
 export default function SettingsPage() {
-  const loginUser = useAppSelector(selectLoginUser);
   const gitHubAuth = useGitHubOAuth();
 
   const handleGitHubLogin = () => {
@@ -24,12 +21,12 @@ export default function SettingsPage() {
 
   return (
     <div className={clsx('flex flex-col items-center justify-end gap-4 bg-gradient-home px-5 py-10 text-center')}>
-      <ClientOnly>{loginUser?.uid ? <GlobalStats /> : <LoginForm />}</ClientOnly>
+      <ClientOnly>{gitHubAuth.isAuthenticated ? <GlobalStats /> : null}</ClientOnly>
       {/* GitHub OAuth Section */}
       <div className="mt-6 w-full max-w-md rounded-lg border-t border-white/20 bg-black/10 p-4 backdrop-blur">
         <h3 className="mb-4 flex items-center gap-2 font-medium text-white">
           <AiFillGithub className="h-5 w-5" />
-          New GitHub OAuth
+          GitHub OAuth
         </h3>
 
         {gitHubAuth?.token && gitHubAuth.isLoading ? (
