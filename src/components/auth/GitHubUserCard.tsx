@@ -5,6 +5,11 @@ import { BiTestTube, BiLogOut } from 'react-icons/bi';
 import clsx from 'clsx';
 import { backupDialogOpenAtom } from '@/atoms/app';
 import { useSetAtom } from 'jotai';
+import { useCallback } from 'react';
+import { saveStateToGithub } from '@/utils/GithubStorage';
+import { useAppSelector } from '@/entry/store';
+import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
+import { SaveIcon } from 'lucide-react';
 
 interface GitHubUserCardProps {
   user: GitHubUser;
@@ -14,6 +19,9 @@ interface GitHubUserCardProps {
 
 export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, className }) => {
   const setBackupDialogOpen = useSetAtom(backupDialogOpenAtom);
+  const loginUserState = useAppSelector((state) => state.loginUser);
+  const { user: githubUser } = useGitHubOAuth();
+  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [loginUserState, githubUser]);
 
   return (
     <div className={clsx('rounded-lg border border-gray-200/50 bg-white/95 p-4 shadow-lg backdrop-blur-sm', className)}>
@@ -51,14 +59,21 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, 
 
       {/* Action Buttons */}
       <div className="flex flex-col items-center gap-4">
-        <Button
-          className="flex flex-1 items-center justify-center gap-2"
-          onClick={() => setBackupDialogOpen(true)}
-          type="primary"
-        >
-          <BiTestTube className="h-4 w-4" />
-          Backup List
-        </Button>
+        <div className="flex items-center justify-center gap-2">
+          <Button className="flex items-center justify-center gap-2" onClick={save} type="primary" size="large">
+            <SaveIcon className="h-4 w-4" />
+            Save
+          </Button>
+          <Button
+            className="flex items-center justify-center gap-2"
+            onClick={() => setBackupDialogOpen(true)}
+            type="primary"
+            size="large"
+          >
+            <BiTestTube className="h-4 w-4" />
+            Load
+          </Button>
+        </div>
         <Button className="flex flex-1 items-center justify-center gap-2" onClick={onLogout} type="default" danger>
           <BiLogOut className="h-4 w-4" />
           Logout

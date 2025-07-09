@@ -9,7 +9,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';
 import Button from '../button';
 import { saveStateToGithub } from '@/utils/GithubStorage';
-import { useClerk } from '@clerk/nextjs';
+import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 
 function GlobalStats({ className }: { className?: string }) {
   const loginUser = useAppSelector(selectLoginUser);
@@ -17,10 +17,10 @@ function GlobalStats({ className }: { className?: string }) {
   const setLoadOpen = useSetAtom(loadDialogOpenAtom);
   const globalState = useAtomValue(globalStateAtom);
   const dispatch = useAppDispatch();
-  const { signOut } = useClerk();
+  const { logout } = useGitHubOAuth();
   const onLogoutClick = () => {
     dispatch(onLogoutClickClearState());
-    signOut();
+    logout();
   };
   return (
     <div className={clsx('flex flex-col justify-between gap-10 text-white', className)}>

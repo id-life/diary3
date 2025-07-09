@@ -1,12 +1,13 @@
 'use client';
 
-import { globalStateAtom, loadDialogOpenAtom } from '@/atoms/app';
-import { formatDateTime } from '@/utils/date';
+import { backupDialogOpenAtom, globalStateAtom } from '@/atoms/app';
+import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { safeNumberValue } from '@/utils';
+import { formatDateTime } from '@/utils/date';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { useBeforeunload } from 'react-beforeunload';
 import { MdExpandMore } from 'react-icons/md';
@@ -16,28 +17,27 @@ import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '..
 import { saveStateToGithub } from '../../utils/GithubStorage';
 import Button from '../button';
 import Collapse from '../collapse';
-import { useClerk, useUser } from '@clerk/nextjs';
 
 function UserHeader() {
   const loginUser = useAppSelector(selectLoginUser);
 
   const dispatch: AppDispatch = useAppDispatch();
   const globalState = useAtomValue(globalStateAtom);
-  const { signOut } = useClerk();
-
+  const { logout, user } = useGitHubOAuth();
   useBeforeunload(() => {
     dispatch(onCloseUpdateLastUseTime());
   });
 
   const onLogoutClick = () => {
     dispatch(onLogoutClickClearState());
-    signOut();
+    logout();
   };
   const loginUserState = useAppSelector((state) => state.loginUser);
-  const save = useCallback(() => saveStateToGithub(loginUserState), [loginUserState]);
-  const setLoadOpen = useSetAtom(loadDialogOpenAtom);
-  const { user } = useUser();
-  const logged = useMemo(() => !!loginUser?.uid || !!user, [loginUser, user]);
+  const { user: githubUser } = useGitHubOAuth();
+  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [loginUserState, user]);
+  const setLoadOpen = useSetAtom(backupDialogOpenAtom);
+
+  const logged = useMemo(() => !!loginUser?.uid || !!user?.username, [loginUser, user]);
 
   return (
     <Collapse
@@ -54,7 +54,7 @@ function UserHeader() {
             <>
               <div className="flex flex-col gap-2 text-sm">
                 <p className="text-base">
-                  <span className="font-semibold">{loginUser?.uid || user?.username}</span>
+                  <span className="font-semibold">{githubUser?.name || loginUser?.uid || user?.username}</span>
                   {" 's Diary"}
                 </p>
                 <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p>
