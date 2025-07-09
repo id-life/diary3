@@ -98,7 +98,7 @@ const GithubLoadDialog: FunctionComponent<GithubLoadDialogProps> = () => {
         toast.update(loadMsg, { render: e?.message ?? 'Loaded Error', type: 'error', isLoading: false, autoClose: 2000 });
       }
     },
-    [loginUser, setOpen],
+    [loginUser, saveBackupList, setOpen],
   );
   useEffect(() => {
     if (!data?.length) {

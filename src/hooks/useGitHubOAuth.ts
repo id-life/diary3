@@ -87,7 +87,7 @@ export const useGitHubOAuth = () => {
         toast.error('Get user profile failed');
       }
     }
-  }, [userQuery.isError, userQuery.error, setAccessToken, queryClient]);
+  }, [userQuery.isError, userQuery.error, setAccessToken, queryClient, logout]);
 
   // Initiate GitHub OAuth login
   const login = useCallback(() => {

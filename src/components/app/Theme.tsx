@@ -14,7 +14,7 @@ export default function Theme() {
     const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
     setTheme(randomTheme);
     document.documentElement.classList.add(randomTheme);
-  }, [isMounted]);
+  }, [isMounted, setTheme]);
 
   return <></>;
 }

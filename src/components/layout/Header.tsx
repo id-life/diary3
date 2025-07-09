@@ -34,7 +34,7 @@ function UserHeader() {
   };
   const loginUserState = useAppSelector((state) => state.loginUser);
   const { user: githubUser } = useGitHubOAuth();
-  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [loginUserState, user]);
+  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [githubUser, loginUserState]);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
   const logged = useMemo(() => !!loginUser?.uid || !!user?.username, [loginUser, user]);
