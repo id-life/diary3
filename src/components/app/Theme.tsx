@@ -11,11 +11,10 @@ export default function Theme() {
 
   useEffect(() => {
     if (!isMounted) return;
-    // 只在客户端随机设置主题
     const randomTheme = themeNames[Math.floor(Math.random() * themeNames.length)];
     setTheme(randomTheme);
     document.documentElement.classList.add(randomTheme);
-  }, [isMounted]);
+  }, [isMounted, setTheme]);
 
   return <></>;
 }

@@ -4,7 +4,7 @@ import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { getDaysFromDateToDateNow, getMonthsFromDateToDateNow, getWeeksFromDateToDateNow } from './date';
 dayjs.extend(weekOfYear);
 
-// 任何entry维度 今天记录了任何entry, 就算你用了. 你连续坚持记录了多少天
+// any entry type, today have any entry, you count it, how many days you have been recording
 export const calcRecordedLongestStreaks = (entryInstancesMap: { [key: string]: EntryInstance[] }) => {
   const entryKeys = Object.keys(entryInstancesMap);
   const sortedDates = entryKeys.sort();
@@ -17,7 +17,7 @@ export const calcRecordedLongestStreaks = (entryInstancesMap: { [key: string]: E
     if (entries.length > 0 && previousDate && dayjs(date).diff(dayjs(previousDate), 'day') === 1) {
       currentStreak++;
     } else {
-      currentStreak = entries.length > 0 ? 1 : 0; // 如果当天没有完成任务，则重置连胜计数
+      currentStreak = entries.length > 0 ? 1 : 0; // if today have no entry, reset streak
     }
 
     if (currentStreak > longestStreak) {
@@ -30,7 +30,7 @@ export const calcRecordedLongestStreaks = (entryInstancesMap: { [key: string]: E
   return longestStreak;
 };
 
-// 任何entry维度 从今天往回算, 连续记录多少天,
+// any entry type, from today to back, how many days you have been recording
 export const calcRecordedCurrentStreaks = (entryInstancesMap: { [key: string]: EntryInstance[] }) => {
   const entryKeys = Object.keys(entryInstancesMap);
   const sortedDates = entryKeys.sort();
@@ -78,16 +78,16 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
         const entries = entryInstancesMap[date]; // date - > 2023-08-01
         const entryTypesToday = new Set(entries.map((entry) => entry.entryTypeId));
 
-        // 检查每个 entryType 是否连续
+        // check if each entryType is consecutive
         for (const entryType of entryTypesToday) {
-          let streak = 1; // 默认开始新的连胜计数
+          let streak = 1; // default start new streak
           // if (idx > 0) {
           const previousDate = dayjs(date).subtract(1, 'day').format('YYYY-MM-DD');
           const previousEntryTypes = entryInstancesMap?.[previousDate]?.length
             ? new Set(entryInstancesMap[previousDate].map((entry) => entry.entryTypeId))
             : new Set();
           if (previousEntryTypes.has(entryType)) {
-            streak = (entryTypeStreaks[entryType] || 0) + 1; // 如果连续，则增加连胜计数
+            streak = (entryTypeStreaks[entryType] || 0) + 1; // if consecutive, increase streak
           }
           // }
 
@@ -95,7 +95,7 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
           entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, streak);
         }
 
-        // 如果某个 entryType 在今天没有完成，则重置其连胜计数
+        // if some entryType have no entry today, reset streak
         for (const entryType in entryTypeStreaks) {
           if (!entryTypesToday.has(entryType)) {
             entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, entryTypeStreaks[entryType]);
@@ -123,7 +123,7 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
             .flat(1)
             .map((entry) => entry?.entryTypeId),
         );
-        // 检查每个 entryType 是否连续
+        // check if each entryType is consecutive
         for (const entryType of entryTypeCurWeek) {
           let streak = 1;
           // if (idx > 0) {
@@ -145,13 +145,13 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
               )
             : new Set();
           if (previousEntryTypes.has(entryType)) {
-            streak = (entryTypeStreaks[entryType] || 0) + 1; // 如果连续，则增加连胜计数
+            streak = (entryTypeStreaks[entryType] || 0) + 1; // if consecutive, increase streak
           }
           // }
           entryTypeStreaks[entryType] = streak;
           entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, streak);
         }
-        // 如果某个 entryType 在今天没有完成，则重置其连胜计数
+        // if some entryType have no entry today, reset streak
         for (const entryType in entryTypeStreaks) {
           if (!entryTypeCurWeek.has(entryType)) {
             entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, entryTypeStreaks[entryType]);
@@ -181,7 +181,7 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
             .map((entry) => entry?.entryTypeId),
         );
 
-        // 检查每个 entryType 是否连续
+        // check if each entryType is consecutive
         for (const entryType of entryTypeCurMonth) {
           let streak = 1;
           const previousMonth = dayjs(month).subtract(1, 'month').format('YYYY-MM');
@@ -195,12 +195,12 @@ export const calcEntryTypeLongestStreaks = (entryInstancesMap: { [key: string]: 
             : new Set();
 
           if (previousEntryTypes.has(entryType)) {
-            streak = (entryTypeStreaks[entryType] || 0) + 1; // 如果连续，则增加连胜计数
+            streak = (entryTypeStreaks[entryType] || 0) + 1; // if consecutive, increase streak
           }
           entryTypeStreaks[entryType] = streak;
           entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, streak);
         }
-        // 如果某个 entryType 在本月没有完成，则重置其连胜计数
+        // if some entryType have no entry this month, reset streak
         for (const entryType in entryTypeStreaks) {
           if (!entryTypeCurMonth.has(entryType)) {
             entryTypeMaxStreaks[entryType] = Math.max(entryTypeMaxStreaks[entryType] || 0, entryTypeStreaks[entryType]);
@@ -233,7 +233,7 @@ export const getEntryInstanceDateRange = (entryInstancesMap: { [key: string]: En
   }
 };
 
-// 获取累计这个type的总instance个数
+// get total instance count of this entryType
 export const getEntryTypesTotalInstance = (entryInstancesMap: { [key: string]: EntryInstance[] }) => {
   const entryTypeTotalInstance: { [key: string]: number } = {};
   for (const key in entryInstancesMap) {
@@ -245,7 +245,7 @@ export const getEntryTypesTotalInstance = (entryInstancesMap: { [key: string]: E
   return entryTypeTotalInstance;
 };
 
-// 累计这个type的总instance个数排序 所有日子里所有instance都算上 越多说明越常用
+// sort by total instance count of this entryType, all days and all instances are counted, the more, the more commonly used
 export const sortEntryTypesArray = (entryTypeArray: EntryType[], entryInstancesMap: { [key: string]: EntryInstance[] }) => {
   const entryTypeTotalInstance = getEntryTypesTotalInstance(entryInstancesMap);
   entryTypeArray.sort((a, b) => {

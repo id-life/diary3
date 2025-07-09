@@ -45,7 +45,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
       newEntryType.createdAt = createdAt ?? dayjs().valueOf();
       newEntryType.updatedAt = dayjs().valueOf();
       if (newEntryType.id !== id) {
-        // 变更了title
+        // changed title
         if (entryTypeIds.includes(newEntryType.id)) {
           toast.error('id already exists');
           return;

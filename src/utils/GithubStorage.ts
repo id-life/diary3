@@ -6,6 +6,8 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { LoginUserState } from '../entry/login-user-slice';
 import { persistor } from '../entry/store';
+import { saveBackupList } from '@/api/github';
+import { GitHubUser } from '@/api/auth';
 
 export const isIncompleteGithubInfo = (loginUser: LoginUserState) => {
   return !loginUser.githubSecret || !loginUser.uid || !loginUser.repo || !loginUser.email;
@@ -83,8 +85,8 @@ export const isIncompleteGithubInfo = (loginUser: LoginUserState) => {
  * Then decide the file name etc
  * Then upload the file to github
  */
-export const saveStateToGithub = async (loginUser: LoginUserState) => {
-  if (isIncompleteGithubInfo(loginUser)) {
+export const saveStateToGithub = async (loginUser: LoginUserState, isNew?: boolean, newUser?: GitHubUser | null) => {
+  if (!isNew && isIncompleteGithubInfo(loginUser)) {
     toast.error('Not logged in');
     return;
   }
@@ -98,35 +100,27 @@ export const saveStateToGithub = async (loginUser: LoginUserState) => {
       auth: loginUser.githubSecret,
       userAgent: 'diary-app',
     });
-    const path = `dairy-save-${loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
+    const path = `dairy-save-${newUser?.username || loginUser.uid}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
 
     try {
-      // 同时保存到数据库
-      await fetch('/api/github-backup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: JSON.parse(state || '{}'),
-          fileName: path,
-        }),
-      });
+      // backup in cloud
+      await saveBackupList({ content: JSON.parse(state || '{}'), fileName: path });
     } catch (error) {
       console.error('Failed to save to database:', error);
     }
-
-    await octokit.rest.repos.createOrUpdateFileContents({
-      owner: loginUser.uid!,
-      repo: loginUser.repo!,
-      path,
-      message: `${path}`,
-      content: Buffer.from(state || '').toString('base64'),
-      'committer.name': loginUser.uid,
-      'committer.email': loginUser.email,
-      'author.name': loginUser.uid,
-      'author.email': loginUser.email,
-    });
+    if (!isNew) {
+      await octokit.rest.repos.createOrUpdateFileContents({
+        owner: loginUser.uid!,
+        repo: loginUser.repo!,
+        path,
+        message: `${path}`,
+        content: Buffer.from(state || '').toString('base64'),
+        'committer.name': loginUser.uid,
+        'committer.email': loginUser.email,
+        'author.name': loginUser.uid,
+        'author.email': loginUser.email,
+      });
+    }
 
     toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 });
   } catch (e: any) {

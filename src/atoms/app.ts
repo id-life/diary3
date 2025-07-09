@@ -4,7 +4,7 @@ export const selectedChartDateAtom = atom<string | null>(null);
 
 export const loadDialogOpenAtom = atom(false);
 
-export const cloudBackupDialogOpenAtom = atom(false);
+export const backupDialogOpenAtom = atom(false);
 
 export type GlobalState = {
   registeredSince: number;

@@ -6,8 +6,8 @@ export const isStrOrNotNaNNum = (value: any) => {
 };
 
 /**
- * 确保安全数值显示的辅助函数
- * 当值为null、undefined或NaN时返回默认值
+ * helper function to ensure safe number value display
+ * return defaultValue when value is null, undefined or NaN
  */
 export const safeNumberValue = (value: number | null | undefined, defaultValue: number = 0): number => {
   return value !== null && value !== undefined && !isNaN(value) ? value : defaultValue;
