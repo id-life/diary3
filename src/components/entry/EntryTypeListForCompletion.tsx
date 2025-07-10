@@ -1,10 +1,10 @@
-import { selectEntryInstancesMap, selectEntryTypesArray, useAppSelector } from '@/entry/store';
 import { useInput } from '@/hooks/useInput';
 import { sortEntryTypesArray } from '@/utils/entry';
 import { useMemo, useState } from 'react';
 import EntryTypeCard from './EntryTypeCard';
 import Segmented from '../segmented';
 import { RoutineEnum } from '@/entry/types-constants';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 
 const options = [
   {
@@ -17,8 +17,7 @@ const options = [
   { value: RoutineEnum.adhoc },
 ];
 const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: string }) => {
-  const entryTypesArray = useAppSelector(selectEntryTypesArray);
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const { entryTypesArray, entryInstancesMap } = useJotaiSelectors();
   const { inputValue, onInputChange } = useInput();
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const { doneList, restList } = useMemo(() => {

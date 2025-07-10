@@ -1,19 +1,36 @@
 import { GlobalState, globalStateAtom } from '@/atoms/app';
 import { StorageKey } from '@/constants/storage';
-import { initDayEntryInstances } from '@/entry/entry-instances-slice';
-import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '@/entry/store';
 import { getDateStringFromNow } from '@/entry/types-constants';
-import { initDateStr } from '@/entry/ui-slice';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
+import { runStateMigration, isMigrationCompleted } from '@/utils/stateMigration';
 import dayjs from 'dayjs';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect } from 'react';
+import { 
+  entryInstancesMapAtom, 
+  initDayEntryInstancesAtom,
+  initDateStrAtom
+} from '@/atoms';
 
 export const useInitGlobalState = () => {
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const setGlobalState = useSetAtom(globalStateAtom);
-  const dispatch = useAppDispatch();
+  const setInitDateStr = useSetAtom(initDateStrAtom);
+  const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
+
+  useEffect(() => {
+    // Run state migration BEFORE atoms are used
+    const runMigrationAndInit = async () => {
+      const migrationSuccess = runStateMigration();
+      if (migrationSuccess || isMigrationCompleted()) {
+        // Force atoms to re-initialize with migrated data
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    };
+    
+    runMigrationAndInit();
+  }, []);
 
   useEffect(() => {
     const now = dayjs();
@@ -30,9 +47,9 @@ export const useInitGlobalState = () => {
     setGlobalState(states);
 
     const dateStrNow = getDateStringFromNow();
-    dispatch(initDateStr({ dateStr: dateStrNow }));
-    dispatch(initDayEntryInstances({ dateStr: dateStrNow }));
-  }, [entryInstancesMap, setGlobalState, dispatch]);
+    setInitDateStr({ dateStr: dateStrNow });
+    setInitDayEntryInstances({ dateStr: dateStrNow });
+  }, [entryInstancesMap, setGlobalState, setInitDateStr, setInitDayEntryInstances]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes

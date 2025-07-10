@@ -2,14 +2,13 @@
 
 import EntryTypeForm from '@/components/entry/EntryTypeForm';
 import StreaksTable from '@/components/entry/StreaksTable';
-import { selectEntryTypeIds, selectEntryTypesArray, useAppSelector } from '@/entry/store';
 import { RoutineEnum } from '@/entry/types-constants';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 
 export default function AddPage() {
-  const entryTypesArray = useAppSelector(selectEntryTypesArray);
-  const entryTypeIds = useAppSelector(selectEntryTypeIds);
-  const isUpdate = useAppSelector((state) => state.uiState.addPage.isEntryTypeUpdating);
-  const updatingEntryTypeId = useAppSelector((state) => state.uiState.addPage.updatingEntryTypeId);
+  const { entryTypesArray, entryTypeIds, uiState } = useJotaiSelectors();
+  const isUpdate = uiState.addPage.isEntryTypeUpdating;
+  const updatingEntryTypeId = uiState.addPage.updatingEntryTypeId;
   const updatingEntryType =
     isUpdate && updatingEntryTypeId ? entryTypesArray.find((entryType) => entryType.id === updatingEntryTypeId) : null;
   console.log({ entryTypesArray });

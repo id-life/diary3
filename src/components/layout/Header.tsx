@@ -21,7 +21,7 @@ function UserHeader() {
   const onLogoutClick = () => {
     logout();
   };
-  
+
   const save = useCallback(() => saveStateToGithub(null, true, githubUser), [githubUser]);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
@@ -45,6 +45,8 @@ function UserHeader() {
                   <span className="font-semibold">{githubUser?.name || githubUser?.username}</span>
                   {" 's Diary"}
                 </p>
+                {/* TODO: lastUseTime Should Migrate to backend profile */}
+                {/* <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p> */}
                 <p className="text-xs text-black/40">@{githubUser?.username}</p>
               </div>
               <div className="flex items-center gap-1">

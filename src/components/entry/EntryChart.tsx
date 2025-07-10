@@ -1,4 +1,4 @@
-import { selectEntryTypesArray, useAppSelector } from '@/entry/store';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
@@ -136,7 +136,7 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
 function EntryChart(props: { entryInstancesMap: { [key: string]: EntryInstance[] } }) {
   const [selectedRange, setSelectedRange] = useState<DateRange>('day');
   const { entryInstancesMap } = props;
-  const entryTypesArray = useAppSelector(selectEntryTypesArray);
+  const { entryTypesArray } = useJotaiSelectors();
   const [dateRange, setDateRange] = useAtom(chartDateRangeAtom);
   const { chartData, areas } = getChartDataAndAreasFromDaysAndEntriesDateMap(
     dateRange,

@@ -1,12 +1,9 @@
-import { updateChangeEntryIdEntryInstance } from '@/entry/entry-instances-slice';
 import { Form, Input, InputNumber, Radio } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { createEntryType, updateEntryType, updateEntryTypeId } from '../../entry/entry-types-slice';
-import { selectEntryInstancesMap, useAppDispatch, useAppSelector } from '../../entry/store';
 import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../entry/types-constants';
-import { exitEntryTypeEdit } from '../../entry/ui-slice';
+import { useJotaiActions, useJotaiSelectors } from '@/hooks/useJotaiMigration';
 import Button from '../button';
 import DiaryIcons from '../icon/DiaryIcons';
 
@@ -20,9 +17,15 @@ const addInitialValues = {
 };
 
 const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | EntryType; entryTypeIds: string[] }) => {
-  const dispatch = useAppDispatch();
   const [form] = Form.useForm();
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const { entryInstancesMap } = useJotaiSelectors();
+  const { 
+    createEntryType, 
+    updateEntryType, 
+    updateEntryTypeId, 
+    updateChangeEntryIdEntryInstance,
+    exitEntryTypeEdit 
+  } = useJotaiActions();
 
   const onValuesChange = (changedValues: any, allValues: any) => {
     if (changedValues.title) {
@@ -50,25 +53,22 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
           toast.error('id already exists');
           return;
         }
-        dispatch(updateChangeEntryIdEntryInstance({ preEntryTypeId: id, changeEntryTypeId: newEntryType.id }));
-        // dispatch(updateEntryType(newEntryType));
-        dispatch(
-          updateEntryTypeId({
-            preEntryTypeId: id,
-            changeEntryTypeId: newEntryType.id,
-            newEntryType,
-          }),
-        );
-        dispatch(exitEntryTypeEdit());
+        updateChangeEntryIdEntryInstance({ preEntryTypeId: id, changeEntryTypeId: newEntryType.id });
+        updateEntryTypeId({
+          preEntryTypeId: id,
+          changeEntryTypeId: newEntryType.id,
+          newEntryType,
+        });
+        exitEntryTypeEdit();
         console.log('change id ==== preEntryType', updatingEntryType, ' newEntryType', newEntryType);
         return;
       }
       console.log('preEntryType', updatingEntryType, ' newEntryType', newEntryType);
 
-      dispatch(updateEntryType(newEntryType));
-      dispatch(exitEntryTypeEdit());
+      updateEntryType(newEntryType);
+      exitEntryTypeEdit();
     } else {
-      dispatch(createEntryType(newEntryType));
+      createEntryType(newEntryType);
       form.resetFields();
     }
   };
@@ -79,7 +79,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
   };
 
   const onCancelUpdateClick = () => {
-    dispatch(exitEntryTypeEdit());
+    exitEntryTypeEdit();
   };
   const entryTypeThemeColorsRadios = useMemo(
     () =>

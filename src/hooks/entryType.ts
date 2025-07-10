@@ -1,10 +1,10 @@
-import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
 import { EntryType, RoutineEnum, StreakStatus } from '@/entry/types-constants';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 import dayjs from 'dayjs';
 import { useCallback } from 'react';
 
 export const useEntryStreakGetters = (routine: RoutineEnum) => {
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const { entryInstancesMap } = useJotaiSelectors();
   const getHeader = useCallback(
     ({ start, end }: { start: string; end: string }) => {
       const s = dayjs(start);

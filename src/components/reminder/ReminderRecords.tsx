@@ -1,8 +1,8 @@
-import { selectReminderRecordArray, useAppSelector } from '@/entry/store';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 import ReminderRecordCard from './ReminderRecordCard';
 
 export default function ReminderRecords() {
-  const reminderRecords = useAppSelector(selectReminderRecordArray);
+  const { reminderRecords } = useJotaiSelectors();
 
   return (
     <div className="flex flex-col gap-2">

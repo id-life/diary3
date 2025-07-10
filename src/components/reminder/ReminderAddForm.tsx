@@ -1,8 +1,6 @@
-import { createReminder, updateReminder } from '@/entry/reminder-records-slice';
-import { selectReminderRecordArray, useAppDispatch, useAppSelector } from '@/entry/store';
 import { ReminderConstructor, ReminderRecord, ReminderType } from '@/entry/types-constants';
-import { exitReminderEdit } from '@/entry/ui-slice';
 import { cn } from '@/utils';
+import { useJotaiSelectors, useJotaiActions } from '@/hooks/useJotaiMigration';
 import { formatDate } from '@/utils/date';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AddToCalendarButton } from 'add-to-calendar-button-react';
@@ -39,9 +37,9 @@ export default function ReminderAddForm() {
   const [weekOpt, setWeekOpt] = useState<number>(0);
   const [monthDayOpt, setMonthDayOpt] = useState<number>(0);
   const [yearMonthOpt, setYearMonthOpt] = useState<number>(0);
-  const dispatch = useAppDispatch();
-  const updatingReminderId = useAppSelector((state) => state.uiState.addPage.updatingReminderId);
-  const reminderRecords = useAppSelector(selectReminderRecordArray);
+  const { reminderRecords, uiState } = useJotaiSelectors();
+  const { createReminder, updateReminder, exitReminderEdit } = useJotaiActions();
+  const updatingReminderId = uiState.addPage.updatingReminderId;
   const updatingReminder = useMemo(
     () => reminderRecords.find((reminder) => reminder.id === updatingReminderId),
     [reminderRecords, updatingReminderId],
@@ -86,9 +84,9 @@ export default function ReminderAddForm() {
     console.log('submit:', submitData);
 
     if (!updatingReminderId) {
-      dispatch(createReminder(submitData));
+      createReminder(submitData);
     } else {
-      dispatch(updateReminder(submitData));
+      updateReminder(submitData);
     }
   }
 
@@ -287,7 +285,7 @@ export default function ReminderAddForm() {
         </div>
         <div className="mt-2 flex items-center justify-center gap-2">
           {updatingReminderId !== null ? (
-            <Button size="large" className="rounded-full" htmlType="button" onClick={() => dispatch(exitReminderEdit())}>
+            <Button size="large" className="rounded-full" htmlType="button" onClick={() => exitReminderEdit()}>
               Cancel
             </Button>
           ) : null}
