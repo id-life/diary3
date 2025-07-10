@@ -3,11 +3,11 @@ import { backupDialogOpenAtom } from '@/atoms/app';
 import { useAtom } from 'jotai';
 import { FunctionComponent } from 'react';
 import { toast } from 'react-toastify';
-import { 
-  convertAndRestoreBackup, 
-  validateBackupData, 
+import {
+  convertAndRestoreBackup,
+  validateBackupData,
   createRestoreBackup,
-  detectBackupFormat 
+  detectBackupFormat,
 } from '@/utils/backupDataConverter';
 import Button from '../button';
 import Dialog from '../dialog';
@@ -30,7 +30,7 @@ const BackupDialog: FunctionComponent = () => {
       // Validate backup data
       if (!validateBackupData(backup.content)) {
         toast.update(loadMsg, {
-          render: '❌ Invalid backup data format',
+          render: 'Invalid backup data format',
           type: 'error',
           isLoading: false,
           autoClose: 3000,
@@ -41,7 +41,7 @@ const BackupDialog: FunctionComponent = () => {
       // Show format detection info
       const format = detectBackupFormat(backup.content);
       console.log('📊 Backup format detected:', format);
-      
+
       toast.update(loadMsg, {
         render: `🔄 Converting ${format} backup data...`,
         type: 'info',
@@ -56,10 +56,10 @@ const BackupDialog: FunctionComponent = () => {
 
       // Convert and restore backup data
       const conversionSuccess = await convertAndRestoreBackup(backup.content);
-      
+
       if (conversionSuccess) {
         toast.update(loadMsg, {
-          render: '✅ Backup restored successfully! Refreshing...',
+          render: 'Backup restored successfully! Refreshing...',
           type: 'success',
           isLoading: false,
           autoClose: 2000,
@@ -70,14 +70,14 @@ const BackupDialog: FunctionComponent = () => {
         }, 2000);
       } else {
         toast.update(loadMsg, {
-          render: '❌ Failed to restore backup data',
+          render: 'Failed to restore backup data',
           type: 'error',
           isLoading: false,
           autoClose: 3000,
         });
       }
     } catch (error) {
-      console.error('❌ Restore backup failed:', error);
+      console.error('Restore backup failed:', error);
       toast.error('Restore backup failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
@@ -96,24 +96,26 @@ const BackupDialog: FunctionComponent = () => {
               {backupList.map((backup) => {
                 const format = detectBackupFormat(backup.content);
                 const isValid = validateBackupData(backup.content);
-                
+
                 return (
                   <div key={backup.id} className="flex items-center justify-between gap-2 rounded-lg bg-zinc-700 p-4 shadow-md">
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-zinc-200">{backup.fileName}</span>
                       <span className="text-xs text-zinc-400">{new Date(backup.createdAt).toLocaleString()}</span>
                       <div className="mt-1 flex items-center gap-2">
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          format === 'old-redux' ? 'bg-blue-500/20 text-blue-300' : 
-                          format === 'new-jotai' ? 'bg-green-500/20 text-green-300' : 
-                          'bg-red-500/20 text-red-300'
-                        }`}>
+                        <span
+                          className={`rounded-full px-2 py-1 text-xs ${
+                            format === 'old-redux'
+                              ? 'bg-blue-500/20 text-blue-300'
+                              : format === 'new-jotai'
+                              ? 'bg-green-500/20 text-green-300'
+                              : 'bg-red-500/20 text-red-300'
+                          }`}
+                        >
                           {format === 'old-redux' ? '🔄 Redux' : format === 'new-jotai' ? '✅ Jotai' : '❌ Unknown'}
                         </span>
                         {!isValid && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-300">
-                            ⚠️ Invalid
-                          </span>
+                          <span className="rounded-full bg-red-500/20 px-2 py-1 text-xs text-red-300">⚠️ Invalid</span>
                         )}
                       </div>
                     </div>
@@ -121,9 +123,9 @@ const BackupDialog: FunctionComponent = () => {
                       onClick={() => restoreBackup(backup)}
                       disabled={!isValid}
                       className={`rounded-full border px-4 py-2 font-semibold shadow-sm transition-all duration-300 ${
-                        isValid 
-                          ? 'border-gray-300 bg-white text-black hover:bg-gray-100' 
-                          : 'border-gray-500 bg-gray-400 text-gray-600 cursor-not-allowed'
+                        isValid
+                          ? 'border-gray-300 bg-white text-black hover:bg-gray-100'
+                          : 'cursor-not-allowed border-gray-500 bg-gray-400 text-gray-600'
                       }`}
                     >
                       {format === 'old-redux' ? 'Convert & Restore' : 'Restore'}

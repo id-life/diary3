@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 import { ReminderRecord } from '@/entry/types-constants';
 import { toast } from 'react-toastify';
+import { hybridReminderRecordsAtom } from './databaseFirst';
 
-// Core data atom with localStorage persistence
-export const reminderRecordsAtom = atomWithStorage<ReminderRecord[]>('reminderRecords.reminderRecords', []);
+// Core data atom with database-first approach
+export const reminderRecordsAtom = hybridReminderRecordsAtom;
 
 // Action atoms for managing reminder records
 export const createReminderAtom = atom(
@@ -20,7 +20,7 @@ export const updateReminderAtom = atom(
   null,
   (get, set, reminderRecord: ReminderRecord) => {
     const current = get(reminderRecordsAtom);
-    const indexToUpdate = current.findIndex((reminder) => reminder.id === reminderRecord.id);
+    const indexToUpdate = current.findIndex((reminder: any) => reminder.id === reminderRecord.id);
     
     if (indexToUpdate >= 0) {
       const updated = [...current];
@@ -35,7 +35,7 @@ export const deleteReminderAtom = atom(
   null,
   (get, set, reminderId: string) => {
     const current = get(reminderRecordsAtom);
-    const filtered = current.filter((reminder) => reminder.id !== reminderId);
+    const filtered = current.filter((reminder: any) => reminder.id !== reminderId);
     set(reminderRecordsAtom, filtered);
   }
 );

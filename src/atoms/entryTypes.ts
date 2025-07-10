@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 import { EntryType } from '@/entry/types-constants';
 import { toast } from 'react-toastify';
+import { hybridEntryTypesAtom } from './databaseFirst';
 
-// Core data atom with localStorage persistence
-export const entryTypesArrayAtom = atomWithStorage<EntryType[]>('entryTypes.entryTypesArray', []);
+// Core data atom with database-first approach
+export const entryTypesArrayAtom = hybridEntryTypesAtom;
 
 // Action atoms for managing entry types
 export const createEntryTypeAtom = atom(
@@ -20,7 +20,7 @@ export const updateEntryTypeAtom = atom(
   null,
   (get, set, entryType: EntryType) => {
     const current = get(entryTypesArrayAtom);
-    const indexToUpdate = current.findIndex((et) => et.id === entryType.id);
+    const indexToUpdate = current.findIndex((et: any) => et.id === entryType.id);
     if (indexToUpdate >= 0) {
       const updated = [...current];
       updated[indexToUpdate] = entryType;
@@ -35,7 +35,7 @@ export const updateEntryTypeIdAtom = atom(
     const { preEntryTypeId, changeEntryTypeId, newEntryType } = payload;
     const { title, id, ...rest } = newEntryType;
     const current = get(entryTypesArrayAtom);
-    const indexToUpdate = current.findIndex((et) => et.id === preEntryTypeId);
+    const indexToUpdate = current.findIndex((et: any) => et.id === preEntryTypeId);
     
     if (indexToUpdate >= 0) {
       const updated = [...current];
@@ -54,7 +54,7 @@ export const deleteEntryTypeAtom = atom(
   null,
   (get, set, entryTypeId: string) => {
     const current = get(entryTypesArrayAtom);
-    const filtered = current.filter((et) => et.id !== entryTypeId);
+    const filtered = current.filter((et: any) => et.id !== entryTypeId);
     set(entryTypesArrayAtom, filtered);
   }
 );
@@ -62,5 +62,5 @@ export const deleteEntryTypeAtom = atom(
 // Computed atoms
 export const entryTypeIdsAtom = atom((get) => {
   const entryTypes = get(entryTypesArrayAtom);
-  return entryTypes.map((entryType) => entryType.id);
+  return entryTypes.map((entryType: any) => entryType.id);
 });

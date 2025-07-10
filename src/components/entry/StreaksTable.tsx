@@ -3,7 +3,9 @@ import { calcEntryTypeLongestStreaks } from '@/utils/entry';
 import clsx from 'clsx';
 import { Fragment, useLayoutEffect, useMemo, useRef } from 'react';
 import { EntryType, RoutineEnum, StreakStatus, getDatePeriods } from '../../entry/types-constants';
-import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
+import { entryInstancesMapAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
+
 import EntryTypeCard from './EntryTypeCard';
 
 const statusColor: { [key in StreakStatus]: string } = {
@@ -14,8 +16,8 @@ const statusColor: { [key in StreakStatus]: string } = {
 };
 function StreaksTable(props: { entryTypesArray: EntryType[]; routine: RoutineEnum }) {
   const { routine, entryTypesArray } = props;
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { entryInstancesMap } = useJotaiSelectors();
   const periods = useMemo(() => getDatePeriods(routine), [routine]);
   const entryTypeMaxStreaks = useMemo(
     () => calcEntryTypeLongestStreaks(entryInstancesMap, routine),

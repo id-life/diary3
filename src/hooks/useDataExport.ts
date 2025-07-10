@@ -198,6 +198,11 @@ export const useDataExport = () => {
    * Clear localStorage (for decoupling)
    */
   const clearLocalStorage = () => {
+    if (typeof window === 'undefined') {
+      console.warn('clearLocalStorage called on server-side, skipping...');
+      return;
+    }
+    
     const confirmMsg = 'This will clear all localStorage data. Continue?';
     if (window.confirm(confirmMsg)) {
       const keysToRemove = [
@@ -224,10 +229,10 @@ export const useDataExport = () => {
   const getExportStats = () => {
     return {
       entryTypesCount: entryTypes.length,
-      entryInstancesCount: Object.values(entryInstances).reduce((total, instances) => total + instances.length, 0),
+      entryInstancesCount: Object.values(entryInstances).reduce((total, instances: any) => total + instances.length, 0),
       reminderRecordsCount: reminderRecords.length,
       totalDatesWithEntries: Object.keys(entryInstances).length,
-      hasLocalStorageData: !!localStorage.getItem('entryTypes.entryTypesArray'),
+      hasLocalStorageData: typeof window !== 'undefined' ? !!localStorage.getItem('entryTypes.entryTypesArray') : false,
       isAuthenticated: !!accessToken,
     };
   };

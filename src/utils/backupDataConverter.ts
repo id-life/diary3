@@ -1,6 +1,6 @@
 /**
  * Backup Data Converter
- * 
+ *
  * This utility converts old Redux persist backup data to the new Jotai format
  * when loading from GitHub backups. It handles both old and new data structures
  * to ensure backward compatibility.
@@ -54,24 +54,24 @@ export const detectBackupFormat = (backupData: any): 'old-redux' | 'new-jotai' |
   try {
     // Check if it's old Redux format (strings that need JSON.parse)
     if (
-      backupData.entryTypes && 
+      backupData.entryTypes &&
       typeof backupData.entryTypes === 'string' &&
-      backupData.entryInstances && 
+      backupData.entryInstances &&
       typeof backupData.entryInstances === 'string'
     ) {
       return 'old-redux';
     }
-    
+
     // Check if it's new Jotai format (already parsed objects)
     if (
-      backupData.entryTypes && 
+      backupData.entryTypes &&
       typeof backupData.entryTypes === 'object' &&
       backupData.entryTypes.entryTypesArray &&
       Array.isArray(backupData.entryTypes.entryTypesArray)
     ) {
       return 'new-jotai';
     }
-    
+
     return 'unknown';
   } catch (error) {
     console.error('Error detecting backup format:', error);
@@ -85,22 +85,24 @@ export const detectBackupFormat = (backupData: any): 'old-redux' | 'new-jotai' |
 export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJotaiBackupData => {
   try {
     console.log('🔄 Converting old Redux backup to new Jotai format...');
-    
+
     // Parse Redux persist strings
     const entryTypes = oldBackupData.entryTypes ? JSON.parse(oldBackupData.entryTypes) : { entryTypesArray: [] };
     const entryInstances = oldBackupData.entryInstances ? JSON.parse(oldBackupData.entryInstances) : { entryInstancesMap: {} };
     const reminderRecords = oldBackupData.reminderRecords ? JSON.parse(oldBackupData.reminderRecords) : { reminderRecords: [] };
-    const uiState = oldBackupData.uiState ? JSON.parse(oldBackupData.uiState) : {
-      app: { dateStr: new Date().toISOString().split('T')[0] },
-      entryPage: {},
-      addPage: {
-        isEntryTypeUpdating: false,
-        updatingEntryTypeId: null,
-        updatingReminderId: null,
-      },
-      reminderPage: {},
-      settingsPage: {}
-    };
+    const uiState = oldBackupData.uiState
+      ? JSON.parse(oldBackupData.uiState)
+      : {
+          app: { dateStr: new Date().toISOString().split('T')[0] },
+          entryPage: {},
+          addPage: {
+            isEntryTypeUpdating: false,
+            updatingEntryTypeId: null,
+            updatingReminderId: null,
+          },
+          reminderPage: {},
+          settingsPage: {},
+        };
     const _persist = oldBackupData._persist ? JSON.parse(oldBackupData._persist) : { version: 1, rehydrated: true };
 
     // Ensure updatingReminderId exists in addPage (backward compatibility)
@@ -113,13 +115,13 @@ export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJot
       entryInstances,
       reminderRecords,
       uiState,
-      _persist
+      _persist,
     };
 
     console.log('✅ Successfully converted old Redux backup:', {
       entryTypes: entryTypes.entryTypesArray.length,
       entryInstances: Object.keys(entryInstances.entryInstancesMap).length,
-      reminderRecords: reminderRecords.reminderRecords.length
+      reminderRecords: reminderRecords.reminderRecords.length,
     });
 
     return convertedData;
@@ -135,26 +137,26 @@ export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJot
 export const convertToJotaiLocalStorage = (backupData: NewJotaiBackupData): Record<string, string> => {
   try {
     console.log('🔄 Converting backup data to Jotai localStorage format...');
-    
+
     const jotaiData: Record<string, string> = {};
-    
+
     // Convert each section to Jotai localStorage keys
     if (backupData.entryTypes?.entryTypesArray) {
       jotaiData['entryTypes.entryTypesArray'] = JSON.stringify(backupData.entryTypes.entryTypesArray);
     }
-    
+
     if (backupData.entryInstances?.entryInstancesMap) {
       jotaiData['entryInstances.entryInstancesMap'] = JSON.stringify(backupData.entryInstances.entryInstancesMap);
     }
-    
+
     if (backupData.reminderRecords?.reminderRecords) {
       jotaiData['reminderRecords.reminderRecords'] = JSON.stringify(backupData.reminderRecords.reminderRecords);
     }
-    
+
     if (backupData.uiState) {
       jotaiData['uiState'] = JSON.stringify(backupData.uiState);
     }
-    
+
     console.log('✅ Successfully converted to Jotai localStorage format');
     return jotaiData;
   } catch (error) {
@@ -169,12 +171,12 @@ export const convertToJotaiLocalStorage = (backupData: NewJotaiBackupData): Reco
 export const convertAndRestoreBackup = async (backupData: any): Promise<boolean> => {
   try {
     console.log('🔄 Starting backup conversion and restoration...');
-    
+
     const format = detectBackupFormat(backupData);
     console.log('📊 Detected backup format:', format);
-    
+
     let convertedData: NewJotaiBackupData;
-    
+
     if (format === 'old-redux') {
       // Convert old Redux format to new Jotai format
       convertedData = convertOldReduxBackup(backupData as OldReduxBackupData);
@@ -184,23 +186,23 @@ export const convertAndRestoreBackup = async (backupData: any): Promise<boolean>
     } else {
       throw new Error('Unknown backup data format');
     }
-    
+
     // Convert to Jotai localStorage keys
     const jotaiLocalStorageData = convertToJotaiLocalStorage(convertedData);
-    
+
     // Apply to localStorage
     Object.entries(jotaiLocalStorageData).forEach(([key, value]) => {
       localStorage.setItem(key, value);
     });
-    
+
     // Also maintain Redux persist format for backward compatibility during transition
     if (format === 'old-redux') {
       localStorage.setItem('persist:diary', JSON.stringify(convertedData));
     }
-    
+
     // Mark successful conversion
     localStorage.setItem('__backup_conversion_completed', new Date().toISOString());
-    
+
     console.log('✅ Backup conversion and restoration completed successfully');
     return true;
   } catch (error) {
@@ -218,23 +220,21 @@ export const validateBackupData = (backupData: any): boolean => {
     if (!backupData || typeof backupData !== 'object') {
       return false;
     }
-    
+
     const format = detectBackupFormat(backupData);
-    
+
     if (format === 'old-redux') {
       // Validate old Redux format
-      const hasRequiredFields = 
-        backupData.entryTypes && 
-        backupData.entryInstances;
-        
+      const hasRequiredFields = backupData.entryTypes && backupData.entryInstances;
+
       if (!hasRequiredFields) {
         return false;
       }
-      
+
       // Try to parse the JSON strings
       JSON.parse(backupData.entryTypes);
       JSON.parse(backupData.entryInstances);
-      
+
       return true;
     } else if (format === 'new-jotai') {
       // Validate new Jotai format
@@ -247,7 +247,7 @@ export const validateBackupData = (backupData: any): boolean => {
         typeof backupData.entryInstances.entryInstancesMap === 'object'
       );
     }
-    
+
     return false;
   } catch (error) {
     console.error('Backup validation failed:', error);
@@ -260,34 +260,33 @@ export const validateBackupData = (backupData: any): boolean => {
  */
 export const createRestoreBackup = (): boolean => {
   try {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupKey = `pre_restore_backup_${timestamp}`;
-    
+    const backupKey = `pre_restore_backup`;
+
     // Backup current Jotai data
     const currentJotaiData: Record<string, string> = {};
     const jotaiKeys = [
       'entryTypes.entryTypesArray',
       'entryInstances.entryInstancesMap',
       'reminderRecords.reminderRecords',
-      'uiState'
+      'uiState',
     ];
-    
-    jotaiKeys.forEach(key => {
+
+    jotaiKeys.forEach((key) => {
       const value = localStorage.getItem(key);
       if (value) {
         currentJotaiData[key] = value;
       }
     });
-    
+
     // Also backup Redux persist data if it exists
     const reduxData = localStorage.getItem('persist:diary');
     if (reduxData) {
       currentJotaiData['persist:diary'] = reduxData;
     }
-    
+
     localStorage.setItem(backupKey, JSON.stringify(currentJotaiData));
     console.log('✅ Created pre-restore backup:', backupKey);
-    
+
     return true;
   } catch (error) {
     console.error('❌ Failed to create restore backup:', error);

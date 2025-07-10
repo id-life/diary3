@@ -68,19 +68,19 @@ const DataExportDialog: FunctionComponent<DataExportDialogProps> = ({ open, onOp
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-zinc-400">Entry Types:</span>
-                <span className="text-zinc-200 font-medium">{stats.entryTypesCount}</span>
+                <span className="text-zinc-200 font-medium">{String(stats.entryTypesCount)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Entry Instances:</span>
-                <span className="text-zinc-200 font-medium">{stats.entryInstancesCount}</span>
+                <span className="text-zinc-200 font-medium">{String(stats.entryInstancesCount)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Reminders:</span>
-                <span className="text-zinc-200 font-medium">{stats.reminderRecordsCount}</span>
+                <span className="text-zinc-200 font-medium">{String(stats.reminderRecordsCount)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-zinc-400">Active Dates:</span>
-                <span className="text-zinc-200 font-medium">{stats.totalDatesWithEntries}</span>
+                <span className="text-zinc-200 font-medium">{String(stats.totalDatesWithEntries)}</span>
               </div>
               <div className="flex justify-between col-span-2">
                 <span className="text-zinc-400">localStorage Data:</span>

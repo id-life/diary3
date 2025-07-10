@@ -1,8 +1,9 @@
-import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
+
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
+import { entryTypesArrayAtom } from '@/atoms';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Area, AreaChart, Brush, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
@@ -136,7 +137,7 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
 function EntryChart(props: { entryInstancesMap: { [key: string]: EntryInstance[] } }) {
   const [selectedRange, setSelectedRange] = useState<DateRange>('day');
   const { entryInstancesMap } = props;
-  const { entryTypesArray } = useJotaiSelectors();
+  const entryTypesArray = useAtomValue(entryTypesArrayAtom);
   const [dateRange, setDateRange] = useAtom(chartDateRangeAtom);
   const { chartData, areas } = getChartDataAndAreasFromDaysAndEntriesDateMap(
     dateRange,

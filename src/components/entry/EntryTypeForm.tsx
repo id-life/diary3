@@ -18,7 +18,7 @@ const addInitialValues = {
 
 const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | EntryType; entryTypeIds: string[] }) => {
   const [form] = Form.useForm();
-  const { entryInstancesMap } = useJotaiSelectors();
+  // TODO: Replace with direct atom usage
   const { 
     createEntryType, 
     updateEntryType, 
@@ -54,11 +54,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
           return;
         }
         updateChangeEntryIdEntryInstance({ preEntryTypeId: id, changeEntryTypeId: newEntryType.id });
-        updateEntryTypeId({
-          preEntryTypeId: id,
-          changeEntryTypeId: newEntryType.id,
-          newEntryType,
-        });
+        updateEntryTypeId(newEntryType);
         exitEntryTypeEdit();
         console.log('change id ==== preEntryType', updatingEntryType, ' newEntryType', newEntryType);
         return;
@@ -73,7 +69,6 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
     }
   };
 
-  console.log('================entryInstancesMap', entryInstancesMap);
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };

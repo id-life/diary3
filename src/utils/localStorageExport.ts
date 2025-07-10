@@ -48,6 +48,31 @@ const safeJsonParse = <T>(value: string | null, fallback: T): T => {
  */
 export const exportLocalStorageToDatabase = (): DatabaseExportFormat => {
   console.log('📦 Exporting localStorage to database format...');
+  
+  if (typeof window === 'undefined') {
+    console.warn('localStorage export attempted on server-side, returning empty data');
+    return {
+      entryTypes: { entryTypesArray: [] },
+      entryInstances: { entryInstancesMap: {} },
+      reminderRecords: { reminderRecords: [] },
+      uiState: {
+        app: { dateStr: new Date().toISOString().split('T')[0] },
+        entryPage: {},
+        addPage: { isEntryTypeUpdating: false, updatingEntryTypeId: null, updatingReminderId: null },
+        reminderPage: {},
+        settingsPage: {}
+      },
+      _persist: {
+        version: 1,
+        rehydrated: true
+      },
+      exportMeta: {
+        exportedAt: new Date().toISOString(),
+        exportSource: 'localStorage',
+        version: '2.0.0'
+      }
+    };
+  }
 
   const exportData: DatabaseExportFormat = {
     entryTypes: {

@@ -4,7 +4,9 @@ import { useMemo, useState } from 'react';
 import EntryTypeCard from './EntryTypeCard';
 import Segmented from '../segmented';
 import { RoutineEnum } from '@/entry/types-constants';
-import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
+import { entryTypesArrayAtom, entryInstancesMapAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
+
 
 const options = [
   {
@@ -17,15 +19,16 @@ const options = [
   { value: RoutineEnum.adhoc },
 ];
 const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: string }) => {
-  const { entryTypesArray, entryInstancesMap } = useJotaiSelectors();
+  const entryTypesArray = useAtomValue(entryTypesArrayAtom);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const { inputValue, onInputChange } = useInput();
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const { doneList, restList } = useMemo(() => {
     const todayEntryInstances = entryInstancesMap[selectedDateStr];
-    let doneEntryTypes = new Set(todayEntryInstances?.length ? todayEntryInstances.map(({ entryTypeId }) => entryTypeId) : []);
+    let doneEntryTypes = new Set(todayEntryInstances?.length ? todayEntryInstances.map(({ entryTypeId }: any) => entryTypeId) : []);
     return {
       restList: sortEntryTypesArray(
-        entryTypesArray.filter(({ id, title, routine }) => {
+        entryTypesArray.filter(({ id, title, routine }: any) => {
           const isNotDone = doneEntryTypes?.size ? !doneEntryTypes.has(id) : true;
           const isInRoutine = segmentedValue === 'all' ? true : routine === segmentedValue;
           if (!isNotDone || !isInRoutine) return false;
@@ -41,7 +44,7 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
       ),
       doneList: doneEntryTypes?.size
         ? sortEntryTypesArray(
-            entryTypesArray.filter(({ id }) => doneEntryTypes.has(id)),
+            entryTypesArray.filter(({ id }: any) => doneEntryTypes.has(id)),
             entryInstancesMap,
           )
         : [],

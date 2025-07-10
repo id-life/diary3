@@ -58,18 +58,33 @@ export const localToken = atomWithStorage<string | null>(
   null,
   {
     getItem: (key: string) => {
-      const value = localStorage.getItem(key);
-      return value; // Return raw string, no JSON.parse
+      if (typeof window === 'undefined') return null;
+      try {
+        const value = localStorage.getItem(key);
+        return value; // Return raw string, no JSON.parse
+      } catch {
+        return null;
+      }
     },
     setItem: (key: string, value: string | null) => {
-      if (value === null) {
-        localStorage.removeItem(key);
-      } else {
-        localStorage.setItem(key, value); // Store raw string, no JSON.stringify
+      if (typeof window === 'undefined') return;
+      try {
+        if (value === null) {
+          localStorage.removeItem(key);
+        } else {
+          localStorage.setItem(key, value); // Store raw string, no JSON.stringify
+        }
+      } catch (error) {
+        console.warn('Failed to set localStorage item:', error);
       }
     },
     removeItem: (key: string) => {
-      localStorage.removeItem(key);
+      if (typeof window === 'undefined') return;
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        console.warn('Failed to remove localStorage item:', error);
+      }
     },
   },
   { getOnInit: true },

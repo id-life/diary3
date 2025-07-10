@@ -37,11 +37,12 @@ export default function ReminderAddForm() {
   const [weekOpt, setWeekOpt] = useState<number>(0);
   const [monthDayOpt, setMonthDayOpt] = useState<number>(0);
   const [yearMonthOpt, setYearMonthOpt] = useState<number>(0);
-  const { reminderRecords, uiState } = useJotaiSelectors();
+  // TODO: Replace with direct atom usage
+  const { uiState, reminderRecords } = useJotaiSelectors();
   const { createReminder, updateReminder, exitReminderEdit } = useJotaiActions();
   const updatingReminderId = uiState.addPage.updatingReminderId;
   const updatingReminder = useMemo(
-    () => reminderRecords.find((reminder) => reminder.id === updatingReminderId),
+    () => reminderRecords.find((reminder: any) => reminder.id === updatingReminderId),
     [reminderRecords, updatingReminderId],
   );
   const form = useForm<z.infer<typeof FormSchema>>({

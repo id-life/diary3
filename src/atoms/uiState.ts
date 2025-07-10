@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 import { getDateStringFromNow } from '@/entry/types-constants';
+import { hybridUiStateAtom } from './databaseFirst';
 
 // UI state types
 export interface UIState {
@@ -17,20 +17,8 @@ export interface UIState {
   settingsPage: {};
 }
 
-// Core UI state atom with localStorage persistence
-export const uiStateAtom = atomWithStorage<UIState>('uiState', {
-  app: {
-    dateStr: getDateStringFromNow(),
-  },
-  entryPage: {},
-  addPage: {
-    isEntryTypeUpdating: false,
-    updatingEntryTypeId: null,
-    updatingReminderId: null,
-  },
-  reminderPage: {},
-  settingsPage: {},
-});
+// Core UI state atom with database-first approach
+export const uiStateAtom = hybridUiStateAtom;
 
 // Action atoms for UI state management
 export const initDateStrAtom = atom(

@@ -1,9 +1,9 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 import { EntryInstance, getDateStringFromTimestamp } from '@/entry/types-constants';
+import { hybridEntryInstancesAtom } from './databaseFirst';
 
-// Core data atom with localStorage persistence
-export const entryInstancesMapAtom = atomWithStorage<{ [key: string]: EntryInstance[] }>('entryInstances.entryInstancesMap', {});
+// Core data atom with database-first approach
+export const entryInstancesMapAtom = hybridEntryInstancesAtom;
 
 // Action atoms for managing entry instances
 export const initDayEntryInstancesAtom = atom(
@@ -40,7 +40,7 @@ export const updateEntryInstanceAtom = atom(
       const current = get(entryInstancesMapAtom);
       
       if (current[dateStr]) {
-        const indexToUpdate = current[dateStr].findIndex((ei) => ei.id === entryInstance.id);
+        const indexToUpdate = current[dateStr].findIndex((ei: any) => ei.id === entryInstance.id);
         if (indexToUpdate >= 0) {
           const updatedDateEntries = [...current[dateStr]];
           updatedDateEntries[indexToUpdate] = entryInstance;
@@ -88,7 +88,7 @@ export const updateChangeEntryIdEntryInstanceAtom = atom(
       for (const key in updated) {
         if (!updated[key]?.length) continue;
         
-        updated[key] = updated[key].map((entryInstance) => {
+        updated[key] = updated[key].map((entryInstance: any) => {
           if (entryInstance.entryTypeId === preEntryTypeId) {
             updatedCount++;
             return { ...entryInstance, entryTypeId: changeEntryTypeId };
@@ -113,7 +113,7 @@ export const deleteEntryInstanceAtom = atom(
     const current = get(entryInstancesMapAtom);
     
     if (current[dateStr]) {
-      const filtered = current[dateStr].filter((ei) => ei.id !== entryInstance.id);
+      const filtered = current[dateStr].filter((ei: any) => ei.id !== entryInstance.id);
       set(entryInstancesMapAtom, {
         ...current,
         [dateStr]: filtered
@@ -137,7 +137,7 @@ export const deleteEntryInstanceByEntryTypeIdAtom = atom(
       for (const key in updated) {
         if (!updated[key]?.length) continue;
         const originalLength = updated[key].length;
-        updated[key] = updated[key].filter(({ entryTypeId }) => entryTypeId !== deleteEntryTypeId);
+        updated[key] = updated[key].filter(({ entryTypeId }: any) => entryTypeId !== deleteEntryTypeId);
         deletedCount += originalLength - updated[key].length;
       }
       
