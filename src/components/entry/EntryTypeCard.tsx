@@ -44,6 +44,7 @@ const EntryTypeCardEditButton = (props: { entryType: EntryType }) => {
     </Button>
   );
 };
+
 export type EntryTypeCardProps = {
   entryType: EntryType;
   isEdit: boolean;
