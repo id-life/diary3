@@ -1,6 +1,6 @@
 import { getUserProfile, GitHubUser } from '@/api/auth';
 import { githubUserStateAtom } from '@/atoms/user';
-import { NEXT_PUBLIC_AUTH_URL } from '@/constants/env';
+import { NEXT_PUBLIC_API_PREFIX } from '@/constants/env';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
@@ -92,7 +92,7 @@ export const useGitHubOAuth = () => {
   // Initiate GitHub OAuth login
   const login = useCallback(() => {
     try {
-      router.push(NEXT_PUBLIC_AUTH_URL + '/auth/github');
+      router.push(NEXT_PUBLIC_API_PREFIX + '/auth/github');
     } catch (error) {
       console.error('GitHub OAuth Login Failed:', error);
       toast.error('GitHub OAuth Login Failed');

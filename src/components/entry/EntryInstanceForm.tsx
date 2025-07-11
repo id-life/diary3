@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { deleteEntryInstance, updateEntryInstance } from '../../entry/entry-instances-slice';
-import { useAppDispatch } from '../../entry/store';
+import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import { EntryInstance } from '../../entry/types-constants';
 import Button from '../button';
 import dayjs from 'dayjs';
@@ -9,7 +8,7 @@ import { InputNumber } from 'antd';
 import { formatDateTime } from '@/utils/date';
 
 const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) => {
-  const dispatch = useAppDispatch();
+  const { updateEntryInstance, deleteEntryInstance } = useJotaiActions();
   const { id, points, notes, entryTypeId, createdAt, updatedAt } = entryInstance;
 
   const { register, handleSubmit, control } = useForm();
@@ -18,9 +17,9 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
       const points = data?.points ? parseFloat(data.points) : entryInstance.points;
       const notes = data?.notes ?? entryInstance.notes;
       const newEntryInstance = { ...entryInstance, points, notes, updatedAt: dayjs().valueOf() };
-      dispatch(updateEntryInstance(newEntryInstance));
+      updateEntryInstance(newEntryInstance);
     },
-    [dispatch, entryInstance],
+    [updateEntryInstance, entryInstance],
   );
   const onError = useCallback((errors: any) => {
     console.error('=======onError', errors);
@@ -70,7 +69,7 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
         type="primary"
         danger
         onClick={() => {
-          dispatch(deleteEntryInstance(entryInstance));
+          deleteEntryInstance(entryInstance);
         }}
       >
         Delete

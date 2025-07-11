@@ -2,16 +2,18 @@
 
 import EntryTypeForm from '@/components/entry/EntryTypeForm';
 import StreaksTable from '@/components/entry/StreaksTable';
-import { selectEntryTypeIds, selectEntryTypesArray, useAppSelector } from '@/entry/store';
 import { RoutineEnum } from '@/entry/types-constants';
+import { entryTypesArrayAtom, entryTypeIdsAtom, uiStateAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
 
 export default function AddPage() {
-  const entryTypesArray = useAppSelector(selectEntryTypesArray);
-  const entryTypeIds = useAppSelector(selectEntryTypeIds);
-  const isUpdate = useAppSelector((state) => state.uiState.addPage.isEntryTypeUpdating);
-  const updatingEntryTypeId = useAppSelector((state) => state.uiState.addPage.updatingEntryTypeId);
+  const entryTypesArray = useAtomValue(entryTypesArrayAtom);
+  const entryTypeIds = useAtomValue(entryTypeIdsAtom);
+  const uiState = useAtomValue(uiStateAtom);
+  const isUpdate = uiState.addPage.isEntryTypeUpdating;
+  const updatingEntryTypeId = uiState.addPage.updatingEntryTypeId;
   const updatingEntryType =
-    isUpdate && updatingEntryTypeId ? entryTypesArray.find((entryType) => entryType.id === updatingEntryTypeId) : null;
+    isUpdate && updatingEntryTypeId ? entryTypesArray.find((entryType: any) => entryType.id === updatingEntryTypeId) : null;
   console.log({ entryTypesArray });
   return (
     <div className="flex h-full flex-col items-center gap-8 overflow-auto px-4 py-6 text-center">

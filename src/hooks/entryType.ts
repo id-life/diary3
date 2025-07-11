@@ -1,10 +1,11 @@
-import { selectEntryInstancesMap, useAppSelector } from '@/entry/store';
 import { EntryType, RoutineEnum, StreakStatus } from '@/entry/types-constants';
+import { entryInstancesMapAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
 import dayjs from 'dayjs';
 import { useCallback } from 'react';
 
 export const useEntryStreakGetters = (routine: RoutineEnum) => {
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const getHeader = useCallback(
     ({ start, end }: { start: string; end: string }) => {
       const s = dayjs(start);
@@ -28,7 +29,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           const entries = entryInstancesMap[s.format('YYYY-MM-DD')];
           if (!entries?.length) return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
-          const isDone = entries.findIndex(({ entryTypeId }) => entryTypeId === id) !== -1;
+          const isDone = entries.findIndex(({ entryTypeId }: any) => entryTypeId === id) !== -1;
           if (isDone) return StreakStatus.COMPLETED;
           else return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
         }
@@ -37,7 +38,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           for (let day = s; day.isBefore(e) || day.isSame(e); day = day.add(1, 'day')) {
             const entries = entryInstancesMap[day.format('YYYY-MM-DD')];
-            if (entries?.length && entries.findIndex(({ entryTypeId }) => entryTypeId === id) !== -1) {
+            if (entries?.length && entries.findIndex(({ entryTypeId }: any) => entryTypeId === id) !== -1) {
               return StreakStatus.COMPLETED;
             }
           }
@@ -48,7 +49,7 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           for (let day = s; day.isBefore(e) || day.isSame(e); day = day.add(1, 'day')) {
             const entries = entryInstancesMap[day.format('YYYY-MM-DD')];
-            if (entries?.length && entries.findIndex(({ entryTypeId }) => entryTypeId === id) !== -1) {
+            if (entries?.length && entries.findIndex(({ entryTypeId }: any) => entryTypeId === id) !== -1) {
               return StreakStatus.COMPLETED;
             }
           }

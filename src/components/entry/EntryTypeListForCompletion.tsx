@@ -1,13 +1,13 @@
-import { selectEntryInstancesMap, selectEntryTypesArray, useAppSelector } from '@/entry/store';
+import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
+import { EntryType, RoutineEnum } from '@/entry/types-constants';
 import { useInput } from '@/hooks/useInput';
 import { sortEntryTypesArray } from '@/utils/entry';
-import { getHiddenEntryTypes, unhideEntryType, hideEntryType } from '@/utils/hiddenEntryTypes';
+import { getHiddenEntryTypes, hideEntryType, unhideEntryType } from '@/utils/hiddenEntryTypes';
+import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
-import EntryTypeCard from './EntryTypeCard';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Segmented from '../segmented';
-import Button from '../button';
-import { RoutineEnum, EntryType } from '@/entry/types-constants';
-import { AiOutlineEyeInvisible, AiOutlineEye } from 'react-icons/ai';
+import EntryTypeCard from './EntryTypeCard';
 
 const options = [
   {
@@ -23,32 +23,35 @@ const options = [
 const EntryTypeCardHideButton = (props: { entryType: EntryType; onHide: (entryTypeId: string) => void }) => {
   return (
     <button
-      className="absolute top-2 right-2 p-1 rounded-full bg-black/10 hover:bg-black/20 transition-colors opacity-60 hover:opacity-100"
+      className="absolute right-2 top-2 rounded-full bg-black/10 p-1 opacity-60 transition-colors hover:bg-black/20 hover:opacity-100"
       onClick={() => props.onHide(props.entryType.id)}
       title="Hide entry"
     >
-      <AiOutlineEyeInvisible className="w-4 h-4 text-white" />
+      <AiOutlineEyeInvisible className="h-4 w-4 text-white" />
     </button>
   );
 };
 
 const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: string }) => {
-  const entryTypesArray = useAppSelector(selectEntryTypesArray);
-  const entryInstancesMap = useAppSelector(selectEntryInstancesMap);
+  const entryTypesArray = useAtomValue(entryTypesArrayAtom);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const { inputValue, onInputChange } = useInput();
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const [hiddenEntryTypes, setHiddenEntryTypes] = useState(() => getHiddenEntryTypes());
-  
+
   const { doneList, restList, hiddenList } = useMemo(() => {
     const todayEntryInstances = entryInstancesMap[selectedDateStr];
-    let doneEntryTypes = new Set(todayEntryInstances?.length ? todayEntryInstances.map(({ entryTypeId }) => entryTypeId) : []);
-    
-    const visibleEntryTypes = entryTypesArray.filter(({ id }) => !hiddenEntryTypes.has(id));
-    const hiddenEntryTypesList = entryTypesArray.filter(({ id }) => hiddenEntryTypes.has(id));
-    
+    let doneEntryTypes = new Set(
+      todayEntryInstances?.length ? todayEntryInstances.map(({ entryTypeId }: { entryTypeId: string }) => entryTypeId) : [],
+    );
+
+    // Separate visible and hidden entry types
+    const visibleEntryTypes = entryTypesArray.filter(({ id }: EntryType) => !hiddenEntryTypes.has(id));
+    const hiddenEntryTypesList = entryTypesArray.filter(({ id }: EntryType) => hiddenEntryTypes.has(id));
+
     return {
       restList: sortEntryTypesArray(
-        visibleEntryTypes.filter(({ id, title, routine }) => {
+        visibleEntryTypes.filter(({ id, title, routine }: any) => {
           const isNotDone = doneEntryTypes?.size ? !doneEntryTypes.has(id) : true;
           const isInRoutine = segmentedValue === 'all' ? true : routine === segmentedValue;
           if (!isNotDone || !isInRoutine) return false;
@@ -64,14 +67,14 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
       ),
       doneList: doneEntryTypes?.size
         ? sortEntryTypesArray(
-            visibleEntryTypes.filter(({ id }) => doneEntryTypes.has(id)),
+            visibleEntryTypes.filter(({ id }: any) => doneEntryTypes.has(id)),
             entryInstancesMap,
           )
         : [],
       hiddenList: hiddenEntryTypesList,
     };
   }, [entryInstancesMap, entryTypesArray, inputValue, segmentedValue, selectedDateStr, hiddenEntryTypes]);
-  
+
   const handleUnhideEntryType = (entryTypeId: string) => {
     unhideEntryType(entryTypeId);
     setHiddenEntryTypes(getHiddenEntryTypes());
@@ -118,17 +121,24 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
       </div>
       {hiddenList?.length ? (
         <>
-          <div className="mt-4 flex items-center justify-center border-t pt-2 text-xl font-semibold">Hidden Entries Archive</div>
+          <div className="mt-4 flex items-center justify-center border-t pt-2 text-xl font-semibold">
+            Hidden Entries Archive
+          </div>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-1 4xl:grid-cols-4">
-            {hiddenList.map((item) => (
-              <div key={item.id} className="relative group">
-                <EntryTypeCard entryType={item} isEdit={false} selectedDayStr={selectedDateStr} className="opacity-40 group-hover:opacity-60 transition-opacity" />
+            {hiddenList.map((item: EntryType) => (
+              <div key={item.id} className="group relative">
+                <EntryTypeCard
+                  entryType={item}
+                  isEdit={false}
+                  selectedDayStr={selectedDateStr}
+                  className="opacity-40 transition-opacity group-hover:opacity-60"
+                />
                 <button
-                  className="absolute top-2 right-2 p-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors opacity-80 hover:opacity-100 backdrop-blur-sm"
+                  className="absolute right-2 top-2 rounded-full bg-white/20 p-1 opacity-80 backdrop-blur-sm transition-colors hover:bg-white/30 hover:opacity-100"
                   onClick={() => handleUnhideEntryType(item.id)}
                   title="Unhide entry"
                 >
-                  <AiOutlineEye className="w-4 h-4 text-white" />
+                  <AiOutlineEye className="h-4 w-4 text-white" />
                 </button>
               </div>
             ))}

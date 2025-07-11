@@ -1,10 +1,9 @@
 'use client';
-import { StorageKey } from '@/constants/storage';
 import { useAccessToken } from '@/hooks/app';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-export default function HomePage() {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { setAccessToken } = useAccessToken();
@@ -22,4 +21,12 @@ export default function HomePage() {
   }, [searchParams, router, setAccessToken]);
 
   return <div></div>;
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
+  );
 }
