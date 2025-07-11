@@ -195,6 +195,11 @@ export const convertAndRestoreBackup = async (backupData: any): Promise<boolean>
       localStorage.setItem(key, value);
     });
 
+    // Preserve legacy loginUser data if it exists
+    if (format === 'old-redux' && (backupData as OldReduxBackupData).loginUser) {
+      localStorage.setItem('loginUser', (backupData as OldReduxBackupData).loginUser!);
+    }
+
     // Also maintain Redux persist format for backward compatibility during transition
     if (format === 'old-redux') {
       localStorage.setItem('persist:diary', JSON.stringify(convertedData));
@@ -269,6 +274,7 @@ export const createRestoreBackup = (): boolean => {
       'entryInstances.entryInstancesMap',
       'reminderRecords.reminderRecords',
       'uiState',
+      'loginUser', // Include legacy loginUser data
     ];
 
     jotaiKeys.forEach((key) => {

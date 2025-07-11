@@ -1,6 +1,7 @@
 'use client';
 
 import { backupDialogOpenAtom, globalStateAtom } from '@/atoms/app';
+import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { safeNumberValue } from '@/utils';
 import { saveStateToGithub } from '@/utils/GithubStorage';
@@ -11,9 +12,26 @@ import Button from '../button';
 
 function GlobalStats({ className }: { className?: string }) {
   const { logout, user: githubUser } = useGitHubOAuth();
+  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
   const save = useCallback(() => saveStateToGithub(null, true, githubUser), [githubUser]);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
   const globalState = useAtomValue(globalStateAtom);
+
+  // Parse legacy loginUser data if stored as string
+  const parsedLegacyUser =
+    legacyLoginUser && typeof legacyLoginUser === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(legacyLoginUser);
+          } catch {
+            return null;
+          }
+        })()
+      : legacyLoginUser;
+
+  // Determine display name and user info
+  const displayName = githubUser?.name || githubUser?.username || parsedLegacyUser?.uid;
+  const userEmail = githubUser?.email || parsedLegacyUser?.email;
 
   const onLogoutClick = () => {
     logout();
@@ -26,7 +44,8 @@ function GlobalStats({ className }: { className?: string }) {
           src="https://fakeimg.pl/200x200/?text=Avatar"
           alt="avatar"
         />
-        <h1 className="text-2xl font-bold">{githubUser?.name || githubUser?.username}</h1>
+        <h1 className="text-2xl font-bold">{displayName || 'User'}</h1>
+        {userEmail && <p className="text-sm text-white/70">{userEmail}</p>}
       </div>
       <div className="flex flex-col gap-4 text-lg">
         <p>

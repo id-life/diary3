@@ -1,23 +1,21 @@
+import { entryInstancesMapAtom, initDateStrAtom, initDayEntryInstancesAtom } from '@/atoms';
 import { GlobalState, globalStateAtom } from '@/atoms/app';
+import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { StorageKey } from '@/constants/storage';
 import { getDateStringFromNow } from '@/entry/types-constants';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
-import { runStateMigration, isMigrationCompleted } from '@/utils/stateMigration';
+import { isMigrationCompleted, runStateMigration } from '@/utils/stateMigration';
 import dayjs from 'dayjs';
-import { useAtom, useSetAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect } from 'react';
-import { 
-  entryInstancesMapAtom, 
-  initDayEntryInstancesAtom,
-  initDateStrAtom
-} from '@/atoms';
 
 export const useInitGlobalState = () => {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const setGlobalState = useSetAtom(globalStateAtom);
   const setInitDateStr = useSetAtom(initDateStrAtom);
   const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
+  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
 
   useEffect(() => {
     // Run state migration BEFORE atoms are used
@@ -25,10 +23,10 @@ export const useInitGlobalState = () => {
       const migrationSuccess = runStateMigration();
       if (migrationSuccess || isMigrationCompleted()) {
         // Force atoms to re-initialize with migrated data
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     };
-    
+
     runMigrationAndInit();
   }, []);
 
@@ -36,8 +34,11 @@ export const useInitGlobalState = () => {
     const now = dayjs();
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys?.length ? entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0) : 0;
+
+    const registeredSince = now.diff(dayjs(legacyLoginUser?.loginTime ?? now), 'day');
+
     const states: GlobalState = {
-      registeredSince: 0, // TODO: old data should be update in database.
+      registeredSince,
       entryDays: entryKeys?.length ?? 0,
       totalEntries,
       historicalLongestStreakByEntry: calcRecordedLongestStreaks(entryInstancesMap),
@@ -49,7 +50,7 @@ export const useInitGlobalState = () => {
     const dateStrNow = getDateStringFromNow();
     setInitDateStr({ dateStr: dateStrNow });
     setInitDayEntryInstances({ dateStr: dateStrNow });
-  }, [entryInstancesMap, setGlobalState, setInitDateStr, setInitDayEntryInstances]);
+  }, [entryInstancesMap, legacyLoginUser, setGlobalState, setInitDateStr, setInitDayEntryInstances]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes

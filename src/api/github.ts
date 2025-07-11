@@ -24,9 +24,3 @@ export const useBackupList = () => {
     enabled: !!accessToken,
   });
 };
-
-export const useSaveBackupList = () => {
-  return useMutation({
-    mutationFn: saveBackupList,
-  });
-};
