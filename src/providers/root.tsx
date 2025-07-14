@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PropsWithChildren } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import { AIProvider } from './AIProvider';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
 const contexts = [
@@ -15,6 +16,7 @@ const contexts = [
   <JotaiStoreProvider key="jotaiStoreProvider" />,
   <QueryClientProvider key="queryClientProvider" client={queryClient} />,
   <PersistGate key="persistGate" loading={null} persistor={persistor} />,
+  <AIProvider key="aiProvider" />,
 ];
 
 export default function Providers({ children }: PropsWithChildren) {

@@ -2,7 +2,7 @@ import MillionLint from '@million/lint';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  webpack(config) {
+  webpack(config, { isServer }) {
     const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.('.svg'));
     config.module.rules = [
       ...config.module.rules.filter((rule) => rule !== fileLoaderRule),
@@ -25,6 +25,14 @@ const nextConfig = {
         resourceQuery: /component/, // *.svg?component
       },
     ];
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'node-gyp-build': false,
+      };
+    }
+
     return config;
   },
   useFileSystemPublicRoutes: true,

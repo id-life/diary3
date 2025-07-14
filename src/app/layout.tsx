@@ -13,6 +13,7 @@ import type { Viewport } from 'next';
 import DialogComponents from '@/components/dialog/DialogComponents';
 
 import '@/styles/globals.css';
+import AIBotLoader from '@/components/ai/AIBotLoader';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </ErrorBoundary>
             <Navbar />
             <DialogComponents />
+            <AIBotLoader />
           </div>
           <ToastContainer autoClose={3000} position="top-center" />
           <Theme />
