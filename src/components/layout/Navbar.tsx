@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createElement, FC, SVGProps, useMemo } from 'react';
+import { act, createElement, FC, SVGProps, useMemo } from 'react';
 import DiaryIcons from '../icon/DiaryIcons';
 import { useInitGlobalState } from '@/hooks/app';
 
@@ -36,12 +36,13 @@ function Navbar() {
   return (
     <nav className="flex w-full items-center rounded-xl bg-white/90 px-8 shadow-xl backdrop-blur">
       {PAGES.map((page) => {
+        const isHomePage = activeKey === page.key || (!activeKey && page.key === 'entry');
         return (
           <Link
             key={page.key.toUpperCase()}
             className={clsx(
               'flex flex-grow items-center justify-center rounded-t-lg py-4',
-              activeKey === page.key ? 'text-blue' : 'text-[#9FC2D7]',
+              isHomePage ? 'text-blue' : 'text-[#9FC2D7]',
             )}
             href={`/${page.key.toLowerCase()}`}
           >

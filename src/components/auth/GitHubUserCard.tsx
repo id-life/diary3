@@ -26,15 +26,7 @@ export const GitHubUserCard: React.FC<GitHubUserCardProps> = ({ user, onLogout, 
       <div className="mb-3 flex items-center gap-3">
         <div className="relative">
           {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt="GitHub Avatar"
-              className="h-12 w-12 rounded-full border-2 border-gray-300"
-              onError={(e) => {
-                // Fallback to default avatar if image fails to load
-                e.currentTarget.style.display = 'none';
-              }}
-            />
+            <img src={user.avatar} alt="GitHub Avatar" className="h-12 w-12 rounded-full border-2 border-gray-300" />
           ) : (
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
               <AiFillGithub className="h-6 w-6 text-gray-600" />

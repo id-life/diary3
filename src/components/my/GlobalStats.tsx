@@ -39,11 +39,7 @@ function GlobalStats({ className }: { className?: string }) {
   return (
     <div className={clsx('flex flex-col justify-between gap-10 text-white', className)}>
       <div className="flex flex-col items-center gap-2">
-        <img
-          className="h-20 w-20 rounded-full border-2 border-white bg-white/30"
-          src="https://fakeimg.pl/200x200/?text=Avatar"
-          alt="avatar"
-        />
+        <img className="h-20 w-20 rounded-full border-2 border-white bg-white/30" src={githubUser?.avatar} alt="avatar" />
         <h1 className="text-2xl font-bold">{displayName || 'User'}</h1>
         {userEmail && <p className="text-sm text-white/70">{userEmail}</p>}
       </div>
