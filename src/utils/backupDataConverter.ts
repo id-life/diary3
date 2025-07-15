@@ -28,6 +28,7 @@ export interface NewJotaiBackupData {
   reminderRecords: {
     reminderRecords: ReminderRecord[];
   };
+  loginUser?: any;
   uiState: {
     app: {
       dateStr: string;
@@ -90,6 +91,7 @@ export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJot
     const entryTypes = oldBackupData.entryTypes ? JSON.parse(oldBackupData.entryTypes) : { entryTypesArray: [] };
     const entryInstances = oldBackupData.entryInstances ? JSON.parse(oldBackupData.entryInstances) : { entryInstancesMap: {} };
     const reminderRecords = oldBackupData.reminderRecords ? JSON.parse(oldBackupData.reminderRecords) : { reminderRecords: [] };
+    const loginUser = oldBackupData.loginUser ? JSON.parse(oldBackupData.loginUser) : null;
     const uiState = oldBackupData.uiState
       ? JSON.parse(oldBackupData.uiState)
       : {
@@ -114,6 +116,7 @@ export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJot
       entryTypes,
       entryInstances,
       reminderRecords,
+      loginUser,
       uiState,
       _persist,
     };
@@ -157,6 +160,10 @@ export const convertToJotaiLocalStorage = (backupData: NewJotaiBackupData): Reco
       jotaiData['uiState'] = JSON.stringify(backupData.uiState);
     }
 
+    if (backupData.loginUser) {
+      jotaiData['loginUser'] = JSON.stringify(backupData.loginUser);
+    }
+
     console.log('✅ Successfully converted to Jotai localStorage format');
     return jotaiData;
   } catch (error) {
@@ -195,9 +202,11 @@ export const convertAndRestoreBackup = async (backupData: any): Promise<boolean>
       localStorage.setItem(key, value);
     });
 
-    // Preserve legacy loginUser data if it exists
+    // Preserve legacy loginUser data if it exists (handle both old and new formats)
     if (format === 'old-redux' && (backupData as OldReduxBackupData).loginUser) {
       localStorage.setItem('loginUser', (backupData as OldReduxBackupData).loginUser!);
+    } else if (format === 'new-jotai' && convertedData.loginUser) {
+      localStorage.setItem('loginUser', JSON.stringify(convertedData.loginUser));
     }
 
     // Also maintain Redux persist format for backward compatibility during transition
