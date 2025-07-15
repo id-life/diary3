@@ -1,8 +1,9 @@
 import { getUserProfile, GitHubUser } from '@/api/auth';
 import { githubUserStateAtom } from '@/atoms/user';
+import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { NEXT_PUBLIC_API_PREFIX } from '@/constants/env';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -19,6 +20,7 @@ export const useGitHubOAuth = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [githubUserState, setGithubUserState] = useAtom(githubUserStateAtom);
+  const setLegacyLoginUser = useSetAtom(legacyLoginUserAtom);
   const { accessToken, setAccessToken } = useAccessToken();
 
   // Query for user profile
@@ -45,6 +47,8 @@ export const useGitHubOAuth = () => {
     async () => {
       // Clear access token
       setAccessToken(null);
+      // Clear legacy login user data
+      setLegacyLoginUser(null);
       // Clear all queries
       queryClient.clear();
     },

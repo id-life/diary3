@@ -36,6 +36,7 @@ export const saveStateToGithub = async (loginUser: any, isNew?: boolean, newUser
       reminderRecords: {
         reminderRecords: safeJsonParse(localStorage.getItem('reminderRecords.reminderRecords'), []),
       },
+      loginUser: safeJsonParse(localStorage.getItem('loginUser'), null),
       uiState: safeJsonParse(localStorage.getItem('uiState'), {
         app: { dateStr: new Date().toISOString().split('T')[0] },
         entryPage: {},
