@@ -66,22 +66,6 @@ function GlobalStats({ className }: { className?: string }) {
           <span className="font-DDin text-2xl font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</span> days.
         </p>
       </div>
-      <div className="mt-auto flex flex-col gap-2">
-        <Button size="large" className="h-12 rounded-full border-none hover:opacity-90" onClick={save}>
-          Save
-        </Button>
-        <Button size="large" className="h-12 rounded-full border-none hover:opacity-90" onClick={() => setLoadOpen(true)}>
-          Load
-        </Button>
-        <Button
-          size="large"
-          className="h-12 rounded-full border-none text-black hover:opacity-90"
-          type="link"
-          onClick={onLogoutClick}
-        >
-          Logout
-        </Button>
-      </div>
     </div>
   );
 }

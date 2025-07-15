@@ -67,7 +67,7 @@ export const useGitHubOAuth = () => {
   useEffect(() => {
     const isLoading = userQuery.isLoading;
     const user = userQuery.data || null;
-    const isAuthenticated = !!accessToken && !!user && !userQuery.isError;
+    const isAuthenticated = !!accessToken && !!user;
 
     setGithubUserState({
       isAuthenticated,

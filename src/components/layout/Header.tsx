@@ -26,7 +26,7 @@ function UserHeader() {
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
   const logged = useMemo(() => isAuthenticated && !!githubUser?.username, [isAuthenticated, githubUser]);
-
+  if (!logged) return null;
   return (
     <Collapse
       initOpen={logged}
@@ -38,31 +38,20 @@ function UserHeader() {
             isOpen ? 'rounded-none' : 'rounded-b-2xl',
           )}
         >
-          {logged ? (
-            <>
-              <div className="flex flex-col gap-2 text-sm">
-                <p className="text-base">
-                  <span className="font-semibold">{githubUser?.name || githubUser?.username}</span>
-                  {" 's Diary"}
-                </p>
-                {/* TODO: lastUseTime Should Migrate to backend profile */}
-                {/* <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p> */}
-                <p className="text-xs text-black/40">@{githubUser?.username}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="text-right text-xs">STREAK DAYS</div>
-                <div className="font-DDin text-2xl/8 font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</div>
-                <MdExpandMore className={clsx('z-[1] h-9 w-9 cursor-pointer text-black', isOpen ? 'rotate-180' : 'rotate-0')} />
-              </div>
-            </>
-          ) : (
-            <div className="w-full text-center text-xl">
-              Not logged in, Let&apos;s{' '}
-              <Link className="text-blue" href="/settings">
-                Get Started
-              </Link>
-            </div>
-          )}
+          <div className="flex flex-col gap-2 text-sm">
+            <p className="text-base">
+              <span className="font-semibold">{githubUser?.name || githubUser?.username}</span>
+              {" 's Diary"}
+            </p>
+            {/* TODO: lastUseTime Should Migrate to backend profile */}
+            {/* <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p> */}
+            <p className="text-xs text-black/40">@{githubUser?.username}</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="text-right text-xs">STREAK DAYS</div>
+            <div className="font-DDin text-2xl/8 font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</div>
+            <MdExpandMore className={clsx('z-[1] h-9 w-9 cursor-pointer text-black', isOpen ? 'rotate-180' : 'rotate-0')} />
+          </div>
         </div>
       )}
     >
