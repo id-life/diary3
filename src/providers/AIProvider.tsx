@@ -16,6 +16,7 @@ interface AIContextType {
   isReady: boolean;
   isLoading: boolean;
   progress: InitProgressReport;
+  error: string | null;
   loadModel: (modelId: string) => Promise<void>;
   reset: () => void;
 }
@@ -26,6 +27,7 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
   const engineRef = useRef<MLCEngineInterface | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<InitProgressReport>({
     progress: 0,
     timeElapsed: 0,
@@ -39,6 +41,7 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
       if (isLoading) return;
       setIsLoading(true);
       setIsReady(false);
+      setError(null);
 
       try {
         const engine = await CreateWebWorkerMLCEngine(
@@ -58,11 +61,15 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
         setIsLoading(false);
         setIsReady(true);
         console.log('AIProvider: The engine has been successfully loaded.');
-      } catch (error) {
-        console.error('Model loading failed:', error);
-        setProgress({ progress: 1, timeElapsed: 0, text: `Error: ${error}` });
+        toast.success('AI 助手已就绪');
+      } catch (err) {
+        const errorMessage = (err as Error).message || 'An unknown error occurred';
+        console.error('Model loading failed:', err);
+        setProgress({ progress: 1, timeElapsed: 0, text: `Error: ${errorMessage}` });
+        setError(errorMessage);
         setIsLoading(false);
         setIsReady(false);
+        toast.error(`AI 模型加载失败: ${errorMessage}`);
       }
     },
     [isLoading],
@@ -95,6 +102,7 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
     isReady,
     isLoading,
     progress,
+    error,
     loadModel,
     reset,
   };

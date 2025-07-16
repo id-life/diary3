@@ -3,6 +3,9 @@
 import { useAI } from '@/providers/AIProvider';
 import { useAppSelector, selectEntryTypesArray, selectEntryInstancesMap, selectReminderRecordArray } from '@/entry/store';
 import { useEffect, useState, useMemo, useRef } from 'react';
+import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
+import isBetween from 'dayjs/plugin/isBetween';
 
 import { RiRobot2Line, RiCloseLine, RiChat1Line } from 'react-icons/ri';
 import { TbSend } from 'react-icons/tb';
@@ -13,7 +16,54 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { Runnable } from '@langchain/core/runnables';
-import { EntryInstance, ReminderRecord } from '@/entry/types-constants';
+import { EntryInstance, EntryType, ReminderRecord, RoutineEnum } from '@/entry/types-constants';
+
+dayjs.extend(isToday);
+dayjs.extend(isBetween);
+
+const getPendingTasksForToday = (entryTypes: EntryType[], entryInstancesMap: { [key: string]: EntryInstance[] }): string[] => {
+  const pendingTasks: string[] = [];
+  const todayStr = dayjs().format('YYYY-MM-DD');
+  const todaysInstances = new Set(entryInstancesMap[todayStr]?.map((inst) => inst.entryTypeId) ?? []);
+
+  entryTypes.forEach((task) => {
+    if (todaysInstances.has(task.id)) return;
+    switch (task.routine) {
+      case RoutineEnum.daily:
+        pendingTasks.push(task.title);
+        break;
+      case RoutineEnum.weekly: {
+        const startOfWeek = dayjs().startOf('week');
+        const endOfWeek = dayjs().endOf('week');
+        let doneThisWeek = false;
+        for (let day = startOfWeek; day.isBefore(endOfWeek.add(1, 'day')); day = day.add(1, 'day')) {
+          if (entryInstancesMap[day.format('YYYY-MM-DD')]?.some((inst) => inst.entryTypeId === task.id)) {
+            doneThisWeek = true;
+            break;
+          }
+        }
+        if (!doneThisWeek) pendingTasks.push(task.title);
+        break;
+      }
+      case RoutineEnum.monthly: {
+        const startOfMonth = dayjs().startOf('month');
+        const endOfMonth = dayjs().endOf('month');
+        let doneThisMonth = false;
+        for (let day = startOfMonth; day.isBefore(endOfMonth.add(1, 'day')); day = day.add(1, 'day')) {
+          if (entryInstancesMap[day.format('YYYY-MM-DD')]?.some((inst) => inst.entryTypeId === task.id)) {
+            doneThisMonth = true;
+            break;
+          }
+        }
+        if (!doneThisMonth) pendingTasks.push(task.title);
+        break;
+      }
+      default:
+        break;
+    }
+  });
+  return pendingTasks;
+};
 
 const serializeUserData = (
   entryTypes: any[],
@@ -21,12 +71,7 @@ const serializeUserData = (
   reminders: ReminderRecord[],
 ) => {
   const data = {
-    tasks: entryTypes.map((t: { id: any; title: any; routine: any; defaultPoints: any }) => ({
-      id: t.id,
-      title: t.title,
-      routine: t.routine,
-      defaultPoints: t.defaultPoints,
-    })),
+    tasks: entryTypes.map((t) => ({ id: t.id, title: t.title, routine: t.routine, defaultPoints: t.defaultPoints })),
     history: entryInstances,
     reminders: reminders,
   };
@@ -34,6 +79,45 @@ const serializeUserData = (
 };
 
 const DEFAULT_MODEL_ID = 'Qwen3-0.6B-q0f16-MLC';
+
+const SUGGESTION_PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
+  new SystemMessage(`# 角色与指令
+    
+你是一个极其严谨、聪明的任务规划专家。你的任务是根据我提供的日期和JSON数据，判断出今天需要完成哪些任务。
+
+你必须在内部完成所有复杂的逻辑分析（如计算日期），但**绝对不要在回答中展示你的思考步骤或任何计算过程**。
+
+你的最终输出必须是干净、流畅的一句话，直接告诉我结果。请模仿示例的风格。
+
+---
+[示例 1：有任务时]
+
+# 输入
+今天是 2023年8月9日。
+数据: {"entryTypes":{"entryTypesArray":[{"title":"brushteeth","routine":"Daily","id":"t1","desc":"刷牙"},{"title":"weekly_report","routine":"Weekly","id":"t4","desc":"写周报"}]},"entryInstances":{"entryInstancesMap":{"2023-08-08":[{"entryTypeId":"t1"}],"2023-07-30":[{"entryTypeId":"t4"}]}}}
+
+# 输出
+今天别忘了这两件事哦：刷牙和写周报。
+
+---
+[示例 2：无任务时]
+
+# 输入
+今天是 2023年8月9日。
+数据: {"entryTypes":{"entryTypesArray":[{"title":"brushteeth","routine":"Daily","id":"t1","desc":"刷牙"}]},"entryInstances":{"entryInstancesMap":{"2023-08-09":[{"entryTypeId":"t1"}]}}}
+
+# 输出
+今天所有计划都完成啦，可以好好放松一下！
+
+`),
+  new HumanMessage(`---
+[正式任务]
+
+# 输入
+{pendingTasks}
+
+# 输出`),
+]);
 
 const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
   new SystemMessage(`# 角色
@@ -43,9 +127,8 @@ const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
 1.  **意图判断**：你的首要任务是判断用户的最新问题是否与他/她的“日常任务数据”相关（比如询问“我今天该做什么？”、“我上次交房租是什么时候？”等）。
 2.  **条件化使用数据**：
     -   **如果**问题与日常任务相关，你必须根据我提供的“日常任务数据”和“对话历史”来回答。
-    -   **如果**问题是通用的知识、闲聊、创意或其他无关话题（如“今天天气怎么样？”、“给我讲个笑话”），你**必须忽略**“日常任务数据”，像一个通用AI助手一样回答，并利用“对话历史”保持对话的连贯性。
-3.  **对话风格**：保持简洁、自然、友好的对话风格。不要输出JSON或任何代码格式。
-`),
+    -   **如果**问题是通用的知识、闲聊、创意或其他无关话题（如“今天天气怎么样？”、“给我讲个笑话”），你**必须忽略**“日常任务数据”，像一个通用AI助手一样回答，并利用“对话历史”保持对话的贯穿性。
+3.  **对话风格**：保持简洁、自然、友好的对话风格。不要输出JSON或任何代码格式。`),
   new HumanMessage(`
 # 上下文信息
 
@@ -64,7 +147,7 @@ const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
 ]);
 
 export default function AIBot() {
-  const { isReady, progress, loadModel, isLoading, engine } = useAI();
+  const { isReady, progress, loadModel, isLoading, engine, error } = useAI();
   const [chatModel, setChatModel] = useState<ChatWebLLM | null>(null);
   const [chain, setChain] = useState<Runnable | null>(null);
 
@@ -75,6 +158,8 @@ export default function AIBot() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [performanceStats, setPerformanceStats] = useState('');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+
+  const [dailySuggestion, setDailySuggestion] = useState<string | null>(null);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
   const entryTypes = useAppSelector(selectEntryTypesArray);
@@ -97,24 +182,66 @@ export default function AIBot() {
     const initChat = async () => {
       if (isReady && engine && !chain) {
         console.log('AIBot: Engine is ready, initializing ChatWebLLM...');
-        setIsGenerating(true);
-        const model = new ChatWebLLM({
-          model: DEFAULT_MODEL_ID,
-          chatOptions: { temperature: 0.7 },
-        });
-
+        const model = new ChatWebLLM({ model: DEFAULT_MODEL_ID, chatOptions: { temperature: 0.7 } });
         await (model as any).initialize();
-
         setChatModel(model);
         const newChain = PROMPT_TEMPLATE.pipe(model).pipe(new StringOutputParser());
         setChain(newChain);
         console.log('AIBot: Chat chain created successfully.');
-        setIsGenerating(false);
+      }
+    };
+    initChat();
+  }, [isReady, engine, chain]);
+
+  useEffect(() => {
+    const generateDailySuggestion = async (model: ChatWebLLM) => {
+      const storageKey = 'daily_suggestion';
+      const todayStr = new Date().toISOString().split('T')[0];
+      const rawData = localStorage.getItem(storageKey);
+      if (rawData) {
+        try {
+          const suggestionData = JSON.parse(rawData);
+          if (suggestionData.date === todayStr) {
+            setDailySuggestion(suggestionData.content);
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to parse daily suggestion from localStorage', e);
+          localStorage.removeItem(storageKey);
+        }
+      }
+
+      setDailySuggestion('正在为您生成今日建议...');
+      const pendingTasks = getPendingTasksForToday(entryTypes, entryInstances);
+      if (pendingTasks.length === 0) {
+        const suggestion = '今天所有计划都完成啦，可以好好放松一下！';
+        setDailySuggestion(suggestion);
+        localStorage.setItem(storageKey, JSON.stringify({ date: todayStr, content: suggestion }));
+        return;
+      }
+
+      const suggestionChain = SUGGESTION_PROMPT_TEMPLATE.pipe(model).pipe(new StringOutputParser());
+      const payload = { pendingTasks: pendingTasks.join(', ') };
+
+      const finalPrompt = await SUGGESTION_PROMPT_TEMPLATE.format(payload);
+      console.log('--- Daily Suggestion Final Prompt ---');
+      console.log(finalPrompt);
+      console.log('------------------------------------');
+
+      try {
+        const suggestion = await suggestionChain.invoke(payload);
+        setDailySuggestion(suggestion);
+        localStorage.setItem(storageKey, JSON.stringify({ date: todayStr, content: suggestion }));
+      } catch (e) {
+        console.error('Failed to generate daily suggestion:', e);
+        setDailySuggestion('生成建议失败，但您可以直接向我提问。');
       }
     };
 
-    initChat();
-  }, [isReady, engine, chain]);
+    if (isReady && chatModel && !dailySuggestion) {
+      generateDailySuggestion(chatModel);
+    }
+  }, [isReady, chatModel, dailySuggestion, entryTypes, entryInstances]);
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -128,9 +255,13 @@ export default function AIBot() {
 
     const latestQuestion = userInput;
 
-    const formattedHistory = chatHistory
-      .map((msg) => `${msg.role === 'user' ? 'Human' : 'Assistant'}: ${msg.content}`)
-      .join('\n');
+    const historyForAI = [...chatHistory];
+    if (historyForAI.length === 0 && dailySuggestion) {
+      historyForAI.unshift({ role: 'assistant', content: dailySuggestion });
+    }
+    historyForAI.push({ role: 'user', content: latestQuestion });
+
+    const formattedHistory = historyForAI.map((msg) => `${msg.role === 'user' ? '用户' : 'AI'}: ${msg.content}`).join('\n');
 
     setChatHistory((prev) => [...prev, { role: 'user', content: latestQuestion }, { role: 'assistant', content: '...' }]);
     setUserInput('');
@@ -144,12 +275,19 @@ export default function AIBot() {
     });
 
     try {
-      const stream = await chain.stream({
+      const promptPayload = {
         history: formattedHistory,
         userData: userDataString,
         currentDate: currentDate,
         latestQuestion: latestQuestion,
-      });
+      };
+
+      const finalPrompt = await PROMPT_TEMPLATE.format(promptPayload);
+      console.log('--- AI Chat Final Prompt ---');
+      console.log(finalPrompt);
+      console.log('----------------------------');
+
+      const stream = await chain.stream(promptPayload);
 
       let currentResponse = '';
       for await (const chunk of stream) {
@@ -168,39 +306,60 @@ export default function AIBot() {
     }
   };
 
-  const isModelLoading = progress.progress < 1;
+  const handleBubbleClick = () => {
+    if (error) {
+      loadModel(DEFAULT_MODEL_ID);
+    } else {
+      setIsPanelOpen(true);
+    }
+  };
+
+  const renderBubbleContent = () => {
+    if (error) {
+      return (
+        <div className="flex items-center gap-3">
+          <RiChat1Line className="h-8 w-8 text-red-500" />
+          <div className="max-w-xs text-sm text-gray-700">
+            <p className="font-semibold text-red-500">AI 加载失败</p>
+            <p className="text-xs text-gray-500">点击重试</p>
+          </div>
+        </div>
+      );
+    }
+    if (!isReady || !dailySuggestion) {
+      const loadingText = dailySuggestion || progress.text;
+      return (
+        <div className="flex items-center gap-3">
+          <RiRobot2Line className="h-8 w-8 animate-spin text-diary-primary" />
+          <div className="max-w-xs text-sm text-gray-700">
+            <p>{loadingText}</p>
+            {isLoading && (
+              <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200">
+                <div className="h-1.5 rounded-full bg-diary-primary" style={{ width: `${progress.progress * 100}%` }}></div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-3">
+        <RiChat1Line className="h-8 w-8 text-diary-primary" />
+        <div className="max-w-xs text-sm text-gray-700">{dailySuggestion}</div>
+      </div>
+    );
+  };
 
   return (
     <>
-      {/* 悬浮气泡 */}
       <div
         className={`fixed bottom-5 right-5 z-50 cursor-pointer rounded-lg bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105 ${
           isPanelOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
         }`}
-        onClick={() => setIsPanelOpen(true)}
+        onClick={handleBubbleClick}
       >
-        <div className="flex items-center gap-3">
-          {isModelLoading ? (
-            <RiRobot2Line className="h-8 w-8 animate-spin text-diary-primary" />
-          ) : (
-            <RiChat1Line className="h-8 w-8 text-diary-primary" />
-          )}
-          <div className="max-w-xs text-sm text-gray-700">
-            {isModelLoading ? (
-              <div>
-                <p>{progress.text}</p>
-                <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200">
-                  <div className="h-1.5 rounded-full bg-diary-primary" style={{ width: `${progress.progress * 100}%` }}></div>
-                </div>
-              </div>
-            ) : (
-              'AI助手已就绪'
-            )}
-          </div>
-        </div>
+        {renderBubbleContent()}
       </div>
-
-      {/* 聊天主面板 */}
       <div
         className={`fixed bottom-20 right-5 z-50 flex h-[70vh] w-96 flex-col rounded-xl bg-gray-50 shadow-2xl transition-all duration-300 ${
           isPanelOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
@@ -212,7 +371,6 @@ export default function AIBot() {
             <RiCloseLine className="h-6 w-6" />
           </button>
         </div>
-
         {isReady && chain ? (
           <>
             <div ref={chatBoxRef} className="flex-1 overflow-y-auto p-4">
@@ -247,12 +405,25 @@ export default function AIBot() {
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center p-4 text-center">
-            <RiRobot2Line className="h-12 w-12 animate-spin text-diary-primary" />
-            <p className="mt-4 text-sm text-gray-600">{progress.text}</p>
-            <div className="mt-2 h-2.5 w-4/5 rounded-full bg-gray-200">
-              <div className="h-2.5 rounded-full bg-diary-primary" style={{ width: `${progress.progress * 100}%` }}></div>
-            </div>
-            <p className="mt-2 text-xs text-gray-400">(首次加载模型可能需要几分钟)</p>
+            {error ? (
+              <>
+                <RiChat1Line className="h-12 w-12 text-red-500" />
+                <p className="mt-4 font-semibold text-red-500">加载失败</p>
+                <p className="mt-2 text-xs text-gray-500">{error}</p>
+                <Button type="primary" onClick={() => loadModel(DEFAULT_MODEL_ID)} className="mt-4">
+                  重试
+                </Button>
+              </>
+            ) : (
+              <>
+                <RiRobot2Line className="h-12 w-12 animate-spin text-diary-primary" />
+                <p className="mt-4 text-sm text-gray-600">{progress.text}</p>
+                <div className="mt-2 h-2.5 w-4/5 rounded-full bg-gray-200">
+                  <div className="h-2.5 rounded-full bg-diary-primary" style={{ width: `${progress.progress * 100}%` }}></div>
+                </div>
+                <p className="mt-2 text-xs text-gray-400">(首次加载模型可能需要几分钟)</p>
+              </>
+            )}
           </div>
         )}
       </div>
