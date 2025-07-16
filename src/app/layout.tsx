@@ -1,16 +1,15 @@
 import Theme from '@/components/app/Theme';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import DialogComponents from '@/components/dialog/DialogComponents';
 import Header from '@/components/layout/Header';
 import Navbar from '@/components/layout/Navbar';
 import Providers from '@/providers/root';
 import { ddin, poppins } from '@/styles/fonts';
 import { cn } from '@/utils';
 import { clsx } from 'clsx';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ToastContainer } from 'react-toastify';
-import type { Viewport } from 'next';
-import DialogComponents from '@/components/dialog/DialogComponents';
 
 import '@/styles/globals.css';
 
