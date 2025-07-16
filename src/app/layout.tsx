@@ -2,7 +2,6 @@ import Theme from '@/components/app/Theme';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import DialogComponents from '@/components/dialog/DialogComponents';
-import Header from '@/components/layout/Header';
 import Navbar from '@/components/layout/Navbar';
 import Providers from '@/providers/root';
 import { ddin, poppins } from '@/styles/fonts';
@@ -41,9 +40,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Providers>
           <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
             <ErrorBoundary>
-              <ClientOnly>
-                <Header />
-              </ClientOnly>
               <main className="relative h-full flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
             </ErrorBoundary>
             <ClientOnly>

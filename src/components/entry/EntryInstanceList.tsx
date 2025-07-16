@@ -1,7 +1,9 @@
-import { EntryInstance } from '@/entry/types-constants';
+import { selectedEntryInstancesArrayAtom } from '@/atoms/chart';
+import { useAtomValue } from 'jotai';
 import EntryInstanceForm from './EntryInstanceForm';
 
-const EntryInstanceList = ({ entryInstancesArray }: { entryInstancesArray: EntryInstance[] }) => {
+const EntryInstanceList = () => {
+  const entryInstancesArray = useAtomValue(selectedEntryInstancesArrayAtom);
   return (
     <div className="flex flex-col items-center gap-2">
       {entryInstancesArray?.length

@@ -1,10 +1,11 @@
-
+import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
-import { entryTypesArrayAtom } from '@/atoms';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
+import { motion } from 'framer-motion';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { HiOutlineRefresh } from 'react-icons/hi';
 import { Area, AreaChart, Brush, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   DateRange,
@@ -18,8 +19,6 @@ import {
 } from '../../entry/types-constants';
 import Segmented from '../segmented';
 import EntryChartTooltip, { TooltipPayload } from './EntryChartTooltip';
-import { HiOutlineRefresh } from 'react-icons/hi';
-import { motion } from 'framer-motion';
 const options = [
   { label: 'By Day', value: 'day' },
   { label: 'By Week', value: 'week' },
@@ -134,9 +133,9 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
   return { areas, chartData };
 };
 
-function EntryChart(props: { entryInstancesMap: { [key: string]: EntryInstance[] } }) {
+function EntryChart() {
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const [selectedRange, setSelectedRange] = useState<DateRange>('day');
-  const { entryInstancesMap } = props;
   const entryTypesArray = useAtomValue(entryTypesArrayAtom);
   const [dateRange, setDateRange] = useAtom(chartDateRangeAtom);
   const { chartData, areas } = getChartDataAndAreasFromDaysAndEntriesDateMap(

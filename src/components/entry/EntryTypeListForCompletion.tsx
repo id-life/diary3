@@ -1,4 +1,5 @@
 import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
+import { selectedEntryInstancesArrayAtom } from '@/atoms/chart';
 import { EntryType, RoutineEnum } from '@/entry/types-constants';
 import { useInput } from '@/hooks/useInput';
 import { sortEntryTypesArray } from '@/utils/entry';
@@ -32,17 +33,19 @@ const EntryTypeCardHideButton = (props: { entryType: EntryType; onHide: (entryTy
   );
 };
 
-const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: string }) => {
+const EntryTypeListForCompletion = () => {
   const entryTypesArray = useAtomValue(entryTypesArrayAtom);
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
+  const selectedEntryInstancesArray = useAtomValue(selectedEntryInstancesArrayAtom);
   const { inputValue, onInputChange } = useInput();
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const [hiddenEntryTypes, setHiddenEntryTypes] = useState(() => getHiddenEntryTypes());
 
   const { doneList, restList, hiddenList } = useMemo(() => {
-    const todayEntryInstances = entryInstancesMap[selectedDateStr];
     let doneEntryTypes = new Set(
-      todayEntryInstances?.length ? todayEntryInstances.map(({ entryTypeId }: { entryTypeId: string }) => entryTypeId) : [],
+      selectedEntryInstancesArray?.length
+        ? selectedEntryInstancesArray.map(({ entryTypeId }: { entryTypeId: string }) => entryTypeId)
+        : [],
     );
 
     // Separate visible and hidden entry types
@@ -73,7 +76,7 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
         : [],
       hiddenList: hiddenEntryTypesList,
     };
-  }, [entryInstancesMap, entryTypesArray, inputValue, segmentedValue, selectedDateStr, hiddenEntryTypes]);
+  }, [selectedEntryInstancesArray, entryTypesArray, entryInstancesMap, hiddenEntryTypes, segmentedValue, inputValue]);
 
   const handleUnhideEntryType = (entryTypeId: string) => {
     unhideEntryType(entryTypeId);
@@ -102,7 +105,7 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
         {restList?.length
           ? restList.map((item) => (
               <div key={item.id} className="relative">
-                <EntryTypeCard entryType={item} isEdit={false} selectedDayStr={selectedDateStr} />
+                <EntryTypeCard entryType={item} isEdit={false} />
                 <EntryTypeCardHideButton entryType={item} onHide={handleHideEntryType} />
               </div>
             ))
@@ -113,7 +116,7 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
         {doneList?.length
           ? doneList.map((item) => (
               <div key={item.id} className="relative">
-                <EntryTypeCard isDone entryType={item} isEdit={false} selectedDayStr={selectedDateStr} />
+                <EntryTypeCard isDone entryType={item} isEdit={false} />
                 <EntryTypeCardHideButton entryType={item} onHide={handleHideEntryType} />
               </div>
             ))
@@ -130,7 +133,6 @@ const EntryTypeListForCompletion = ({ selectedDateStr }: { selectedDateStr: stri
                 <EntryTypeCard
                   entryType={item}
                   isEdit={false}
-                  selectedDayStr={selectedDateStr}
                   className="opacity-40 transition-opacity group-hover:opacity-60"
                 />
                 <button
