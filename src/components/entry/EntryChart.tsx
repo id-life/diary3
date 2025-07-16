@@ -2,10 +2,8 @@ import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { HiOutlineRefresh } from 'react-icons/hi';
 import { Area, AreaChart, Brush, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   DateRange,
@@ -18,7 +16,29 @@ import {
   barLowValue,
 } from '../../entry/types-constants';
 import Segmented from '../segmented';
+import { DatePicker } from '../ui/date-picker';
 import EntryChartTooltip, { TooltipPayload } from './EntryChartTooltip';
+import { useIsMounted } from '@/hooks/useIsMounted';
+
+// Custom Legend Component for horizontal scrolling
+const CustomLegend = ({ payload }: { payload?: any[] }) => {
+  if (!payload?.length) return null;
+
+  return (
+    <div className="chart-legend-scroll mx-5 my-2.5 max-w-full overflow-x-auto overflow-y-hidden whitespace-nowrap px-2.5 py-2.5">
+      <ul className="m-0 inline-flex list-none items-center gap-4 p-0">
+        {payload
+          .filter((entry) => entry.dataKey !== '_barLow' && entry.dataKey !== '_barHigh')
+          .map((entry, index) => (
+            <li key={`item-${index}`} className="flex items-center gap-2 whitespace-nowrap">
+              <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: entry.color }} />
+              <span className="text-sm text-gray-700">{entry.value}</span>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
 const options = [
   { label: 'By Day', value: 'day' },
   { label: 'By Week', value: 'week' },
@@ -145,12 +165,22 @@ function EntryChart() {
     entryTypesArray,
   );
   const [selectedChartDate, setSelectedChartDate] = useAtom(selectedChartDateAtom);
+  // Initialize selectedChartDate to today's date on client mount if it's null
+  const isMounted = useIsMounted();
+
+  useEffect(() => {
+    if (isMounted) {
+      setSelectedChartDate(dayjs().format('YYYY-MM-DD'));
+    }
+  }, [isMounted, setSelectedChartDate]);
+
   const handleChartClick = useCallback(
     (data: any) => {
       setSelectedChartDate(data?.activeLabel ?? null);
     },
     [setSelectedChartDate],
   );
+
   useEffect(() => {
     const dates = getEntryInstanceDateRange(entryInstancesMap, selectedRange);
     setDateRange(dates);
@@ -202,19 +232,18 @@ function EntryChart() {
       endIndex,
     };
   }, [chartData, selectedChartDate, selectedRange]);
+
   return (
     <div>
-      <div className="flex justify-between gap-2">
-        <Segmented defaultValue={selectedRange} onChange={(value) => setSelectedRange(value as DateRange)} options={options} />
-        <motion.div
-          transition={{ type: 'spring', stiffness: 300 }}
-          whileTap={{ scale: 1.1 }}
-          whileHover={{ scale: 1.1 }}
-          className="cursor-pointer rounded-full bg-blue/10 p-2 text-blue"
-          onClick={() => setSelectedChartDate(dayjs().format('YYYY-MM-DD'))}
-        >
-          <HiOutlineRefresh className="h-6 w-6" />
-        </motion.div>
+      <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4">
+        <div className="flex-1">
+          <Segmented
+            defaultValue={selectedRange}
+            onChange={(value) => setSelectedRange(value as DateRange)}
+            options={options}
+          />
+        </div>
+        <DatePicker value={selectedChartDate} onChange={setSelectedChartDate} />
       </div>
       <ResponsiveContainer width="95%" height={480}>
         <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 12, right: 16, left: -20, bottom: 12 }}>
@@ -236,12 +265,7 @@ function EntryChart() {
           </defs>
           <XAxis dataKey="_date" padding={{ left: 16, right: 16 }} />
           <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} />
-          <Legend
-            wrapperStyle={{
-              marginLeft: '20px',
-              padding: '10px 10px 10px 10px',
-            }}
-          />
+          <Legend content={<CustomLegend />} />
           <Tooltip
             itemStyle={{
               paddingTop: 0,
@@ -266,7 +290,7 @@ function EntryChart() {
               />
             )}
           />
-          <Brush dataKey="date" height={30} startIndex={startIndex} endIndex={endIndex} stroke="#8884d8" />
+          <Brush dataKey="_date" height={30} startIndex={startIndex} endIndex={endIndex} stroke="#8884d8" />
           <CartesianGrid strokeDasharray="3 3" />
           {areas}
         </AreaChart>
