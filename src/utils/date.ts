@@ -4,7 +4,7 @@ export const formatDateTime = (timestamp?: string | number | Date | null, showSe
   timestamp ? dayjs(timestamp).format(`h:mm${showSeconds ? ':ss' : ''}a | ddd YYYY MMM DD`) : '';
 
 export const formatDate = (timestamp?: string | number | Date | null) =>
-  timestamp ? dayjs(timestamp).format('YYYY MMM DD') : '';
+  timestamp ? dayjs(timestamp).format('YYYY-MM-DD') : '';
 
 export const getDaysFromDateToDateNow = (startDate: string | number) => {
   const start = dayjs(startDate);

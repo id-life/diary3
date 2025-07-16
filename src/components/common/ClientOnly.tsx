@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { Fragment, PropsWithChildren, useEffect, useState } from 'react';
 
 export function ClientOnly({ children, ...delegated }: PropsWithChildren) {
   const [hasMounted, setHasMounted] = useState(false);
@@ -9,5 +9,5 @@ export function ClientOnly({ children, ...delegated }: PropsWithChildren) {
 
   if (!hasMounted) return null;
 
-  return <div {...delegated}>{children}</div>;
+  return <Fragment {...delegated}>{children}</Fragment>;
 }

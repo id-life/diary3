@@ -10,25 +10,17 @@ module.exports = {
         center: true,
       },
       screens: {
-        xs: {
-          max: '480px',
-        },
-        sm: {
-          max: '640px',
-        },
-        md: {
-          max: '768px',
-        },
-        lg: {
-          min: '769px',
-          max: '1024px',
-        },
-        xl: {
-          min: '1025px',
-          max: '1365px',
-        },
+        xs: { max: '480px' },
+        sm: { max: '640px' },
+        md: { max: '768px' },
+        lg: { min: '769px', max: '1024px' },
+        xl: { min: '1025px', max: '1365px' },
         '2xl': '1366px',
         '4xl': '1920px',
+        // Mobile-first responsive design
+        mobile: { max: '767px' },
+        tablet: { min: '768px', max: '1023px' },
+        desktop: { min: '1024px' },
       },
       colors: {
         diary: {
@@ -36,10 +28,16 @@ module.exports = {
           danger: '#dc2626',
           dialog: '#282828',
           'dialog-mask': '000000CC',
+          // Primary colors
+          navy: '#1e1b39',
+          'navy-light': '#2d2a4a',
         },
+        gray: {
+          DEFAULT: '#BBBAC3',
+        },
+        purple: '#6865FF',
         blue: '#376BED',
         'gradient-home-from': 'var(--gradient-home-from)',
-
         // shadcn
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -98,6 +96,40 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        // Component specific radius
+        'login-input': '10px',
+        'login-button': '10px',
+        card: '8px',
+        tag: '4px',
+        button: '6px',
+      },
+      lineHeight: {
+        3.5: '.875rem',
+      },
+      spacing: {
+        // Custom spacing values
+        14: '3.5rem', // 56px for input height
+        15: '3.75rem', // 60px
+        18: '4.5rem', // 72px
+        22: '5.5rem', // 88px
+        26: '6.5rem', // 104px
+        30: '7.5rem', // 120px
+        35: '8.75rem', // 140px for social icon gap
+        // Progress bar specific
+        'progress-height': '8px',
+        'progress-mark': '14px',
+        // Card specific
+        'card-padding': '12px',
+        'card-gap': '8px',
+      },
+      fontSize: {
+        '2xs': '10px',
+        '3xs': '8px',
+      },
+      boxShadow: {
+        card: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'card-hover': '0 4px 12px rgba(0, 0, 0, 0.15)',
+        button: '0 2px 4px rgba(0, 0, 0, 0.1)',
       },
       keyframes: {
         'accordion-down': {
