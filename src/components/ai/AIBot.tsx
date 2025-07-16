@@ -12,7 +12,6 @@ import { TbSend } from 'react-icons/tb';
 import Button from '../button';
 
 import { ChatWebLLM } from '@langchain/community/chat_models/webllm';
-import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { Runnable } from '@langchain/core/runnables';
@@ -81,46 +80,39 @@ const serializeUserData = (
 const DEFAULT_MODEL_ID = 'Qwen3-0.6B-q0f16-MLC';
 
 const SUGGESTION_PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
-  new SystemMessage(`# 角色与指令
-    
-你是一个极其严谨、聪明的任务规划专家。你的任务是根据我提供的日期和JSON数据，判断出今天需要完成哪些任务。
-
-你必须在内部完成所有复杂的逻辑分析（如计算日期），但**绝对不要在回答中展示你的思考步骤或任何计算过程**。
-
-你的最终输出必须是干净、流畅的一句话，直接告诉我结果。请模仿示例的风格。
-
----
-[示例 1：有任务时]
-
-# 输入
-今天是 2023年8月9日。
-数据: {"entryTypes":{"entryTypesArray":[{"title":"brushteeth","routine":"Daily","id":"t1","desc":"刷牙"},{"title":"weekly_report","routine":"Weekly","id":"t4","desc":"写周报"}]},"entryInstances":{"entryInstancesMap":{"2023-08-08":[{"entryTypeId":"t1"}],"2023-07-30":[{"entryTypeId":"t4"}]}}}
-
-# 输出
-今天别忘了这两件事哦：刷牙和写周报。
+  [
+    'system',
+    `# 角色与指令
+你是一个极其严谨、聪明的任务规划专家。你的任务是根据我提供的待办任务列表，生成一个自然、流畅的中文提醒。
+你的最终输出必须是干净、流畅的一句话，**绝对不要在回答中展示你的思考步骤或任何计算过程或标签**。
+请模仿示例的风格。
 
 ---
-[示例 2：无任务时]
+[示例 1]
+输入: '刷牙', '写周报'
+输出: 今天别忘了这两件事哦：刷牙和写周报。
 
-# 输入
-今天是 2023年8月9日。
-数据: {"entryTypes":{"entryTypesArray":[{"title":"brushteeth","routine":"Daily","id":"t1","desc":"刷牙"}]},"entryInstances":{"entryInstancesMap":{"2023-08-09":[{"entryTypeId":"t1"}]}}}
-
-# 输出
-今天所有计划都完成啦，可以好好放松一下！
-
-`),
-  new HumanMessage(`---
+[示例 2]
+输入: '健身'
+输出: 今天是锻炼的好日子，别忘了去健身房哦！
+`,
+  ],
+  [
+    'human',
+    `---
 [正式任务]
 
 # 输入
 {pendingTasks}
 
-# 输出`),
+# 输出`,
+  ],
 ]);
 
 const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
-  new SystemMessage(`# 角色
+  [
+    'system',
+    `# 角色
 你是一个贴心的生活助手。你的性格友好、乐于助人、有分寸感。
 
 # 核心能力与规则
@@ -128,22 +120,26 @@ const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
 2.  **条件化使用数据**：
     -   **如果**问题与日常任务相关，你必须根据我提供的“日常任务数据”和“对话历史”来回答。
     -   **如果**问题是通用的知识、闲聊、创意或其他无关话题（如“今天天气怎么样？”、“给我讲个笑话”），你**必须忽略**“日常任务数据”，像一个通用AI助手一样回答，并利用“对话历史”保持对话的贯穿性。
-3.  **对话风格**：保持简洁、自然、友好的对话风格。不要输出JSON或任何代码格式。`),
-  new HumanMessage(`
+3.  **对话风格**：保持简洁、自然、友好的对话风格。不要输出JSON或任何代码格式。`,
+  ],
+  [
+    'human',
+    `
 # 上下文信息
-
-## 对话历史
-{history}
 
 ## 我的日常任务数据（仅在用户提问相关时参考）
 今天是 {currentDate}。
 数据：{userData}
 
+## 对话历史
+{history}
+
 ## 用户最新问题
 {latestQuestion}
 
 # 回复
-`),
+`,
+  ],
 ]);
 
 export default function AIBot() {
