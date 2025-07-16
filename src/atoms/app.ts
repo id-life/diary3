@@ -2,8 +2,6 @@ import { atom } from 'jotai';
 
 export const selectedChartDateAtom = atom<string | null>(null);
 
-export const loadDialogOpenAtom = atom(false);
-
 export const backupDialogOpenAtom = atom(false);
 
 export type GlobalState = {

@@ -1,20 +1,17 @@
 'use client';
-import { deleteEntryInstanceByEntryTypeId } from '@/entry/entry-instances-slice';
 import { formatDate } from '@/utils/date';
 import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { PiStepsDuotone } from 'react-icons/pi';
 import { twMerge } from 'tailwind-merge';
-import { deleteEntryType } from '../../entry/entry-types-slice';
-import { useAppDispatch } from '../../entry/store';
 import { EntryType } from '../../entry/types-constants';
-import { enterEntryTypeEdit } from '../../entry/ui-slice';
+import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import Button from '../button';
 import Tooltip from '../tooltip';
 import EntryTypeCompletionForm from './EntryTypeCompletionForm';
 import DiaryIcons from '../icon/DiaryIcons';
 
 const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
-  const dispatch = useAppDispatch();
+  const { deleteEntryType, deleteEntryInstanceByEntryTypeId } = useJotaiActions();
 
   return (
     <Button
@@ -23,8 +20,8 @@ const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
       size="small"
       className="rounded-lg"
       onClick={() => {
-        dispatch(deleteEntryType(props.entryType.id));
-        dispatch(deleteEntryInstanceByEntryTypeId(props.entryType.id));
+        deleteEntryType(props.entryType.id);
+        deleteEntryInstanceByEntryTypeId(props.entryType.id);
       }}
     >
       <AiFillDelete className="h-full w-6" />
@@ -33,7 +30,7 @@ const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
 };
 
 const EntryTypeCardEditButton = (props: { entryType: EntryType }) => {
-  const dispatch = useAppDispatch();
+  const { enterEntryTypeEdit } = useJotaiActions();
 
   return (
     <Button
@@ -41,12 +38,13 @@ const EntryTypeCardEditButton = (props: { entryType: EntryType }) => {
       className="rounded-lg"
       type="primary"
       ghost
-      onClick={() => dispatch(enterEntryTypeEdit({ entryTypeId: props.entryType.id }))}
+      onClick={() => enterEntryTypeEdit({ entryTypeId: props.entryType.id })}
     >
       <AiFillEdit className="h-full w-6" />
     </Button>
   );
 };
+
 export type EntryTypeCardProps = {
   entryType: EntryType;
   isEdit: boolean;

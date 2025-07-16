@@ -36,6 +36,13 @@ module.exports = {
           danger: '#dc2626',
           dialog: '#282828',
           'dialog-mask': '000000CC',
+          // Login page specific colors
+          navy: '#1e1b39',
+          'navy-light': '#2d2a4a',
+          purple: '#6865ff',
+          'purple-hover': '#5854d6',
+          'input-bg': 'rgba(30, 27, 57, 0.04)',
+          'text-muted': 'rgba(30, 27, 57, 0.3)',
         },
         blue: '#376BED',
         'gradient-home-from': 'var(--gradient-home-from)',
@@ -98,6 +105,10 @@ module.exports = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      spacing: {
+        14: '3.5rem',
+        35: '8.75rem',
       },
       keyframes: {
         'accordion-down': {

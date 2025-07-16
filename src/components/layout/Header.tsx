@@ -3,42 +3,30 @@
 import { backupDialogOpenAtom, globalStateAtom } from '@/atoms/app';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { safeNumberValue } from '@/utils';
-import { formatDateTime } from '@/utils/date';
 import clsx from 'clsx';
 import { useAtomValue, useSetAtom } from 'jotai';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
-import { useBeforeunload } from 'react-beforeunload';
 import { MdExpandMore } from 'react-icons/md';
 import packageJson from '../../../package.json';
-import { onCloseUpdateLastUseTime, onLogoutClickClearState } from '../../entry/login-user-slice';
-import { AppDispatch, selectLoginUser, useAppDispatch, useAppSelector } from '../../entry/store';
 import { saveStateToGithub } from '../../utils/GithubStorage';
 import Button from '../button';
 import Collapse from '../collapse';
 
 function UserHeader() {
-  const loginUser = useAppSelector(selectLoginUser);
-
-  const dispatch: AppDispatch = useAppDispatch();
   const globalState = useAtomValue(globalStateAtom);
-  const { logout, user } = useGitHubOAuth();
-  useBeforeunload(() => {
-    dispatch(onCloseUpdateLastUseTime());
-  });
+  const { logout, user: githubUser, isAuthenticated } = useGitHubOAuth();
 
   const onLogoutClick = () => {
-    dispatch(onLogoutClickClearState());
     logout();
   };
-  const loginUserState = useAppSelector((state) => state.loginUser);
-  const { user: githubUser } = useGitHubOAuth();
-  const save = useCallback(() => saveStateToGithub(loginUserState, true, githubUser), [githubUser, loginUserState]);
+
+  const save = useCallback(() => saveStateToGithub(null, true, githubUser), [githubUser]);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
-  const logged = useMemo(() => !!loginUser?.uid || !!user?.username, [loginUser, user]);
-
+  const logged = useMemo(() => isAuthenticated && !!githubUser?.username, [isAuthenticated, githubUser]);
+  if (!logged) return null;
   return (
     <Collapse
       initOpen={logged}
@@ -50,29 +38,20 @@ function UserHeader() {
             isOpen ? 'rounded-none' : 'rounded-b-2xl',
           )}
         >
-          {logged ? (
-            <>
-              <div className="flex flex-col gap-2 text-sm">
-                <p className="text-base">
-                  <span className="font-semibold">{githubUser?.name || loginUser?.uid || user?.username}</span>
-                  {" 's Diary"}
-                </p>
-                <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="text-right text-xs">STREAK DAYS</div>
-                <div className="font-DDin text-2xl/8 font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</div>
-                <MdExpandMore className={clsx('z-[1] h-9 w-9 cursor-pointer text-black', isOpen ? 'rotate-180' : 'rotate-0')} />
-              </div>
-            </>
-          ) : (
-            <div className="w-full text-center text-xl">
-              Not logged in, Let&apos;s{' '}
-              <Link className="text-blue" href="/settings">
-                Get Started
-              </Link>
-            </div>
-          )}
+          <div className="flex flex-col gap-2 text-sm">
+            <p className="text-base">
+              <span className="font-semibold">{githubUser?.name || githubUser?.username}</span>
+              {" 's Diary"}
+            </p>
+            {/* TODO: lastUseTime Should Migrate to backend profile */}
+            {/* <p className="text-xs text-black/40">LastUse: {formatDateTime(loginUser?.lastUseTime, false)}</p> */}
+            <p className="text-xs text-black/40">@{githubUser?.username}</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="text-right text-xs">STREAK DAYS</div>
+            <div className="font-DDin text-2xl/8 font-bold">{safeNumberValue(globalState?.currentStreakByEntry)}</div>
+            <MdExpandMore className={clsx('z-[1] h-9 w-9 cursor-pointer text-black', isOpen ? 'rotate-180' : 'rotate-0')} />
+          </div>
         </div>
       )}
     >

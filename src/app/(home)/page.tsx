@@ -1,14 +1,14 @@
 'use client';
-import { StorageKey } from '@/constants/storage';
+import { ClientOnly } from '@/components/common/ClientOnly';
+import EntryPageContent from '@/components/entry/EntryPageContent';
 import { useAccessToken } from '@/hooks/app';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-export default function HomePage() {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { setAccessToken } = useAccessToken();
-
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
@@ -18,8 +18,16 @@ export default function HomePage() {
       return;
     }
     console.log('no token');
-    router.push('/entry');
   }, [searchParams, router, setAccessToken]);
+  return <EntryPageContent />;
+}
 
-  return <div></div>;
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ClientOnly>
+        <HomePageContent />
+      </ClientOnly>
+    </Suspense>
+  );
 }

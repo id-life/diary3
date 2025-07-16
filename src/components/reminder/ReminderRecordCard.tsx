@@ -1,6 +1,4 @@
-import { deleteReminder } from '@/entry/reminder-records-slice';
-import { useAppDispatch } from '@/entry/store';
-import { enterReminderEdit } from '@/entry/ui-slice';
+import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import { formatDate } from '@/utils/date';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -16,7 +14,7 @@ export type EntryTypeCardProps = {
 };
 const rankWord = ['st', 'nd', 'rd'];
 const ReminderRecordCard = (props: EntryTypeCardProps) => {
-  const dispatch = useAppDispatch();
+  const { deleteReminder, enterReminderEdit } = useJotaiActions();
   const { record, className } = props;
   const { id, title, content, type, createdAt, updatedAt, weekDay, monthDay, month, sinceStartTime } = record;
   const repeatAt = useMemo(() => {
@@ -73,7 +71,7 @@ const ReminderRecordCard = (props: EntryTypeCardProps) => {
           className="rounded-lg"
           type="primary"
           ghost
-          onClick={() => dispatch(enterReminderEdit({ reminderId: id }))}
+          onClick={() => enterReminderEdit({ reminderId: id })}
         >
           <AiFillEdit className="h-full w-6" />
         </Button>
@@ -83,7 +81,7 @@ const ReminderRecordCard = (props: EntryTypeCardProps) => {
           size="small"
           className="rounded-lg"
           onClick={() => {
-            dispatch(deleteReminder(id));
+            deleteReminder(id);
           }}
         >
           <AiFillDelete className="h-full w-6" />

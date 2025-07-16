@@ -1,9 +1,8 @@
 import { InputNumber } from 'antd';
 import dayjs from 'dayjs';
 import { Controller, useForm } from 'react-hook-form';
-import { createEntryInstance } from '../../entry/entry-instances-slice';
-import { useAppDispatch } from '../../entry/store';
 import { EntryType, getEntryInstanceIdFromEntryType } from '../../entry/types-constants';
+import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import Button from '../button';
 import DiaryIcons from '../icon/DiaryIcons';
 
@@ -18,7 +17,7 @@ function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?:
   } = useForm({
     defaultValues: { points: props.entryType.defaultPoints, notes: '' },
   });
-  const dispatch = useAppDispatch();
+  const { createEntryInstance } = useJotaiActions();
 
   const onSubmit = (values: any) => {
     const selectedDay = selectedDayStr ? dayjs(selectedDayStr) : dayjs();
@@ -31,16 +30,14 @@ function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?:
       now.format('YYYY/MM/DD HH:mm:ss'),
     );
 
-    dispatch(
-      createEntryInstance({
-        id: getEntryInstanceIdFromEntryType(props.entryType, now),
-        createdAt: now.valueOf(),
-        updatedAt: now.valueOf(),
-        entryTypeId: props.entryType.id,
-        points: values.points,
-        notes: values.notes,
-      }),
-    );
+    createEntryInstance({
+      id: getEntryInstanceIdFromEntryType(props.entryType, now),
+      createdAt: now.valueOf(),
+      updatedAt: now.valueOf(),
+      entryTypeId: props.entryType.id,
+      points: values.points,
+      notes: values.notes,
+    });
     setValue('points', props.entryType.defaultPoints);
     setValue('notes', '');
   };
