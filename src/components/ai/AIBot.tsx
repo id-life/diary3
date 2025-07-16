@@ -64,9 +64,11 @@ const PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
 ]);
 
 export default function AIBot() {
-  const { isReady: isEngineReady, progress, loadModel, isLoading: isEngineLoading, engine } = useAI();
+  const { isReady, progress, loadModel, isLoading, engine } = useAI();
   const [chatModel, setChatModel] = useState<ChatWebLLM | null>(null);
   const [chain, setChain] = useState<Runnable | null>(null);
+
+  const [hasInitiatedLoad, setHasInitiatedLoad] = useState(false);
 
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [userInput, setUserInput] = useState('');
@@ -84,14 +86,17 @@ export default function AIBot() {
   );
 
   useEffect(() => {
-    if (!isEngineReady && !isEngineLoading) {
+    if (!hasInitiatedLoad) {
+      console.log('AIBot: Component mounted, triggering loadModel...');
       loadModel(DEFAULT_MODEL_ID);
+      setHasInitiatedLoad(true);
     }
-  }, [isEngineReady, isEngineLoading, loadModel]);
+  }, [loadModel, hasInitiatedLoad]);
 
   useEffect(() => {
     const initChat = async () => {
-      if (isEngineReady && engine && !chain) {
+      if (isReady && engine && !chain) {
+        console.log('AIBot: Engine is ready, initializing ChatWebLLM...');
         setIsGenerating(true);
         const model = new ChatWebLLM({
           model: DEFAULT_MODEL_ID,
@@ -103,12 +108,13 @@ export default function AIBot() {
         setChatModel(model);
         const newChain = PROMPT_TEMPLATE.pipe(model).pipe(new StringOutputParser());
         setChain(newChain);
+        console.log('AIBot: Chat chain created successfully.');
         setIsGenerating(false);
       }
     };
 
     initChat();
-  }, [isEngineReady, engine, chain, chatModel]);
+  }, [isReady, engine, chain]);
 
   useEffect(() => {
     if (chatBoxRef.current) {
@@ -162,7 +168,7 @@ export default function AIBot() {
     }
   };
 
-  const isLoading = progress.progress < 1;
+  const isModelLoading = progress.progress < 1;
 
   return (
     <>
@@ -174,13 +180,13 @@ export default function AIBot() {
         onClick={() => setIsPanelOpen(true)}
       >
         <div className="flex items-center gap-3">
-          {isLoading ? (
+          {isModelLoading ? (
             <RiRobot2Line className="h-8 w-8 animate-spin text-diary-primary" />
           ) : (
             <RiChat1Line className="h-8 w-8 text-diary-primary" />
           )}
           <div className="max-w-xs text-sm text-gray-700">
-            {isLoading ? (
+            {isModelLoading ? (
               <div>
                 <p>{progress.text}</p>
                 <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200">
@@ -207,7 +213,7 @@ export default function AIBot() {
           </button>
         </div>
 
-        {isEngineReady && chain ? (
+        {isReady && chain ? (
           <>
             <div ref={chatBoxRef} className="flex-1 overflow-y-auto p-4">
               {chatHistory.map((msg, index) => (

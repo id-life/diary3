@@ -1,10 +1,17 @@
 'use client';
 
 import { createContext, PropsWithChildren, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { MLCEngine, InitProgressReport, prebuiltAppConfig, ModelRecord, MLCEngineConfig } from '@mlc-ai/web-llm';
+import {
+  MLCEngineInterface,
+  InitProgressReport,
+  prebuiltAppConfig,
+  ModelRecord,
+  CreateWebWorkerMLCEngine,
+} from '@mlc-ai/web-llm';
+import { toast } from 'react-toastify';
 
 interface AIContextType {
-  engine: MLCEngine | null;
+  engine: MLCEngineInterface | null;
   availableModels: ModelRecord[];
   isReady: boolean;
   isLoading: boolean;
@@ -16,7 +23,7 @@ interface AIContextType {
 const AIContext = createContext<AIContextType | null>(null);
 
 export const AIProvider = ({ children }: PropsWithChildren) => {
-  const engineRef = useRef<MLCEngine | null>(null);
+  const engineRef = useRef<MLCEngineInterface | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState<InitProgressReport>({
@@ -27,43 +34,58 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
 
   const availableModels = prebuiltAppConfig.model_list;
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !engineRef.current) {
-      const worker = new Worker('/web-llm.worker.js') as MLCEngineConfig;
-
-      engineRef.current = new MLCEngine(worker);
-
-      engineRef.current.setInitProgressCallback((report: InitProgressReport) => {
-        setProgress(report);
-      });
-    }
-  }, []);
-
-  const loadModel = useCallback(
+  const initAndLoadModel = useCallback(
     async (modelId: string) => {
-      if (isLoading || !engineRef.current) return;
+      if (isLoading) return;
       setIsLoading(true);
       setIsReady(false);
 
-      console.time('model_load_time');
-      await engineRef.current.reload(modelId);
-      console.timeEnd('model_load_time');
+      try {
+        const engine = await CreateWebWorkerMLCEngine(
+          new Worker(new URL('../worker.ts', import.meta.url), {
+            type: 'module',
+          }),
+          modelId,
+          {
+            initProgressCallback: (report) => {
+              console.log(`AIProvider Progress: ${report.text} (${(report.progress * 100).toFixed(2)}%)`);
+              setProgress(report);
+            },
+          },
+        );
 
-      setIsLoading(false);
-      setIsReady(true);
+        engineRef.current = engine;
+        setIsLoading(false);
+        setIsReady(true);
+        console.log('AIProvider: The engine has been successfully loaded.');
+      } catch (error) {
+        console.error('Model loading failed:', error);
+        setProgress({ progress: 1, timeElapsed: 0, text: `Error: ${error}` });
+        setIsLoading(false);
+        setIsReady(false);
+      }
     },
     [isLoading],
+  );
+
+  const loadModel = useCallback(
+    async (modelId: string) => {
+      if (!engineRef.current) {
+        await initAndLoadModel(modelId);
+      } else {
+        console.log('AIProvider: Engine already exists, calling reload.');
+        await engineRef.current.reload(modelId);
+      }
+    },
+    [initAndLoadModel],
   );
 
   const reset = useCallback(() => {
     if (engineRef.current) {
       engineRef.current.unload();
+      engineRef.current = null;
       setIsReady(false);
-      setProgress({
-        progress: 0,
-        timeElapsed: 0,
-        text: 'Engine reset. Ready to load a new model.',
-      });
+      setProgress({ progress: 0, timeElapsed: 0, text: 'The engine has been reset and is ready to load new models.' });
     }
   }, []);
 
@@ -83,7 +105,7 @@ export const AIProvider = ({ children }: PropsWithChildren) => {
 export const useAI = () => {
   const context = useContext(AIContext);
   if (!context) {
-    throw new Error('useAI must be used within an AIProvider');
+    throw new Error('useAI 必须在 AIProvider 内部使用');
   }
   return context;
 };
