@@ -32,6 +32,9 @@ module.exports = {
           navy: '#1e1b39',
           'navy-light': '#2d2a4a',
         },
+        gray: {
+          DEFAULT: '#BBBAC3',
+        },
         purple: '#6865FF',
         blue: '#376BED',
         'gradient-home-from': 'var(--gradient-home-from)',

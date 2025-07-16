@@ -11,13 +11,14 @@ import { useState } from 'react';
 import { HiChevronRight, HiDownload, HiUpload } from 'react-icons/hi';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import { LoadSVG, SaveSVG } from '../svg';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
     <Card className="flex-center flex-col px-2 pb-3 pt-5 text-center">
       <p className="text-xs/3.5 text-diary-navy">{title}</p>
       <p className="mt-5 text-3xl/8 font-bold text-diary-navy">{value}</p>
-      <p className="text-diary-gray-medium mt-5 text-xs opacity-50">{unit}</p>
+      <p className="mt-5 text-xs text-diary-navy opacity-50">{unit}</p>
     </Card>
   );
 }
@@ -72,17 +73,17 @@ export default function UserProfilePage() {
   return (
     <div className="flex h-full flex-col overflow-auto px-4 pb-10">
       {/* Header */}
-      <div className="-mx-4 bg-[#FDFEFE] px-4 pb-6 pt-11 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
+      <div className="-mx-4 bg-[#FDFEFE] px-4 py-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
         {/* User Info */}
         <div className="flex items-center gap-4">
-          <div className="h-20 w-20 overflow-hidden rounded-full bg-gray-200">
-            <img src={userAvatar} alt="User avatar" className="h-full w-full object-cover" />
+          <div className="size-20 overflow-hidden rounded-full bg-gray-200">
+            <img src={userAvatar} alt="User avatar" className="size-full object-cover" />
           </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-semibold text-diary-navy">
-              {displayName} <span className="text-lg">&apos;s Diary</span>
+          <div className="flex-1 text-right">
+            <h1 className="text-2xl font-bold text-diary-navy">
+              {displayName} <span className="text-xl">&apos;s Diary</span>
             </h1>
-            <p className="text-diary-gray-medium mt-1 text-xs">Last Use: {lastUseTime}</p>
+            <p className="mt-1 text-xs text-[#8A8898]">Last Use: {lastUseTime}</p>
           </div>
         </div>
       </div>
@@ -96,10 +97,10 @@ export default function UserProfilePage() {
             className="border-diary-card-border flex w-full items-center justify-between border-b px-4 py-4 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
-              <HiDownload className="text-diary-gray-medium h-6 w-6" />
+              <SaveSVG />
               <span className="font-medium text-diary-navy">Save</span>
             </div>
-            <HiChevronRight className="text-diary-gray-medium h-5 w-5" />
+            <HiChevronRight className="h-5 w-5 text-gray" />
           </button>
 
           <button
@@ -107,10 +108,10 @@ export default function UserProfilePage() {
             className="flex w-full items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
-              <HiUpload className="text-diary-gray-medium h-6 w-6" />
+              <LoadSVG />
               <span className="font-medium text-diary-navy">Load</span>
             </div>
-            <HiChevronRight className="text-diary-gray-medium h-5 w-5" />
+            <HiChevronRight className="size-5 text-gray" />
           </button>
         </Card>
       </div>

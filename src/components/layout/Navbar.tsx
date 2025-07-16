@@ -62,7 +62,7 @@ function Navbar() {
           >
             {createElement(icon, {
               className: cn(
-                'text-2xl/6 size-6 fill-[#BBBAC3] transition-all hover:brightness-90 duration-300',
+                'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300',
                 (isActive || isInHomePage) && 'fill-blue hover:fill-blue',
                 className,
               ),
