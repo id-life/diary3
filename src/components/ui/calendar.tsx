@@ -1,13 +1,31 @@
 import * as React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { DayPicker } from 'react-day-picker';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { DayPicker, useNavigation } from 'react-day-picker';
 
 import { cn } from '@/utils';
 import { buttonVariants } from '@/components/ui/button';
+import dayjs from 'dayjs';
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
+  const [internalMonth, setInternalMonth] = React.useState<Date>(props.defaultMonth || new Date());
+
+  // Use external month prop if provided, otherwise use internal state
+  const currentMonth = props.month || internalMonth;
+  const setCurrentMonth = props.onMonthChange || setInternalMonth;
+
+  const handlePreviousYear = () => {
+    const newDate = new Date(currentMonth);
+    newDate.setFullYear(newDate.getFullYear() - 1);
+    setCurrentMonth(newDate);
+  };
+
+  const handleNextYear = () => {
+    const newDate = new Date(currentMonth);
+    newDate.setFullYear(newDate.getFullYear() + 1);
+    setCurrentMonth(newDate);
+  };
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -39,8 +57,36 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+        IconRight: () => <ChevronRight className="h-4 w-4" />,
+        Caption: () => {
+          const { goToMonth, nextMonth, previousMonth } = useNavigation();
+          return (
+            <div className="flex w-full items-center justify-center">
+              <div className="absolute left-4 flex">
+                <ChevronsLeft
+                  className="mr-1 size-4 cursor-pointer text-gray-800 opacity-50 hover:opacity-100"
+                  onClick={handlePreviousYear}
+                />
+                <ChevronLeft
+                  onClick={() => previousMonth && goToMonth(previousMonth)}
+                  className="size-4 cursor-pointer text-gray-800 opacity-50 hover:opacity-100"
+                />
+              </div>
+              <div className="text-sm font-medium">{dayjs(currentMonth).format('MMM YYYY')}</div>
+              <div className="absolute right-4 flex">
+                <ChevronRight
+                  onClick={() => nextMonth && goToMonth(nextMonth)}
+                  className="size-4 cursor-pointer text-gray-800 opacity-50 hover:opacity-100"
+                />
+                <ChevronsRight
+                  className="ml-1 size-4 cursor-pointer text-gray-800 opacity-50 hover:opacity-100"
+                  onClick={handleNextYear}
+                />
+              </div>
+            </div>
+          );
+        },
       }}
       {...props}
     />

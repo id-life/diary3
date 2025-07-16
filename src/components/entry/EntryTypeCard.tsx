@@ -9,6 +9,9 @@ import Button from '../button';
 import Tooltip from '../tooltip';
 import EntryTypeCompletionForm from './EntryTypeCompletionForm';
 import DiaryIcons from '../icon/DiaryIcons';
+import { selectedChartDateAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
+import dayjs from 'dayjs';
 
 const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
   const { deleteEntryType, deleteEntryInstanceByEntryTypeId } = useJotaiActions();
@@ -53,7 +56,8 @@ export type EntryTypeCardProps = {
   isDone?: boolean;
 };
 const EntryTypeCard = (props: EntryTypeCardProps) => {
-  const { entryType, isEdit, className, selectedDayStr, isDone } = props;
+  const selectedDayStr = useAtomValue(selectedChartDateAtom);
+  const { entryType, isEdit, className, isDone } = props;
   const { title, routine, themeColors, createdAt, updatedAt, pointStep, defaultPoints } = entryType;
   return isEdit ? (
     <div className={twMerge('flex justify-between gap-2 bg-white text-white', className)}>
@@ -118,7 +122,7 @@ const EntryTypeCard = (props: EntryTypeCardProps) => {
       <Tooltip placement="top" offsetX={8} title="defaultPoints">
         <div className="flex flex-grow flex-col items-center gap-2 font-DDin text-3xl font-bold">{defaultPoints}</div>
       </Tooltip>
-      <EntryTypeCompletionForm entryType={props.entryType} selectedDayStr={selectedDayStr} />
+      <EntryTypeCompletionForm entryType={props.entryType} selectedDayStr={selectedDayStr || dayjs().format('YYYY-MM-DD')} />
     </div>
   );
 };

@@ -134,3 +134,22 @@
     @apply flex items-center justify-center;
   }
 }
+
+/* Custom scrollbar styles for chart legend */
+.chart-legend-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.chart-legend-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.chart-legend-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.chart-legend-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

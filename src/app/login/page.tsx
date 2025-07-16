@@ -51,11 +51,7 @@ export default function LoginPage() {
 
   // If user is authenticated, show loading while redirecting
   if (gitHubAuth.isAuthenticated && gitHubAuth.user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-100 via-purple-50 to-white">
-        <div>Redirecting...</div>
-      </div>
-    );
+    return null;
   }
 
   // Show login/signup form
@@ -82,7 +78,7 @@ export default function LoginPage() {
               placeholder={isSignUp ? 'Email or Phone Number' : 'User Name or Phone Number'}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="h-14 w-full rounded-lg border-0 bg-diary-input-bg px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="bg-diary-input-bg h-14 w-full rounded-lg px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
             />
           </div>
 
@@ -93,7 +89,7 @@ export default function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-14 w-full rounded-lg border-0 bg-diary-input-bg px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="bg-diary-input-bg h-14 w-full rounded-lg border-0 px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
             />
             <button
               type="button"
@@ -117,7 +113,7 @@ export default function LoginPage() {
           {/* Sign up toggle and forgot password */}
           {!isSignUp && (
             <div className="mt-4 flex items-center justify-between text-sm">
-              <button className="text-diary-purple hover:text-diary-purple-hover">Forget password?</button>
+              <button className="text-purple hover:brightness-110">Forget password?</button>
               <button onClick={() => setIsSignUp(true)} className="text-diary-navy hover:text-diary-navy-light">
                 sign up
               </button>
