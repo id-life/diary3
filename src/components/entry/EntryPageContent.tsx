@@ -1,17 +1,14 @@
 'use client';
 import { entryInstancesMapAtom, selectedChartDateAtom } from '@/atoms';
-import { ClientOnly } from '@/components/common/ClientOnly';
 import EntryChart from '@/components/entry/EntryChart';
 import EntryInstanceList from '@/components/entry/EntryInstanceList';
 import EntryProgressBar from '@/components/entry/EntryProgressBar';
 import EntryTypeListForCompletion from '@/components/entry/EntryTypeListForCompletion';
 import HeaderDatetime from '@/components/entry/HeaderDatetime';
-import { useAccessToken } from '@/hooks/app';
 import { formatDate } from '@/utils/date';
 import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 export default function EntryPageContent() {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);

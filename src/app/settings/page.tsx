@@ -30,7 +30,7 @@ export default function SettingsPage() {
   if (!gitHubAuth.user) return null;
 
   return (
-    <ClientOnly className="h-full">
+    <ClientOnly>
       <UserProfilePage />
       <DataExportDialog open={exportDialogOpen} onOpenChange={setExportDialogOpen} />
     </ClientOnly>
