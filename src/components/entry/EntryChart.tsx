@@ -235,7 +235,7 @@ function EntryChart() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4">
+      <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-3">
         <div className="flex-1">
           <Segmented
             defaultValue={selectedRange}
@@ -245,8 +245,8 @@ function EntryChart() {
         </div>
         <DatePicker value={selectedChartDate} onChange={setSelectedChartDate} />
       </div>
-      <ResponsiveContainer width="95%" height={480}>
-        <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 12, right: 16, left: -20, bottom: 12 }}>
+      <ResponsiveContainer width="95%" height={320}>
+        <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 8, right: 12, left: -16, bottom: 8 }}>
           <defs>
             <linearGradient id="default" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#FF4AF8" stopOpacity={0.45} />
@@ -263,19 +263,18 @@ function EntryChart() {
               );
             })}
           </defs>
-          <XAxis dataKey="_date" padding={{ left: 16, right: 16 }} />
-          <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} />
-          <Legend content={<CustomLegend />} />
+          <XAxis dataKey="_date" padding={{ left: 12, right: 12 }} fontSize={12} />
+          <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} fontSize={12} />
           <Tooltip
             itemStyle={{
               paddingTop: 0,
               paddingBottom: 0,
-              height: '20px',
+              height: '18px',
             }}
             wrapperStyle={{
-              padding: '0 10px',
+              padding: '0 8px',
               overflow: 'hidden',
-              maxHeight: '220px',
+              maxHeight: '180px',
             }}
             cursor={true}
             content={(props) => (
