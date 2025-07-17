@@ -1,7 +1,6 @@
 'use client';
 
 import { useAI } from '@/providers/AIProvider';
-import { useAppSelector, selectEntryTypesArray, selectEntryInstancesMap, selectReminderRecordArray } from '@/entry/store';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
@@ -16,6 +15,8 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { Runnable } from '@langchain/core/runnables';
 import { EntryInstance, EntryType, ReminderRecord, RoutineEnum } from '@/entry/types-constants';
+import { entryTypesArrayAtom, entryInstancesMapAtom, reminderRecordsAtom } from '@/atoms';
+import { useAtomValue } from 'jotai';
 
 dayjs.extend(isToday);
 dayjs.extend(isBetween);
@@ -77,7 +78,7 @@ const serializeUserData = (
   return JSON.stringify(data, null, 2);
 };
 
-const DEFAULT_MODEL_ID = 'Qwen3-0.6B-q0f16-MLC';
+const DEFAULT_MODEL_ID = 'Llama-3.2-1B-Instruct-q4f32_1-MLC';
 
 const SUGGESTION_PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
   [
@@ -158,9 +159,9 @@ export default function AIBot() {
   const [dailySuggestion, setDailySuggestion] = useState<string | null>(null);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
-  const entryTypes = useAppSelector(selectEntryTypesArray);
-  const entryInstances = useAppSelector(selectEntryInstancesMap);
-  const reminders = useAppSelector(selectReminderRecordArray);
+  const entryTypes = useAtomValue(entryTypesArrayAtom);
+  const entryInstances = useAtomValue(entryInstancesMapAtom);
+  const reminders = useAtomValue(reminderRecordsAtom);
   const userDataString = useMemo(
     () => serializeUserData(entryTypes, entryInstances, reminders),
     [entryTypes, entryInstances, reminders],
@@ -296,7 +297,17 @@ export default function AIBot() {
       }
     } catch (error) {
       console.error('Error during chat generation:', error);
-      setChatHistory((prev) => [...prev.slice(0, -1), { role: 'assistant', content: '抱歉，我好像出错了。' }]);
+      if (error instanceof Error && error.message.includes('ContextWindowSizeExceededError')) {
+        setChatHistory((prev) => [
+          ...prev.slice(0, -1),
+          {
+            role: 'assistant',
+            content: '抱歉，当前聊天已达到窗口上限。',
+          },
+        ]);
+      } else {
+        setChatHistory((prev) => [...prev.slice(0, -1), { role: 'assistant', content: '抱歉，我好像出错了。' }]);
+      }
     } finally {
       setIsGenerating(false);
     }
