@@ -1,27 +1,20 @@
 'use client';
 
+import { useInitGlobalState } from '@/hooks/app';
+import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
+import { cn } from '@/utils';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { act, createElement, FC, SVGProps, useMemo, useEffect } from 'react';
-import DiaryIcons from '../icon/DiaryIcons';
-import { useInitGlobalState } from '@/hooks/app';
-import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
+import { createElement, FC, SVGProps, useEffect, useMemo } from 'react';
+import { AddCircleSVG, EntrySVG, HomeSVG, ReminderSVG, UserSVG } from '../svg';
 
-export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>> }[] = [
-  { key: 'entry', icon: DiaryIcons.HomeSvg },
-  {
-    key: 'add',
-    icon: DiaryIcons.AddSvg,
-  },
-  {
-    key: 'reminder',
-    icon: DiaryIcons.ReminderSvg,
-  },
-  {
-    key: 'settings',
-    icon: DiaryIcons.SettingsSvg,
-  },
+export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: string }[] = [
+  { key: 'entry', icon: HomeSVG },
+  { key: 'add', icon: EntrySVG },
+  { key: 'add-entry', icon: AddCircleSVG, className: 'size-9' }, // TODO: add entry dialog
+  { key: 'reminder', icon: ReminderSVG },
+  { key: 'settings', icon: UserSVG },
 ];
 
 function Navbar() {
@@ -53,19 +46,27 @@ function Navbar() {
   }
 
   return (
-    <nav className="flex w-full items-center rounded-xl bg-white/90 px-8 shadow-xl backdrop-blur">
+    <nav className="flex w-full items-center rounded-xl bg-white px-6 drop-shadow-[0px_-4px_8px_rgba(0,0,0,0.05)]">
       {PAGES.map((page) => {
-        const isHomePage = activeKey === page.key || (!activeKey && page.key === 'entry');
+        const { className, key, icon } = page;
+        const isActive = activeKey === key;
+        const isInHomePage = !activeKey && key === 'entry';
         return (
           <Link
-            key={page.key.toUpperCase()}
+            key={key.toUpperCase()}
             className={clsx(
-              'flex flex-grow items-center justify-center rounded-t-lg py-4',
-              isHomePage ? 'text-blue' : 'text-[#9FC2D7]',
+              'flex flex-grow items-center justify-center rounded-t-lg py-2',
+              isActive || isInHomePage ? 'text-blue' : 'text-[#BBBAC3]',
             )}
-            href={`/${page.key.toLowerCase()}`}
+            href={`/${key.toLowerCase()}`}
           >
-            {createElement(page?.icon, { className: 'text-2xl' })}
+            {createElement(icon, {
+              className: cn(
+                'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300',
+                (isActive || isInHomePage) && 'fill-blue hover:fill-blue',
+                className,
+              ),
+            })}
           </Link>
         );
       })}

@@ -1,44 +1,33 @@
 'use client';
-import { entryInstancesMapAtom, selectedChartDateAtom } from '@/atoms';
-import { ClientOnly } from '@/components/common/ClientOnly';
+import { globalStateAtom } from '@/atoms';
 import EntryChart from '@/components/entry/EntryChart';
 import EntryInstanceList from '@/components/entry/EntryInstanceList';
 import EntryProgressBar from '@/components/entry/EntryProgressBar';
 import EntryTypeListForCompletion from '@/components/entry/EntryTypeListForCompletion';
-import HeaderDatetime from '@/components/entry/HeaderDatetime';
-import { useAccessToken } from '@/hooks/app';
-import { formatDate } from '@/utils/date';
-import dayjs from 'dayjs';
+import { safeNumberValue } from '@/utils';
 import { useAtomValue } from 'jotai';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 export default function EntryPageContent() {
-  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
-  const selectedChartDate = useAtomValue(selectedChartDateAtom);
-  const selectedDay = useMemo(() => selectedChartDate || dayjs().format('YYYY-MM-DD'), [selectedChartDate]);
-  const selectedTotalPoints = useMemo(
-    () =>
-      entryInstancesMap[selectedDay]?.length
-        ? entryInstancesMap[selectedDay].reduce(
-            (pre: number, cur: any) => pre + (typeof cur?.points === 'number' ? cur.points : parseFloat(cur.points)),
-            0,
-          )
-        : 0,
-    [entryInstancesMap, selectedDay],
-  );
-  const entryInstancesArray = useMemo(() => entryInstancesMap[selectedDay], [entryInstancesMap, selectedDay]);
+  const globalState = useAtomValue(globalStateAtom);
+  const currentStreakByEntry = useMemo(() => safeNumberValue(globalState?.currentStreakByEntry), [globalState]);
 
   return (
-    <div className="flex h-full flex-col gap-4 overflow-auto px-4 py-6 text-center">
-      <HeaderDatetime />
-      <EntryProgressBar points={selectedTotalPoints} />
-      <h2 className="mt-4 flex items-center justify-center pt-2 text-xl font-semibold">
-        Selected Date {formatDate(selectedDay)}
-      </h2>
-      <EntryChart entryInstancesMap={entryInstancesMap} />
-      <EntryInstanceList entryInstancesArray={entryInstancesArray} />
-      <EntryTypeListForCompletion selectedDateStr={selectedDay} />
+    <div className="flex h-full flex-col gap-4 overflow-auto px-4 pb-10 text-center">
+      <div className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-[1.625rem]/10 font-semibold">{currentStreakByEntry}</span>
+          <span className="text-left text-xs/3">
+            STREAK
+            <br />
+            DAY{currentStreakByEntry > 1 ? 'S' : ''}
+          </span>
+        </div>
+        <EntryProgressBar className="grow" />
+      </div>
+      <EntryChart />
+      <EntryInstanceList />
+      <EntryTypeListForCompletion />
     </div>
   );
 }

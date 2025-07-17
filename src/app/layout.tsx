@@ -1,16 +1,14 @@
 import Theme from '@/components/app/Theme';
 import { ClientOnly } from '@/components/common/ClientOnly';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import Header from '@/components/layout/Header';
+import DialogComponents from '@/components/dialog/DialogComponents';
 import Navbar from '@/components/layout/Navbar';
 import Providers from '@/providers/root';
 import { ddin, poppins } from '@/styles/fonts';
 import { cn } from '@/utils';
 import { clsx } from 'clsx';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { ToastContainer } from 'react-toastify';
-import type { Viewport } from 'next';
-import DialogComponents from '@/components/dialog/DialogComponents';
 
 import '@/styles/globals.css';
 import AIBotLoader from '@/components/ai/AIBotLoader';
@@ -43,12 +41,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Providers>
           <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
             <ErrorBoundary>
-              <ClientOnly>
-                <Header />
-              </ClientOnly>
               <main className="relative h-full flex-grow overflow-auto scroll-smooth bg-[#F6F6F6]">{children}</main>
             </ErrorBoundary>
-            <Navbar />
+            <ClientOnly>
+              <Navbar />
+            </ClientOnly>
             <DialogComponents />
             <AIBotLoader />
           </div>
