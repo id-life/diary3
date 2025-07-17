@@ -1,4 +1,4 @@
-import { animateValue } from 'motion';
+import { animateValue } from 'motion/react';
 
 const calculateElementTop = (el: HTMLElement) => {
   let top = 0;

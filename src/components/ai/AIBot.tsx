@@ -78,7 +78,7 @@ const serializeUserData = (
   return JSON.stringify(data, null, 2);
 };
 
-const DEFAULT_MODEL_ID = 'Llama-3.2-1B-Instruct-q4f32_1-MLC';
+const DEFAULT_MODEL_ID = 'Qwen3-0.6B-q4f32_1-MLC';
 
 const SUGGESTION_PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
   [

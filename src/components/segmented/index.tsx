@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { motion } from 'motion';
+import { motion } from 'motion/react';
 import React, { useCallback, useState, useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
 
