@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import isBetween from 'dayjs/plugin/isBetween';
+import { cn } from '@/utils';
 
 import { RiRobot2Line, RiCloseLine, RiChat1Line } from 'react-icons/ri';
 import { TbSend } from 'react-icons/tb';
@@ -360,17 +361,22 @@ export default function AIBot() {
   return (
     <>
       <div
-        className={`fixed bottom-5 right-5 z-50 cursor-pointer rounded-lg bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105 ${
-          isPanelOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
-        }`}
+        className={cn(
+          'fixed z-50 cursor-pointer rounded-lg bg-white p-4 shadow-xl transition-all duration-300 hover:scale-105',
+          'bottom-20 right-5 md:bottom-5',
+          isPanelOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100',
+        )}
         onClick={handleBubbleClick}
       >
         {renderBubbleContent()}
       </div>
       <div
-        className={`fixed bottom-20 right-5 z-50 flex h-[70vh] w-96 flex-col rounded-xl bg-gray-50 shadow-2xl transition-all duration-300 ${
-          isPanelOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
-        }`}
+        className={cn(
+          'fixed z-50 flex flex-col bg-gray-50 shadow-2xl transition-all duration-300',
+          'inset-0 h-full w-full',
+          'md:inset-auto md:bottom-20 md:right-5 md:h-[70vh] md:w-96 md:rounded-xl',
+          isPanelOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0',
+        )}
       >
         <div className="flex items-center justify-between border-b bg-white p-4">
           <h3 className="font-semibold">AI Assistant</h3>
@@ -406,7 +412,7 @@ export default function AIBot() {
                 <TbSend />
               </Button>
             </form>
-            <div className="border-t bg-white p-2 text-xs text-gray-500">
+            <div className="hidden border-t bg-white p-2 text-xs text-gray-500 md:block">
               <pre className="whitespace-pre-wrap font-sans">{performanceStats || 'Performance stats will appear here.'}</pre>
             </div>
           </>
