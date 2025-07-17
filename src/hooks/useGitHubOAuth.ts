@@ -43,8 +43,8 @@ export const useGitHubOAuth = () => {
   });
 
   // Mutation for logout
-  const logoutMutation = useMutation(
-    async () => {
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
       // Clear access token
       setAccessToken(null);
       // Clear legacy login user data
@@ -52,16 +52,14 @@ export const useGitHubOAuth = () => {
       // Clear all queries
       queryClient.clear();
     },
-    {
-      onSuccess: () => {
-        toast.success('Logout success');
-      },
-      onError: (error) => {
-        console.error('Logout failed:', error);
-        toast.error('Logout failed');
-      },
+    onSuccess: () => {
+      toast.success('Logout success');
     },
-  );
+    onError: (error: Error) => {
+      console.error('Logout failed:', error);
+      toast.error('Logout failed');
+    },
+  });
   const { mutate: logout } = logoutMutation;
   // Update atom state based on query state
   useEffect(() => {
