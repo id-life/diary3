@@ -11,7 +11,7 @@ import {
   useFloatingNodeId,
   useDismiss,
 } from '@floating-ui/react';
-import { motion, AnimatePresence, MotionProps } from 'framer-motion';
+import { motion, AnimatePresence, MotionProps } from 'motion';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { RiCloseFill } from 'react-icons/ri';

@@ -1,4 +1,4 @@
-import { animateValue } from 'framer-motion';
+import { animateValue } from 'motion';
 
 const calculateElementTop = (el: HTMLElement) => {
   let top = 0;
