@@ -26,11 +26,13 @@ const options = [
 const EntrySimpleCard = ({
   entryType,
   onHide,
+  onUnHide,
   className,
   isDone,
 }: {
   entryType: EntryType;
-  onHide: (entryTypeId: string) => void;
+  onHide?: (entryTypeId: string) => void;
+  onUnHide?: (entryTypeId: string) => void;
   className?: string;
   isDone?: boolean;
 }) => {
@@ -51,17 +53,29 @@ const EntrySimpleCard = ({
       onClick={() => createEntryInstanceWithDefaults(selectedDay)}
     >
       {title}
-      <EntryTypeCardHideButton entryType={entryType} onHide={onHide} />
+      <EntryTypeCardHideButton entryType={entryType} onHide={onHide} onUnHide={onUnHide} />
     </div>
   );
 };
-const EntryTypeCardHideButton = ({ entryType, onHide }: { entryType: EntryType; onHide: (entryTypeId: string) => void }) => {
+const EntryTypeCardHideButton = ({
+  entryType,
+  onHide,
+  onUnHide,
+}: {
+  entryType: EntryType;
+  onHide?: (entryTypeId: string) => void;
+  onUnHide?: (entryTypeId: string) => void;
+}) => {
   return (
     <button
       className="rounded-full opacity-60 transition-colors hover:opacity-100"
       onClick={(e) => {
         e.stopPropagation();
-        onHide(entryType?.id);
+        if (onUnHide) {
+          onUnHide?.(entryType?.id);
+        } else {
+          onHide?.(entryType?.id);
+        }
       }}
       title="Hide entry"
     >
@@ -136,12 +150,12 @@ const EntryTypeListForCompletion = () => {
         isExpanded ? 'h-[80vh]' : 'h-35'
       }`}
     >
-      <div className="h-[3.25rem] shrink-0 cursor-pointer overflow-hidden" onClick={toggleExpanded}>
+      <div className="h-15 shrink-0 cursor-pointer overflow-hidden" onClick={toggleExpanded}>
         <div className="flex-center">
           <BiSolidUpArrow className={cn('size-3 text-[#838190] transition duration-300', { 'rotate-180': isExpanded })} />
         </div>
         {/* Filter Section */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="mt-2 flex items-center justify-between gap-2 overflow-auto">
           <Segmented
             onClick={(e) => e.stopPropagation()}
             defaultValue={segmentedValue}
@@ -208,7 +222,7 @@ const EntryTypeListForCompletion = () => {
                     className="opacity-50 hover:opacity-80"
                     key={item.id}
                     entryType={item}
-                    onHide={handleHideEntryType}
+                    onUnHide={handleUnhideEntryType}
                   />
                 ))}
               </div>

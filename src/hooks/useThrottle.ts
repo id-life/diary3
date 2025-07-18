@@ -1,5 +1,5 @@
-import { useRef, useEffect, useCallback } from 'react';
 import { throttle } from 'lodash-es';
+import { useCallback, useEffect, useRef } from 'react';
 
 /**
  * return the throttled version of the passed function, only call once every `delay` milliseconds
