@@ -3,10 +3,44 @@ import EntryChart from '@/components/entry/EntryChart';
 import EntryInstanceList from '@/components/entry/EntryInstanceList';
 import EntryTypeListForCompletion from '@/components/entry/EntryTypeListForCompletion';
 import EntryHeader from './EntryHeader';
+import { useRef, useLayoutEffect, useCallback } from 'react';
+import { useAtomValue } from 'jotai';
+import { entryInstancesMapAtom } from '@/atoms';
+import dayjs from 'dayjs';
+import { usePrevious } from '@/hooks/usePrevious';
 
 export default function EntryPageContent() {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
+  const todayStr = dayjs().format('YYYY-MM-DD');
+
+  // Get today's entry instances count for monitoring changes
+  const todayInstancesCount = entryInstancesMap[todayStr]?.length || 0;
+  const prevCount = usePrevious(todayInstancesCount);
+
+  // Scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, []);
+
+  // Scroll to bottom when new entries are added
+  useLayoutEffect(() => {
+    // Only scroll if count increased (new entry added)
+    if (prevCount !== undefined && todayInstancesCount > prevCount) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+    }
+  }, [todayInstancesCount, prevCount, scrollToBottom]);
+
   return (
-    <div className="flex h-full flex-col gap-3 overflow-auto px-4 pb-10 text-center">
+    <div ref={scrollContainerRef} className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
       <EntryHeader />
       <EntryChart />
       <EntryInstanceList />

@@ -17,6 +17,7 @@ type SegmentedProps = {
   id?: string;
   className?: string;
   optionClass?: string;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
 export const Segmented = ({
@@ -27,6 +28,7 @@ export const Segmented = ({
   id,
   className,
   optionClass,
+  onClick,
 }: SegmentedProps) => {
   const [internalValue, setInternalValue] = useState(() => defaultValue || options[0]?.value || '');
 
@@ -58,26 +60,30 @@ export const Segmented = ({
   );
 
   return (
-    <div className={twMerge('flex w-fit cursor-pointer items-center rounded-md p-1 text-xs font-semibold', className)}>
+    <div
+      className={twMerge('flex w-fit cursor-pointer items-center rounded bg-[#F1F1F2] p-1 text-xs/3 font-medium', className)}
+      onClick={onClick}
+    >
       {options.map((option) => {
         if (!option) return null;
         const { label, value: optionValue, disabled } = option;
         return (
-          <div
-            className={clsx(
-              'relative px-3 py-1 first:rounded-l-lg last:rounded-r-lg',
-              {
-                'text-blue': isSelected(optionValue),
-              },
-              { 'text-gray-400': disabled },
-              optionClass,
-            )}
-            onClick={() => !disabled && select(optionValue)}
-            key={optionValue}
-          >
-            {label ?? optionValue}
+          <div className="relative" key={optionValue}>
+            <div
+              className={clsx(
+                'relative z-10 px-3 py-2.5 text-diary-navy first:rounded-l-md last:rounded-r-md',
+                // {
+                //   'text-blue': isSelected(optionValue),
+                // },
+                { 'text-gray-400': disabled },
+                optionClass,
+              )}
+              onClick={() => !disabled && select(optionValue)}
+            >
+              {label ?? optionValue}
+            </div>
             {isSelected(optionValue) && (
-              <motion.div layoutId={`segmented_selected_${id ?? 'default'}`} className="absolute inset-0 rounded bg-blue/10" />
+              <motion.div layoutId={`segmented_selected_${id ?? 'default'}`} className="absolute inset-0 rounded bg-white" />
             )}
           </div>
         );
