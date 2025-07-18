@@ -6,5 +6,22 @@ import UserSVG from '@/../public/svgs/icons/user.svg?component';
 import AddCircleSVG from '@/../public/svgs/icons/add-circle.svg?component';
 import SaveSVG from '@/../public/svgs/icons/save.svg?component';
 import LoadSVG from '@/../public/svgs/icons/load.svg?component';
+import CloseSVG from '@/../public/svgs/icons/close.svg?component';
+import EditDateSVG from '@/../public/svgs/icons/edit-date.svg?component';
+import SearchSVG from '@/../public/svgs/icons/search.svg?component';
+import PointStepSVG from '@/../public/svgs/icons/point-step.svg?component';
 
-export { AddCircleSVG, DiaryIconSVG, EntrySVG, HomeSVG, ReminderSVG, UserSVG, SaveSVG, LoadSVG };
+export {
+  AddCircleSVG,
+  DiaryIconSVG,
+  EntrySVG,
+  HomeSVG,
+  ReminderSVG,
+  UserSVG,
+  SaveSVG,
+  LoadSVG,
+  CloseSVG,
+  EditDateSVG,
+  SearchSVG,
+  PointStepSVG,
+};

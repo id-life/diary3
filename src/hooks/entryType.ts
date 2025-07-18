@@ -1,8 +1,10 @@
-import { EntryType, RoutineEnum, StreakStatus } from '@/entry/types-constants';
+import { EntryType, RoutineEnum, StreakStatus, getEntryInstanceIdFromEntryType } from '@/entry/types-constants';
 import { entryInstancesMapAtom } from '@/atoms';
 import { useAtomValue } from 'jotai';
 import dayjs from 'dayjs';
 import { useCallback } from 'react';
+import { useJotaiActions } from './useJotaiMigration';
+import { toast } from 'react-toastify';
 
 export const useEntryStreakGetters = (routine: RoutineEnum) => {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
@@ -64,5 +66,38 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
   return {
     getHeader,
     getStatus,
+  };
+};
+
+export const useCreateNewEntryInstance = (entryType: EntryType) => {
+  const { createEntryInstance } = useJotaiActions();
+
+  const createEntryInstanceWithDefaults = useCallback(
+    (selectedDayStr?: string | null, customPoints?: number, customNotes?: string) => {
+      const selectedDay = selectedDayStr ? dayjs(selectedDayStr) : dayjs();
+      const [y, m, d] = [selectedDay.year(), selectedDay.month(), selectedDay.date()];
+      const now = dayjs().year(y).month(m).date(d);
+
+      const newEntryInstance = {
+        id: getEntryInstanceIdFromEntryType(entryType, now),
+        createdAt: now.valueOf(),
+        updatedAt: now.valueOf(),
+        entryTypeId: entryType.id,
+        points: customPoints ?? entryType.defaultPoints,
+        notes: customNotes ?? '',
+      };
+
+      createEntryInstance(newEntryInstance);
+
+      // Show success toast with entry type title
+      toast.success(`Completed "${entryType.title}"`);
+
+      return newEntryInstance;
+    },
+    [entryType, createEntryInstance],
+  );
+
+  return {
+    createEntryInstanceWithDefaults,
   };
 };

@@ -1,32 +1,49 @@
 'use client';
-import { globalStateAtom } from '@/atoms';
+import { entryInstancesMapAtom } from '@/atoms';
 import EntryChart from '@/components/entry/EntryChart';
 import EntryInstanceList from '@/components/entry/EntryInstanceList';
-import EntryProgressBar from '@/components/entry/EntryProgressBar';
 import EntryTypeListForCompletion from '@/components/entry/EntryTypeListForCompletion';
-import { safeNumberValue } from '@/utils';
+import { usePrevious } from '@/hooks/usePrevious';
+import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
+import EntryHeader from './EntryHeader';
 
 export default function EntryPageContent() {
-  const globalState = useAtomValue(globalStateAtom);
-  const currentStreakByEntry = useMemo(() => safeNumberValue(globalState?.currentStreakByEntry), [globalState]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
+  const todayStr = dayjs().format('YYYY-MM-DD');
+
+  // Get today's entry instances count for monitoring changes
+  const todayInstancesCount = entryInstancesMap[todayStr]?.length || 0;
+  const prevCount = usePrevious(todayInstancesCount);
+
+  // Scroll to bottom function
+  const scrollToBottom = useCallback(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, []);
+
+  // Scroll to bottom when new entries are added
+  useLayoutEffect(() => {
+    // Only scroll if count increased (new entry added)
+    if (prevCount !== undefined && todayInstancesCount > prevCount) {
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+    }
+  }, [todayInstancesCount, prevCount, scrollToBottom]);
 
   return (
-    <div className="flex h-full flex-col gap-4 overflow-auto px-4 pb-10 text-center">
-      <div className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center justify-center gap-1">
-          <span className="text-[1.625rem]/10 font-semibold">{currentStreakByEntry}</span>
-          <span className="text-left text-xs/3">
-            STREAK
-            <br />
-            DAY{currentStreakByEntry > 1 ? 'S' : ''}
-          </span>
-        </div>
-        <EntryProgressBar className="grow" />
-      </div>
+    <div ref={scrollContainerRef} className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
+      <EntryHeader />
       <EntryChart />
-      <EntryInstanceList />
+      <EntryInstanceList className="-mt-18" />
       <EntryTypeListForCompletion />
     </div>
   );

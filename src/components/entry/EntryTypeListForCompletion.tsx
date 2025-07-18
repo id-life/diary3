@@ -1,14 +1,17 @@
-import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
+import { entryInstancesMapAtom, entryTypesArrayAtom, selectedChartDateAtom } from '@/atoms';
 import { selectedEntryInstancesArrayAtom } from '@/atoms/chart';
 import { EntryType, RoutineEnum } from '@/entry/types-constants';
 import { useInput } from '@/hooks/useInput';
+import { useCreateNewEntryInstance } from '@/hooks/entryType';
+import { cn } from '@/utils';
 import { sortEntryTypesArray } from '@/utils/entry';
 import { getHiddenEntryTypes, hideEntryType, unhideEntryType } from '@/utils/hiddenEntryTypes';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { AiOutlineEye } from 'react-icons/ai';
+import { BiSolidUpArrow } from 'react-icons/bi';
 import Segmented from '../segmented';
-import EntryTypeCard from './EntryTypeCard';
+import { SearchSVG } from '../svg';
 
 const options = [
   {
@@ -20,15 +23,63 @@ const options = [
   { value: RoutineEnum.monthly },
   { value: RoutineEnum.adhoc },
 ];
-
-const EntryTypeCardHideButton = (props: { entryType: EntryType; onHide: (entryTypeId: string) => void }) => {
+const EntrySimpleCard = ({
+  entryType,
+  onHide,
+  onUnHide,
+  className,
+  isDone,
+}: {
+  entryType: EntryType;
+  onHide?: (entryTypeId: string) => void;
+  onUnHide?: (entryTypeId: string) => void;
+  className?: string;
+  isDone?: boolean;
+}) => {
+  const { title, themeColors } = entryType;
+  const { createEntryInstanceWithDefaults } = useCreateNewEntryInstance(entryType);
+  const selectedDay = useAtomValue(selectedChartDateAtom);
+  return (
+    <div
+      className={cn(
+        'relative flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs/3 font-medium text-white transition duration-300 hover:scale-105',
+        className,
+      )}
+      style={
+        isDone
+          ? { background: `#${themeColors[0]}33`, color: `#${themeColors[0]}` }
+          : { background: `linear-gradient(90deg, #${themeColors[0]} 0%, #${themeColors[1]} 100%)` }
+      }
+      onClick={() => createEntryInstanceWithDefaults(selectedDay)}
+    >
+      {title}
+      <EntryTypeCardHideButton entryType={entryType} onHide={onHide} onUnHide={onUnHide} />
+    </div>
+  );
+};
+const EntryTypeCardHideButton = ({
+  entryType,
+  onHide,
+  onUnHide,
+}: {
+  entryType: EntryType;
+  onHide?: (entryTypeId: string) => void;
+  onUnHide?: (entryTypeId: string) => void;
+}) => {
   return (
     <button
-      className="absolute right-2 top-2 rounded-full bg-black/10 p-1 opacity-60 transition-colors hover:bg-black/20 hover:opacity-100"
-      onClick={() => props.onHide(props.entryType.id)}
+      className="rounded-full opacity-60 transition-colors hover:opacity-100"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (onUnHide) {
+          onUnHide?.(entryType?.id);
+        } else {
+          onHide?.(entryType?.id);
+        }
+      }}
       title="Hide entry"
     >
-      <AiOutlineEyeInvisible className="h-4 w-4 text-white" />
+      <AiOutlineEye className="h-3 text-white" />
     </button>
   );
 };
@@ -40,6 +91,7 @@ const EntryTypeListForCompletion = () => {
   const { inputValue, onInputChange } = useInput();
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const [hiddenEntryTypes, setHiddenEntryTypes] = useState(() => getHiddenEntryTypes());
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { doneList, restList, hiddenList } = useMemo(() => {
     let doneEntryTypes = new Set(
@@ -88,65 +140,103 @@ const EntryTypeListForCompletion = () => {
     setHiddenEntryTypes(getHiddenEntryTypes());
   };
 
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-2 bg-gradient p-2 text-white">
-        <div className="flex items-center justify-center gap-2">
-          filterStr:
-          <input className="border bg-transparent p-2" value={inputValue} onChange={onInputChange} />
+    <div
+      className={`fixed bottom-[3.25rem] left-0 right-0 z-50 flex flex-col overflow-auto border-t bg-white px-3 py-2 drop-shadow-[0px_-4px_8px_rgba(0,0,0,0.05)] transition-all duration-300 ${
+        isExpanded ? 'h-[80vh]' : 'h-35'
+      }`}
+    >
+      <div className="h-15 shrink-0 cursor-pointer overflow-hidden" onClick={toggleExpanded}>
+        <div className="flex-center">
+          <BiSolidUpArrow className={cn('size-3 text-[#838190] transition duration-300', { 'rotate-180': isExpanded })} />
         </div>
-        <Segmented
-          defaultValue={segmentedValue}
-          onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
-          options={options}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-1 4xl:grid-cols-4">
-        {restList?.length
-          ? restList.map((item) => (
-              <div key={item.id} className="relative">
-                <EntryTypeCard entryType={item} isEdit={false} />
-                <EntryTypeCardHideButton entryType={item} onHide={handleHideEntryType} />
-              </div>
-            ))
-          : null}
-      </div>
-      <div className="mt-4 flex items-center justify-center border-t pt-2 text-xl font-semibold">Today Done List</div>
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-1 4xl:grid-cols-4">
-        {doneList?.length
-          ? doneList.map((item) => (
-              <div key={item.id} className="relative">
-                <EntryTypeCard isDone entryType={item} isEdit={false} />
-                <EntryTypeCardHideButton entryType={item} onHide={handleHideEntryType} />
-              </div>
-            ))
-          : null}
-      </div>
-      {hiddenList?.length ? (
-        <>
-          <div className="mt-4 flex items-center justify-center border-t pt-2 text-xl font-semibold">
-            Hidden Entries Archive
+        {/* Filter Section */}
+        <div className="mt-2 flex items-center justify-between gap-2 overflow-auto">
+          <Segmented
+            onClick={(e) => e.stopPropagation()}
+            defaultValue={segmentedValue}
+            onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
+            options={options}
+          />
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex h-10 items-center gap-1 rounded border border-gray-300 bg-white px-1.5 py-2"
+          >
+            <input
+              className="border-none bg-transparent text-xs/3 font-medium placeholder:text-[#8A8998]"
+              placeholder="Search..."
+              value={inputValue}
+              onChange={onInputChange}
+            />
+            <SearchSVG className="size-6 fill-diary-navy opacity-30" />
           </div>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-1 4xl:grid-cols-4">
-            {hiddenList.map((item: EntryType) => (
-              <div key={item.id} className="group relative">
-                <EntryTypeCard
-                  entryType={item}
-                  isEdit={false}
-                  className="opacity-40 transition-opacity group-hover:opacity-60"
-                />
-                <button
-                  className="absolute right-2 top-2 rounded-full bg-white/20 p-1 opacity-80 backdrop-blur-sm transition-colors hover:bg-white/30 hover:opacity-100"
-                  onClick={() => handleUnhideEntryType(item.id)}
-                  title="Unhide entry"
-                >
-                  <AiOutlineEye className="h-4 w-4 text-white" />
-                </button>
+        </div>
+      </div>
+      {!isExpanded && restList?.length > 0 && (
+        <div className="flex flex-wrap gap-2.5 gap-y-3 overflow-auto pt-3">
+          {restList.map((item) => (
+            <EntrySimpleCard key={item.id} entryType={item} onHide={handleHideEntryType} />
+          ))}
+          {/* Completed Tasks */}
+          {doneList?.length > 0 &&
+            doneList.map((item) => <EntrySimpleCard key={item.id} entryType={item} onHide={handleHideEntryType} isDone />)}
+        </div>
+      )}
+      {/* Expandable Content */}
+      {isExpanded && (
+        <div className="flex grow flex-col gap-2 overflow-auto pb-4">
+          {restList?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="mb-3 text-lg font-semibold text-gray-800">TODO List</h3>
+              <div className="flex flex-wrap gap-2.5 gap-y-3">
+                {restList.map((item) => (
+                  <EntrySimpleCard key={item.id} entryType={item} onHide={handleHideEntryType} />
+                ))}
               </div>
-            ))}
-          </div>
-        </>
-      ) : null}
+            </div>
+          )}
+
+          {/* Completed Tasks */}
+          {doneList?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="mb-3 text-lg font-semibold text-green-600">Completed</h3>
+              <div className="flex flex-wrap gap-2.5 gap-y-3">
+                {doneList.map((item) => (
+                  <EntrySimpleCard key={item.id} entryType={item} onHide={handleHideEntryType} isDone />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hidden Tasks */}
+          {hiddenList?.length > 0 && (
+            <div className="mb-6">
+              <h3 className="mb-3 text-lg font-semibold text-gray-500">Hidden</h3>
+              <div className="flex flex-wrap gap-2.5 gap-y-3">
+                {hiddenList.map((item: EntryType) => (
+                  <EntrySimpleCard
+                    className="opacity-50 hover:opacity-80"
+                    key={item.id}
+                    entryType={item}
+                    onUnHide={handleUnhideEntryType}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {restList.length === 0 && doneList.length === 0 && (
+            <div className="py-8 text-center text-gray-500">
+              <p>Empty</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

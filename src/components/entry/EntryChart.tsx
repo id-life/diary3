@@ -1,5 +1,6 @@
 import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
 import { chartDateRangeAtom, selectedChartDateAtom } from '@/atoms/app';
+import { useIsMounted } from '@/hooks/useIsMounted';
 import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
@@ -18,15 +19,14 @@ import {
 import Segmented from '../segmented';
 import { DatePicker } from '../ui/date-picker';
 import EntryChartTooltip, { TooltipPayload } from './EntryChartTooltip';
-import { useIsMounted } from '@/hooks/useIsMounted';
 
 // Custom Legend Component for horizontal scrolling
 const CustomLegend = ({ payload }: { payload?: any[] }) => {
   if (!payload?.length) return null;
 
   return (
-    <div className="chart-legend-scroll mx-5 my-2.5 max-w-full overflow-x-auto overflow-y-hidden whitespace-nowrap px-2.5 py-2.5">
-      <ul className="m-0 inline-flex list-none items-center gap-4 p-0">
+    <div className="chart-legend-scroll ml-6 max-w-full overflow-x-auto overflow-y-hidden whitespace-nowrap">
+      <ul className="inline-flex list-none items-center gap-4 p-0">
         {payload
           .filter((entry) => entry.dataKey !== '_barLow' && entry.dataKey !== '_barHigh')
           .map((entry, index) => (
@@ -235,7 +235,7 @@ function EntryChart() {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-4">
+      <div className="mb-8 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-3">
         <div className="flex-1">
           <Segmented
             defaultValue={selectedRange}
@@ -245,8 +245,8 @@ function EntryChart() {
         </div>
         <DatePicker value={selectedChartDate} onChange={setSelectedChartDate} />
       </div>
-      <ResponsiveContainer width="95%" height={480}>
-        <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 12, right: 16, left: -20, bottom: 12 }}>
+      <ResponsiveContainer width="95%" height={320}>
+        <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 8, right: 12, left: -16, bottom: 8 }}>
           <defs>
             <linearGradient id="default" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#FF4AF8" stopOpacity={0.45} />
@@ -263,19 +263,19 @@ function EntryChart() {
               );
             })}
           </defs>
-          <XAxis dataKey="_date" padding={{ left: 16, right: 16 }} />
-          <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} />
-          <Legend content={<CustomLegend />} />
+          <XAxis dataKey="_date" padding={{ left: 12, right: 12 }} fontSize={12} />
+          <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} fontSize={12} />
+          <Legend content={<CustomLegend />} wrapperStyle={{ top: '-32px', left: 0, bottom: 'auto' }} />
           <Tooltip
             itemStyle={{
               paddingTop: 0,
               paddingBottom: 0,
-              height: '20px',
+              height: '18px',
             }}
             wrapperStyle={{
-              padding: '0 10px',
+              padding: '0 8px',
               overflow: 'hidden',
-              maxHeight: '220px',
+              maxHeight: '180px',
             }}
             cursor={true}
             content={(props) => (
@@ -290,7 +290,7 @@ function EntryChart() {
               />
             )}
           />
-          <Brush dataKey="_date" height={30} startIndex={startIndex} endIndex={endIndex} stroke="#8884d8" />
+          <Brush className="hidden" dataKey="_date" height={30} startIndex={startIndex} endIndex={endIndex} stroke="#8884d8" />
           <CartesianGrid strokeDasharray="3 3" />
           {areas}
         </AreaChart>
