@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
-import dayjs from 'dayjs';
-import Dialog from './index';
+import { addDialogOpenAtom, entryTypeIdsAtom } from '@/atoms';
 import { Button } from '@/components/ui/button';
 import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '@/entry/types-constants';
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
+import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
-import { addDialogOpenAtom, entryTypeIdsAtom } from '@/atoms';
+import { useCallback, useState } from 'react';
+import { toast } from 'react-toastify';
+import Dialog from './index';
 
 interface AddDialogProps {
   isUpdate?: boolean;
@@ -22,17 +22,6 @@ const DEFAULT_VALUES = {
   routine: RoutineEnum.daily,
   themeColors: EntryTypeThemeColors[0],
 };
-
-const THEME_COLORS = [
-  ['1487fc'], // Blue
-  ['0bbd9f'], // Teal
-  ['50ba10'], // Green
-  ['ff7b1c'], // Orange
-  ['ee422b'], // Red
-  ['ff4af8'], // Pink
-  ['7f4efa'], // Purple
-  ['4f4fff'], // Indigo
-];
 
 export default function AddDialog({ isUpdate = false, updatingEntryType }: AddDialogProps) {
   const [open, setOpen] = useAtom(addDialogOpenAtom);
@@ -73,7 +62,7 @@ export default function AddDialog({ isUpdate = false, updatingEntryType }: AddDi
   }, []);
 
   const handleColorSelect = useCallback((colorIndex: number) => {
-    const selectedColor = THEME_COLORS[colorIndex];
+    const selectedColor = EntryTypeThemeColors[colorIndex];
     setFormData((prev) => ({ ...prev, themeColors: selectedColor }));
   }, []);
 
@@ -148,7 +137,7 @@ export default function AddDialog({ isUpdate = false, updatingEntryType }: AddDi
       onClose={handleCancel}
       title="Add Entry"
       render={({ close }) => (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 px-1">
           {/* Entry Name */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-900">
@@ -235,18 +224,28 @@ export default function AddDialog({ isUpdate = false, updatingEntryType }: AddDi
           {/* Entry Routine Colors */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-gray-900">Entry Routine Colors:</label>
-            <div className="flex gap-3">
-              {THEME_COLORS.map((color, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => handleColorSelect(index)}
-                  className={`h-5 w-5 rounded border-2 transition-all ${
-                    formData.themeColors[0] === color[0] ? 'border-gray-400 shadow-md' : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  style={{ backgroundColor: `#${color[0]}` }}
-                />
-              ))}
+            <div className="flex flex-wrap gap-3">
+              {EntryTypeThemeColors.map((themeColorPair: string[], index: number) => {
+                const [color1, color2] = themeColorPair;
+                const isSelected = formData.themeColors[0] === color1 && formData.themeColors[1] === color2;
+                return (
+                  <button
+                    key={`${themeColorPair[0]}-${themeColorPair[1]}`}
+                    type="button"
+                    onClick={() => handleColorSelect(index)}
+                    className={`flex-center size-6.5 rounded transition duration-300 ${isSelected ? 'border' : ''}`}
+                    style={{
+                      borderColor: isSelected ? `#${color1}` : 'transparent',
+                      backgroundColor: isSelected ? `#${color1}33` : 'transparent',
+                    }}
+                  >
+                    <div
+                      className="size-5 rounded-[3px] transition duration-300"
+                      style={{ background: `linear-gradient(90deg, #${themeColorPair[0]} 0%, #${themeColorPair[1]} 100%)` }}
+                    ></div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

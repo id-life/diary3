@@ -105,6 +105,7 @@ module.exports = {
         3.5: '.875rem',
       },
       spacing: {
+        6.5: '1.625rem',
         // Custom spacing values
         14: '3.5rem', // 56px for input height
         15: '3.75rem', // 60px

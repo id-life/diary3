@@ -1,3 +1,4 @@
+import { cn } from '@/utils';
 import {
   FloatingFocusManager,
   FloatingNode,
@@ -109,11 +110,9 @@ function Dialog({
             >
               <FloatingFocusManager context={context}>
                 <motion.div
-                  className={twMerge(
-                    clsx(
-                      `relative flex h-fit max-h-[85vh] min-w-[30rem] max-w-5xl flex-col rounded-[10px] bg-white md:min-w-[11.25rem]`,
-                      renderFooter ? 'p-5 pb-20' : ' p-5',
-                    ),
+                  className={cn(
+                    `relative flex h-fit max-h-[85vh] w-[calc(100%_-_3.75rem)] max-w-2xl flex-col rounded-[10px] bg-white`,
+                    renderFooter ? 'p-5 pb-20' : ' p-5',
                     className,
                   )}
                   initial={{ opacity: 0, scale: 0.85 }}

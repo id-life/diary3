@@ -18,7 +18,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         // Custom button variants for backward compatibility
-        primary: 'border-diary-primary bg-diary-primary text-white enabled:hover:opacity-80 rounded-2xl border font-semibold',
+        primary: 'border-diary-primary bg-diary-primary text-white enabled:hover:opacity-80 rounded-lg border font-semibold',
         danger: 'border-diary-danger bg-diary-danger text-white enabled:hover:opacity-80 rounded-2xl border font-semibold',
         unstyle: '',
       },
