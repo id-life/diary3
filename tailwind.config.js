@@ -26,8 +26,6 @@ module.exports = {
         diary: {
           primary: '#376BED',
           danger: '#dc2626',
-          dialog: '#282828',
-          'dialog-mask': '000000CC',
           // Primary colors
           navy: '#1e1b39',
           'navy-light': '#2d2a4a',

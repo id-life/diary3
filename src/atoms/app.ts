@@ -27,3 +27,5 @@ export const themeNames = [
 ];
 
 export const themeAtom = atom(themeNames[0]);
+
+export const addDialogOpenAtom = atom(false);
