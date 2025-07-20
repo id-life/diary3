@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiFillCalendar } from 'react-icons/ai';
 import { z } from 'zod';
-import Button from '../button';
+import { Button } from '../ui/button';
 import Segmented from '../segmented';
 import { Calendar } from '../ui/calendar';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
@@ -290,7 +290,7 @@ export default function ReminderAddForm() {
               Cancel
             </Button>
           ) : null}
-          <Button type="primary" size="large" className="rounded-full" htmlType="submit">
+          <Button variant="primary" size="large" className="rounded-full" htmlType="submit">
             {updatingReminderId !== null ? 'Update' : 'Submit'}
           </Button>
           {startDate && (

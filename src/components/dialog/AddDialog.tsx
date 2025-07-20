@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import Dialog from './index';
-import Button from '@/components/button';
+import { Button } from '@/components/ui/button';
 import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '@/entry/types-constants';
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import { useAtom, useAtomValue } from 'jotai';
@@ -251,7 +251,7 @@ export default function AddDialog({ isUpdate = false, updatingEntryType }: AddDi
           </div>
 
           {/* Create Button */}
-          <Button type="primary" size="large" onClick={handleSubmit}>
+          <Button variant="primary" size="large" onClick={handleSubmit}>
             {isUpdate ? 'Update' : 'Create'}
           </Button>
         </div>

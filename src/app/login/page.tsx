@@ -1,7 +1,7 @@
 'use client';
 
 import { login } from '@/api/auth';
-import Button from '@/components/button';
+import { Button } from '@/components/ui/button';
 import { DiaryIconSVG } from '@/components/svg';
 import { useAccessToken } from '@/hooks/app';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
@@ -104,7 +104,7 @@ export default function LoginPage() {
           <Button
             className="mt-4 h-14 w-full rounded-lg border-diary-navy bg-diary-navy text-white"
             onClick={handleUsernamePasswordLogin}
-            type="primary"
+            variant="primary"
             disabled={!username || !password || isLoggingIn}
           >
             {isLoggingIn ? 'Loading...' : isSignUp ? 'Continue' : 'Sign in'}

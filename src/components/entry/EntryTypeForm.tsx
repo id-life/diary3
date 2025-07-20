@@ -1,11 +1,11 @@
+import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import { Form, Input, InputNumber, Radio } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../entry/types-constants';
-import { useJotaiActions, useJotaiSelectors } from '@/hooks/useJotaiMigration';
-import Button from '../button';
 import DiaryIcons from '../icon/DiaryIcons';
+import { Button } from '../ui/button';
 
 const addInitialValues = {
   routine: RoutineEnum.adhoc,
@@ -19,13 +19,8 @@ const addInitialValues = {
 const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | EntryType; entryTypeIds: string[] }) => {
   const [form] = Form.useForm();
   // TODO: Replace with direct atom usage
-  const { 
-    createEntryType, 
-    updateEntryType, 
-    updateEntryTypeId, 
-    updateChangeEntryIdEntryInstance,
-    exitEntryTypeEdit 
-  } = useJotaiActions();
+  const { createEntryType, updateEntryType, updateEntryTypeId, updateChangeEntryIdEntryInstance, exitEntryTypeEdit } =
+    useJotaiActions();
 
   const onValuesChange = (changedValues: any, allValues: any) => {
     if (changedValues.title) {
@@ -177,7 +172,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
           <Radio.Group className="flex flex-wrap items-center gap-3">{entryTypeThemeColorsRadios}</Radio.Group>
         </Form.Item>
         <div className="mt-4 flex items-center justify-center gap-4">
-          <Button type="primary" className="rounded-full font-bold" size="large" htmlType="submit">
+          <Button variant="primary" className="rounded-full font-bold" size="large" htmlType="submit">
             <DiaryIcons.EditSvg /> {props.isUpdate ? 'Update' : 'Create'}
           </Button>
           {props.isUpdate && (

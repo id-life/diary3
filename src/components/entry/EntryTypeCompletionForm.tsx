@@ -2,7 +2,7 @@ import { useCreateNewEntryInstance } from '@/hooks/entryType';
 import { InputNumber } from 'antd';
 import { Controller, useForm } from 'react-hook-form';
 import { EntryType } from '../../entry/types-constants';
-import Button from '../button';
+import { Button } from '../ui/button';
 import DiaryIcons from '../icon/DiaryIcons';
 
 function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?: string }) {
@@ -46,7 +46,7 @@ function EntryTypeCompletionForm(props: { entryType: EntryType; selectedDayStr?:
         />
         {errors?.points && <span className="text-red-500">{errors.points.message}</span>}
       </label>
-      <Button htmlType="submit" type="unstyle" className="absolute left-4 top-4 flex w-10 items-center justify-center">
+      <Button htmlType="submit" variant="unstyle" className="absolute left-4 top-4 flex w-10 items-center justify-center">
         <DiaryIcons.CheckSvg className="text-xl" />
       </Button>
     </form>

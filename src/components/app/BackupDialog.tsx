@@ -9,7 +9,7 @@ import {
   createRestoreBackup,
   detectBackupFormat,
 } from '@/utils/backupDataConverter';
-import Button from '../button';
+import { Button } from '../ui/button';
 import Dialog from '../dialog';
 
 interface BackupInfo {
@@ -145,8 +145,8 @@ const BackupDialog: FunctionComponent = () => {
             Close
           </Button>
           <Button
-            onClick={refetch}
-            type="primary"
+            onClick={() => refetch()}
+            variant="primary"
             className="rounded bg-green-500 px-3 py-1 font-semibold text-white hover:bg-green-600"
           >
             Refetch

@@ -24,7 +24,7 @@ module.exports = {
       },
       colors: {
         diary: {
-          primary: '#376BED',
+          primary: '#1E1B39',
           danger: '#dc2626',
           // Primary colors
           navy: '#1e1b39',
