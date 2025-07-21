@@ -37,8 +37,7 @@ const EntryTypeCardEditButton = (props: { entryType: EntryType }) => {
   return (
     <Button
       size="small"
-      className="rounded-lg"
-      variant="ghost"
+      className="rounded-lg hover:bg-transparent"
       onClick={() => enterEntryTypeEdit({ entryTypeId: props.entryType.id })}
     >
       <AiFillEdit className="h-full w-6" />

@@ -22,7 +22,7 @@ export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: s
 function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated } = useGitHubOAuth();
+  const { isAuthenticated, isLoading } = useGitHubOAuth();
   const searchParams = useSearchParams();
   const setAddDialogOpen = useSetAtom(addDialogOpenAtom);
   const activeKey = useMemo(() => {
@@ -35,16 +35,16 @@ function Navbar() {
   useInitGlobalState();
   // Redirect to login if not authenticated (all pages require authentication)
   useEffect(() => {
-    if (token) return;
+    if (token || isLoading) return;
     // Only allow access to login page without authentication
     const isLoginPage = pathname === '/login';
     if (!isAuthenticated && !isLoginPage) {
       router.push('/login');
     }
-  }, [isAuthenticated, pathname, router, searchParams, token]);
+  }, [isAuthenticated, isLoading, pathname, router, searchParams, token]);
 
-  // Don't render navbar if not authenticated
-  if (!isAuthenticated) {
+  // Don't render navbar if not authenticated or still loading
+  if (!isAuthenticated || isLoading) {
     return null;
   }
 

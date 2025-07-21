@@ -9,7 +9,7 @@ import { Button } from '../ui/button';
 
 const addInitialValues = {
   routine: RoutineEnum.adhoc,
-  themeColors: JSON.stringify(EntryTypeThemeColors[(EntryTypeThemeColors.length * Math.random()) | 0]),
+  themeColors: JSON.stringify(EntryTypeThemeColors[0]),
   defaultPoints: 1,
   pointStep: 0,
   id: '',
@@ -43,8 +43,8 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
       newEntryType.createdAt = createdAt ?? dayjs().valueOf();
       newEntryType.updatedAt = dayjs().valueOf();
       if (newEntryType.id !== id) {
-        // changed title
-        if (entryTypeIds.includes(newEntryType.id)) {
+        // changed title - check if new ID exists (excluding current entry)
+        if (entryTypeIds.filter(existingId => existingId !== id).includes(newEntryType.id)) {
           toast.error('id already exists');
           return;
         }
