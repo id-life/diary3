@@ -24,10 +24,8 @@ module.exports = {
       },
       colors: {
         diary: {
-          primary: '#376BED',
+          primary: '#1E1B39',
           danger: '#dc2626',
-          dialog: '#282828',
-          'dialog-mask': '000000CC',
           // Primary colors
           navy: '#1e1b39',
           'navy-light': '#2d2a4a',
@@ -107,6 +105,7 @@ module.exports = {
         3.5: '.875rem',
       },
       spacing: {
+        6.5: '1.625rem',
         // Custom spacing values
         14: '3.5rem', // 56px for input height
         15: '3.75rem', // 60px

@@ -5,7 +5,7 @@ import { PiStepsDuotone } from 'react-icons/pi';
 import { twMerge } from 'tailwind-merge';
 import { EntryType } from '../../entry/types-constants';
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
-import Button from '../button';
+import { Button } from '../ui/button';
 import Tooltip from '../tooltip';
 import EntryTypeCompletionForm from './EntryTypeCompletionForm';
 import DiaryIcons from '../icon/DiaryIcons';
@@ -18,10 +18,9 @@ const EntryTypeCardDeleteButton = (props: { entryType: EntryType }) => {
 
   return (
     <Button
-      danger
-      ghost
+      variant="danger"
       size="small"
-      className="rounded-lg"
+      className="rounded-lg border-diary-danger bg-transparent text-diary-danger hover:opacity-80"
       onClick={() => {
         deleteEntryType(props.entryType.id);
         deleteEntryInstanceByEntryTypeId(props.entryType.id);
@@ -38,9 +37,7 @@ const EntryTypeCardEditButton = (props: { entryType: EntryType }) => {
   return (
     <Button
       size="small"
-      className="rounded-lg"
-      type="primary"
-      ghost
+      className="rounded-lg hover:bg-transparent"
       onClick={() => enterEntryTypeEdit({ entryTypeId: props.entryType.id })}
     >
       <AiFillEdit className="h-full w-6" />

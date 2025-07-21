@@ -6,13 +6,15 @@ import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
 import { BiSolidBellRing } from 'react-icons/bi';
 import { twMerge } from 'tailwind-merge';
 import { ReminderRecord, ReminderType } from '../../entry/types-constants';
-import Button from '../button';
+import { Button } from '../ui/button';
 
 export type EntryTypeCardProps = {
   record: ReminderRecord;
   className?: string;
 };
+
 const rankWord = ['st', 'nd', 'rd'];
+
 const ReminderRecordCard = (props: EntryTypeCardProps) => {
   const { deleteReminder, enterReminderEdit } = useJotaiActions();
   const { record, className } = props;
@@ -66,20 +68,13 @@ const ReminderRecordCard = (props: EntryTypeCardProps) => {
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        <Button
-          size="small"
-          className="rounded-lg"
-          type="primary"
-          ghost
-          onClick={() => enterReminderEdit({ reminderId: id })}
-        >
+        <Button size="small" className="rounded-lg" variant="ghost" onClick={() => enterReminderEdit({ reminderId: id })}>
           <AiFillEdit className="h-full w-6" />
         </Button>
         <Button
-          danger
-          ghost
+          variant="danger"
           size="small"
-          className="rounded-lg"
+          className="rounded-lg border-diary-danger bg-transparent text-diary-danger hover:opacity-80"
           onClick={() => {
             deleteReminder(id);
           }}

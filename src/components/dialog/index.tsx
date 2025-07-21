@@ -1,32 +1,25 @@
-import React, { cloneElement, useCallback, useEffect, useState } from 'react';
+import { cn } from '@/utils';
 import {
-  useClick,
-  useFloating,
-  useInteractions,
-  useRole,
-  FloatingPortal,
-  FloatingOverlay,
   FloatingFocusManager,
   FloatingNode,
-  useFloatingNodeId,
+  FloatingOverlay,
+  FloatingPortal,
+  useClick,
   useDismiss,
+  useFloating,
+  useFloatingNodeId,
+  useInteractions,
+  useRole,
 } from '@floating-ui/react';
-import { motion, AnimatePresence, MotionProps } from 'framer-motion';
 import clsx from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { cloneElement, useCallback, useEffect, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
+import { twMerge } from 'tailwind-merge';
 
-const zIndexClass = {
-  0: 'z-0',
-  20: 'z-20',
-  30: 'z-30',
-  40: 'z-40',
-  50: 'z-50',
-};
 type DialogProps = {
   open?: boolean;
   title?: React.ReactNode;
-  background?: string;
   zIndex?: 0 | 20 | 30 | 40 | 50;
   onClose?: () => void;
   onOpenChange?: (open: boolean) => void;
@@ -53,9 +46,7 @@ function Dialog({
   className,
   renderHeader,
   renderFooter,
-  zIndex = 20,
   scroll = true,
-  background = 'bg-diary-dialog',
   maskClass,
 }: React.PropsWithChildren<DialogProps>) {
   const [open, setOpen] = useState(false);
@@ -115,18 +106,13 @@ function Dialog({
           {open && (
             <FloatingOverlay
               lockScroll
-              className={twMerge(
-                clsx('grid place-items-center bg-diary-dialog-mask backdrop-blur transition', zIndexClass[zIndex]),
-                maskClass,
-              )}
+              className={twMerge(clsx('z-50 grid place-items-center bg-black/60 backdrop-blur transition'), maskClass)}
             >
               <FloatingFocusManager context={context}>
                 <motion.div
-                  className={twMerge(
-                    clsx(
-                      `relative flex h-fit max-h-[85vh] max-w-5xl flex-col rounded-[10px] ${background} min-w-[30rem] text-white md:min-w-[11.25rem]`,
-                      renderFooter ? 'p-5 pb-20' : ' p-5',
-                    ),
+                  className={cn(
+                    `relative flex h-fit max-h-[85vh] w-[calc(100%_-_3.75rem)] max-w-2xl flex-col rounded-[10px] bg-white`,
+                    renderFooter ? 'p-5 pb-20' : ' p-5',
                     className,
                   )}
                   initial={{ opacity: 0, scale: 0.85 }}
@@ -144,7 +130,7 @@ function Dialog({
                     {render({ close: () => onClose(false) })}
                   </main>
                   {renderFooter && (
-                    <footer className="absolute bottom-0 left-0 right-0 rounded-b-[10px] px-6 py-6 backdrop-blur-xl">
+                    <footer className="absolute bottom-0 left-0 right-0 rounded-b-[10px] px-6 py-6">
                       {renderFooter?.({ close: () => onClose(false) })}
                     </footer>
                   )}

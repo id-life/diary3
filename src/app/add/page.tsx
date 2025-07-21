@@ -14,7 +14,7 @@ export default function AddPage() {
   const updatingEntryTypeId = uiState.addPage.updatingEntryTypeId;
   const updatingEntryType =
     isUpdate && updatingEntryTypeId ? entryTypesArray.find((entryType: any) => entryType.id === updatingEntryTypeId) : null;
-  console.log({ entryTypesArray });
+
   return (
     <div className="flex h-full flex-col items-center gap-8 overflow-auto px-4 py-6 text-center">
       <EntryTypeForm isUpdate={isUpdate} updatingEntryType={updatingEntryType} entryTypeIds={entryTypeIds} />

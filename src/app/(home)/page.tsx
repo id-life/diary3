@@ -17,7 +17,6 @@ function HomePageContent() {
       router.push('/settings');
       return;
     }
-    console.log('no token');
   }, [searchParams, router, setAccessToken]);
   return <EntryPageContent />;
 }
