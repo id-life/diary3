@@ -13,10 +13,10 @@ import { ClockSVG, TrashSVG } from '../svg';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 const statusColorMap: { [key in Exclude<StreakStatus, 'COMPLETED'>]: string } = {
-  [StreakStatus.UNCREATED]: 'bg-gray-100',
-  [StreakStatus.INCOMPLETE]: 'bg-rose-200',
-  [StreakStatus.WARNING]: 'bg-amber-200',
-  [StreakStatus.COMPLETED]: 'bg-green-200',
+  [StreakStatus.UNCREATED]: 'bg-[#f2f2f2]',
+  [StreakStatus.INCOMPLETE]: 'bg-[#ffbdb4]',
+  [StreakStatus.WARNING]: 'bg-[#f9daa8]',
+  [StreakStatus.COMPLETED]: 'bg-[#9aded2]',
 };
 
 type EntryStreakCardProps = {
