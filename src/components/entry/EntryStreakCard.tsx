@@ -10,7 +10,6 @@ import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { ClockSVG, TrashSVG } from '../svg';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 const statusColorMap: { [key in Exclude<StreakStatus, 'COMPLETED'>]: string } = {
   [StreakStatus.UNCREATED]: 'bg-[#f2f2f2]',
@@ -25,7 +24,6 @@ type EntryStreakCardProps = {
 };
 
 export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
-  const isDesktop = useIsDesktop();
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const { deleteEntryType, deleteEntryInstanceByEntryTypeId, enterEntryTypeEdit } = useJotaiActions();
 
@@ -53,7 +51,7 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
   const primaryColor = `#${entryType.themeColors[0]}`;
 
   return (
-    <Card className={clsx('flex w-full flex-col gap-3 p-3 text-diary-primary', isDesktop && 'w-auto')} onClick={handleEdit}>
+    <Card className="flex w-full flex-col gap-3 p-3 text-diary-primary md:w-auto" onClick={handleEdit}>
       <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 text-xs">
         <span className="mr-auto rounded-[4px] px-1.5 py-1 font-medium text-white" style={{ backgroundColor: primaryColor }}>
           {entryType.title}

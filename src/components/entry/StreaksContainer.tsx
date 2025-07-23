@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import { useAtomValue } from 'jotai';
-import { entryInstancesMapAtom, entryTypesArrayAtom } from '@/atoms';
+import { entryInstancesMapAtom } from '@/atoms';
 import { EntryType, RoutineEnum } from '@/entry/types-constants';
 import { calcEntryTypeLongestStreaks } from '@/utils/entry';
 import { EntryStreakCard } from './EntryStreakCard';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
-import clsx from 'clsx';
 
 type StreaksContainerProps = {
   entryTypesArray: EntryType[];
@@ -13,7 +11,6 @@ type StreaksContainerProps = {
 };
 
 export function StreaksContainer({ entryTypesArray, routine }: StreaksContainerProps) {
-  const isDesktop = useIsDesktop();
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
 
   const sortedEntryTypes = useMemo(() => {
@@ -37,7 +34,7 @@ export function StreaksContainer({ entryTypesArray, routine }: StreaksContainerP
   }
 
   return (
-    <div className={clsx('flex gap-3', isDesktop ? 'flex-row flex-wrap gap-4' : 'flex-col')}>
+    <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-4">
       {sortedEntryTypes.map((entryType) => (
         <EntryStreakCard key={entryType.id} entryType={entryType} routine={routine} />
       ))}
