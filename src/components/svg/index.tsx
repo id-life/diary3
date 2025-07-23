@@ -10,6 +10,8 @@ import CloseSVG from '@/../public/svgs/icons/close.svg?component';
 import EditDateSVG from '@/../public/svgs/icons/edit-date.svg?component';
 import SearchSVG from '@/../public/svgs/icons/search.svg?component';
 import PointStepSVG from '@/../public/svgs/icons/point-step.svg?component';
+import ClockSVG from '@/../public/svgs/icons/clock.svg?component';
+import TrashSVG from '@/../public/svgs/icons/trash.svg?component';
 
 export {
   AddCircleSVG,
@@ -24,4 +26,6 @@ export {
   EditDateSVG,
   SearchSVG,
   PointStepSVG,
+  ClockSVG,
+  TrashSVG,
 };

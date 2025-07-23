@@ -1,10 +1,11 @@
 import { globalStateAtom } from '@/atoms';
 import { safeNumberValue } from '@/utils';
 import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
-import EntryProgressBar from './EntryProgressBar';
+import { PropsWithChildren, useMemo } from 'react';
 
-export default function EntryHeader() {
+interface IProps extends PropsWithChildren {}
+
+export default function EntryHeader({ children }: IProps) {
   const globalState = useAtomValue(globalStateAtom);
   const currentStreakByEntry = useMemo(() => safeNumberValue(globalState?.currentStreakByEntry), [globalState]);
 
@@ -18,7 +19,7 @@ export default function EntryHeader() {
           DAY{currentStreakByEntry > 1 ? 'S' : ''}
         </span>
       </div>
-      <EntryProgressBar className="grow" />
+      {children}
     </div>
   );
 }
