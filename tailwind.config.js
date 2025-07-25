@@ -10,11 +10,12 @@ module.exports = {
         center: true,
       },
       screens: {
-        xs: { max: '480px' },
-        sm: { max: '640px' },
-        md: { max: '768px' },
-        lg: { min: '769px', max: '1024px' },
-        xl: { min: '1025px', max: '1365px' },
+        xs: '480px',
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px',
         '2xl': '1366px',
         '4xl': '1920px',
         // Mobile-first responsive design

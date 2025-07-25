@@ -1,88 +1,76 @@
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
-import { formatDate } from '@/utils/date';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
-import { AiFillDelete, AiFillEdit } from 'react-icons/ai';
-import { BiSolidBellRing } from 'react-icons/bi';
-import { twMerge } from 'tailwind-merge';
 import { ReminderRecord, ReminderType } from '../../entry/types-constants';
 import { Button } from '../ui/button';
+import { Card } from '../ui/card';
+import { useRouter } from 'next/navigation';
+import { BellSVG, TrashSVG } from '../svg';
 
-export type EntryTypeCardProps = {
+export type ReminderRecordCardProps = {
   record: ReminderRecord;
-  className?: string;
 };
 
-const rankWord = ['st', 'nd', 'rd'];
-
-const ReminderRecordCard = (props: EntryTypeCardProps) => {
+const ReminderRecordCard = ({ record }: ReminderRecordCardProps) => {
+  const router = useRouter();
   const { deleteReminder, enterReminderEdit } = useJotaiActions();
-  const { record, className } = props;
-  const { id, title, content, type, createdAt, updatedAt, weekDay, monthDay, month, sinceStartTime } = record;
-  const repeatAt = useMemo(() => {
+  const { id, title, content, type, weekDay, monthDay, month } = record;
+
+  const dateTag = useMemo(() => {
     if (type === ReminderType.weekly)
-      return ` ${dayjs()
+      return dayjs()
         .day(weekDay ?? 0)
-        .format('dddd')}`;
-    if (type === ReminderType.monthly) return !!monthDay && ` ${monthDay}${monthDay > 3 ? 'th' : rankWord[monthDay - 1]}`;
+        .format('ddd'); // e.g., "Sun"
+    if (type === ReminderType.monthly)
+      return dayjs()
+        .date(monthDay ?? 1)
+        .format('MMM DD'); // e.g., "Jul 08"
     if (type === ReminderType.annual)
-      return ` ${dayjs()
+      return dayjs()
         .month(month ?? 0)
-        .format('MMMM')}`;
-  }, [month, monthDay, type, weekDay]);
-  const sinceDiffDay = useMemo(() => sinceStartTime && dayjs().diff(dayjs(sinceStartTime), 'day'), [sinceStartTime]);
+        .format('MMM'); // e.g., "Jul"
+    return null;
+  }, [type, weekDay, monthDay, month]);
+
+  const handleEdit = () => {
+    enterReminderEdit({ reminderId: id });
+    router.push('/reminder/add');
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete the reminder "${title}"?`)) {
+      deleteReminder(id);
+    }
+  };
+
   return (
-    <div className={twMerge('relative flex flex-wrap items-center gap-3 rounded-lg bg-white px-4 py-2', className)}>
-      <div className="flex aspect-square w-8 items-center justify-center rounded-full bg-blue text-white">
-        <BiSolidBellRing />
+    <Card
+      className="grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-[14px] py-3 pl-[14px] pr-[15px]"
+      onClick={handleEdit}
+    >
+      <div className="flex-shrink-0 text-gray-400">
+        <BellSVG />
       </div>
-      <div className="flex flex-grow flex-col gap-1">
-        <div className="flex items-center gap-1.5 text-xl font-medium">
-          {title}
-          <div className="rounded border border-white bg-white/25 p-1 font-DDin text-xs font-bold">{type}</div>
-          {type === ReminderType.since ? (
-            <div className="text-left font-DDin text-2xl font-bold text-primary">
-              {sinceDiffDay}
-              <span className="text-xs">
-                {Math.abs(sinceDiffDay ?? 0) <= 1 ? ' day' : ' days'} since {formatDate(sinceStartTime)}
-              </span>
-            </div>
-          ) : (
-            <div className="font-DDin text-xs font-bold text-primary">
-              Repeat on
-              {repeatAt}
-            </div>
-          )}
+
+      <div className="flex-grow space-y-2 text-xs">
+        <div className="flex items-center font-medium">
+          <span className="text-sm font-semibold text-diary-primary">{title}</span>
+          <span className="ml-2 rounded-[4px] bg-[#bcbbc4] px-1.5 py-1 text-white">{type}</span>
+          {dateTag && <span className="ml-1.5 rounded bg-[#bcbbc4] px-1.5 py-1 text-white">{dateTag}</span>}
         </div>
         <p>{content}</p>
       </div>
 
-      <div className="flex justify-between gap-3 text-left text-sm">
-        <div className="flex flex-col">
-          <p className="opacity-60">Create at</p>
-          <p>{formatDate(createdAt)} </p>
-        </div>
-        <div className="flex flex-col">
-          <p className="opacity-60">Update at</p>
-          <p>{formatDate(updatedAt)} </p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <Button size="small" className="rounded-lg" variant="ghost" onClick={() => enterReminderEdit({ reminderId: id })}>
-          <AiFillEdit className="h-full w-6" />
-        </Button>
-        <Button
-          variant="danger"
-          size="small"
-          className="rounded-lg border-diary-danger bg-transparent text-diary-danger hover:opacity-80"
-          onClick={() => {
-            deleteReminder(id);
-          }}
-        >
-          <AiFillDelete className="h-full w-6" />
-        </Button>
-      </div>
-    </div>
+      <Button
+        onClick={handleDelete}
+        variant="ghost"
+        size="icon"
+        className="flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center rounded-[4px] bg-[#FF000433] text-[#FF0004]"
+      >
+        <TrashSVG />
+      </Button>
+    </Card>
   );
 };
 
