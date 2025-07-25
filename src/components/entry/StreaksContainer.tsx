@@ -34,7 +34,7 @@ export function StreaksContainer({ entryTypesArray, routine }: StreaksContainerP
   }
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:gap-4">
+    <div className="flex flex-col gap-3 md:grid md:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] md:justify-items-start md:gap-4">
       {sortedEntryTypes.map((entryType) => (
         <EntryStreakCard key={entryType.id} entryType={entryType} routine={routine} />
       ))}

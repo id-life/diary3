@@ -51,7 +51,7 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
   const primaryColor = `#${entryType.themeColors[0]}`;
 
   return (
-    <Card className="flex w-full flex-col gap-3 p-3 text-diary-primary md:w-auto" onClick={handleEdit}>
+    <Card className="flex h-full w-full flex-col gap-3 p-3 text-diary-primary" onClick={handleEdit}>
       <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 text-xs">
         <span className="mr-auto rounded-[4px] px-1.5 py-1 font-medium text-white" style={{ backgroundColor: primaryColor }}>
           {entryType.title}

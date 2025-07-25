@@ -9,8 +9,9 @@ import {
   createRestoreBackup,
   detectBackupFormat,
 } from '@/utils/backupDataConverter';
-import { Button } from '../ui/button';
 import Dialog from '../dialog';
+import dayjs from 'dayjs';
+import { LoadFileSVG } from '../svg';
 
 interface BackupInfo {
   id: string;
@@ -25,38 +26,15 @@ const BackupDialog: FunctionComponent = () => {
 
   const restoreBackup = async (backup: BackupInfo) => {
     try {
-      const loadMsg = toast.loading('🔄 Validating backup data...');
-
-      // Validate backup data
+      const loadMsg = toast.loading('Validating backup data...');
       if (!validateBackupData(backup.content)) {
-        toast.update(loadMsg, {
-          render: 'Invalid backup data format',
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000,
-        });
+        toast.update(loadMsg, { render: 'Invalid backup data format', type: 'error', isLoading: false, autoClose: 3000 });
         return;
       }
-
-      // Show format detection info
       const format = detectBackupFormat(backup.content);
-      console.log('📊 Backup format detected:', format);
-
-      toast.update(loadMsg, {
-        render: `🔄 Converting ${format} backup data...`,
-        type: 'info',
-        isLoading: true,
-      });
-
-      // Create backup of current data
-      const backupSuccess = createRestoreBackup();
-      if (!backupSuccess) {
-        console.warn('⚠️ Failed to create pre-restore backup, but continuing...');
-      }
-
-      // Convert and restore backup data
+      toast.update(loadMsg, { render: `Converting ${format} backup data...`, type: 'info', isLoading: true });
+      createRestoreBackup();
       const conversionSuccess = await convertAndRestoreBackup(backup.content);
-
       if (conversionSuccess) {
         toast.update(loadMsg, {
           render: 'Backup restored successfully! Refreshing...',
@@ -64,17 +42,9 @@ const BackupDialog: FunctionComponent = () => {
           isLoading: false,
           autoClose: 2000,
         });
-
-        setTimeout(() => {
-          window?.location?.reload();
-        }, 2000);
+        setTimeout(() => window?.location?.reload(), 2000);
       } else {
-        toast.update(loadMsg, {
-          render: 'Failed to restore backup data',
-          type: 'error',
-          isLoading: false,
-          autoClose: 3000,
-        });
+        toast.update(loadMsg, { render: 'Failed to restore backup data', type: 'error', isLoading: false, autoClose: 3000 });
       }
     } catch (error) {
       console.error('Restore backup failed:', error);
@@ -82,75 +52,47 @@ const BackupDialog: FunctionComponent = () => {
     }
   };
 
+  const formatFileName = (fileName: string, index: number) => {
+    const fileNumber = index + 1;
+    return `SaveFile ${fileNumber.toString().padStart(2, '0')}`;
+  };
+
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => setOpen(open)}
-      title="Cloud Backup Data"
+      title={<span className="text-lg font-semibold">Load</span>}
+      className="px-6 py-4"
       render={() => (
-        <div className="flex flex-col gap-4 p-4">
+        <div className="pt-1">
           {isLoading ? (
-            <div className="py-4 text-center">Loading...</div>
+            <div className="py-8 text-center text-gray-500">Loading backups...</div>
           ) : backupList?.length ? (
-            <div className="flex max-h-[500px] flex-col gap-3 overflow-auto">
-              {backupList.map((backup) => {
-                const format = detectBackupFormat(backup.content);
-                const isValid = validateBackupData(backup.content);
-
-                return (
-                  <div key={backup.id} className="flex items-center justify-between gap-2 rounded-lg bg-zinc-700 p-4 shadow-md">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-zinc-200">{backup.fileName}</span>
-                      <span className="text-xs text-zinc-400">{new Date(backup.createdAt).toLocaleString()}</span>
-                      <div className="mt-1 flex items-center gap-2">
-                        <span
-                          className={`rounded-full px-2 py-1 text-xs ${
-                            format === 'old-redux'
-                              ? 'bg-blue-500/20 text-blue-300'
-                              : format === 'new-jotai'
-                              ? 'bg-green-500/20 text-green-300'
-                              : 'bg-red-500/20 text-red-300'
-                          }`}
-                        >
-                          {format === 'old-redux' ? '🔄 Redux' : format === 'new-jotai' ? '✅ Jotai' : '❌ Unknown'}
-                        </span>
-                        {!isValid && (
-                          <span className="rounded-full bg-red-500/20 px-2 py-1 text-xs text-red-300">⚠️ Invalid</span>
-                        )}
-                      </div>
-                    </div>
-                    <Button
+            <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-2.5">
+              {backupList
+                .slice()
+                .reverse()
+                .map((backup, index) => {
+                  const isValid = validateBackupData(backup.content);
+                  return (
+                    <button
+                      key={backup.id}
                       onClick={() => restoreBackup(backup)}
                       disabled={!isValid}
-                      className={`rounded-full border px-4 py-2 font-semibold shadow-sm transition-all duration-300 ${
-                        isValid
-                          ? 'border-gray-300 bg-white text-black hover:bg-gray-100'
-                          : 'cursor-not-allowed border-gray-500 bg-gray-400 text-gray-600'
-                      }`}
+                      className="flex w-full items-center gap-[14px] rounded-[8px] border bg-white px-[14px] py-3"
                     >
-                      {format === 'old-redux' ? 'Convert & Restore' : 'Restore'}
-                    </Button>
-                  </div>
-                );
-              })}
+                      <LoadFileSVG />
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-left text-sm font-semibold">{formatFileName(backup.fileName, index)}</span>
+                        <span className="text-xs">{dayjs(backup.createdAt).format('YYYY/MM/DD HH:mm:ss')}</span>
+                      </div>
+                    </button>
+                  );
+                })}
             </div>
           ) : (
-            <div className="py-4 text-center">Empty</div>
+            <div className="py-8 text-center text-gray-500">No backups found.</div>
           )}
-        </div>
-      )}
-      renderFooter={({ close }) => (
-        <div className="mt-4 flex justify-end gap-2">
-          <Button onClick={close} className="rounded bg-gray-500 px-3 py-1 font-semibold text-white hover:bg-gray-600">
-            Close
-          </Button>
-          <Button
-            onClick={() => refetch()}
-            variant="primary"
-            className="rounded bg-green-500 px-3 py-1 font-semibold text-white hover:bg-green-600"
-          >
-            Refetch
-          </Button>
         </div>
       )}
     />

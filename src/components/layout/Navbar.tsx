@@ -27,8 +27,8 @@ function Navbar() {
   const setAddDialogOpen = useSetAtom(addDialogOpenAtom);
   const activeKey = useMemo(() => {
     if (!pathname) return '';
-    const path = pathname.slice(1);
-    return PAGES.find((page) => page.key === path)?.key || '';
+    const topLevelPath = pathname.split('/')[1];
+    return PAGES.find((page) => page.key === topLevelPath)?.key || '';
   }, [pathname]);
   const token = searchParams.get('token');
 

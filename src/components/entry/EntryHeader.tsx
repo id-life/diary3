@@ -2,23 +2,39 @@ import { globalStateAtom } from '@/atoms';
 import { safeNumberValue } from '@/utils';
 import { useAtomValue } from 'jotai';
 import { PropsWithChildren, useMemo } from 'react';
+interface IProps extends PropsWithChildren {
+  layout?: 'flow' | 'centered';
+}
 
-interface IProps extends PropsWithChildren {}
+const StreakDisplay = ({ currentStreakByEntry }: { currentStreakByEntry: number }) => (
+  <div className="flex items-center justify-center gap-1">
+    <span className="text-[1.625rem]/10 font-semibold">{currentStreakByEntry}</span>
+    <span className="text-left text-xs/3">
+      STREAK
+      <br />
+      DAY{currentStreakByEntry > 1 ? 'S' : ''}
+    </span>
+  </div>
+);
 
-export default function EntryHeader({ children }: IProps) {
+export default function EntryHeader({ children, layout = 'flow' }: IProps) {
   const globalState = useAtomValue(globalStateAtom);
   const currentStreakByEntry = useMemo(() => safeNumberValue(globalState?.currentStreakByEntry), [globalState]);
 
+  if (layout === 'centered') {
+    return (
+      <div className="relative sticky top-0 z-10 -mx-4 flex items-center justify-center bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 pt-1">
+          <StreakDisplay currentStreakByEntry={currentStreakByEntry} />
+        </div>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
-      <div className="flex items-center justify-center gap-1">
-        <span className="text-[1.625rem]/10 font-semibold">{currentStreakByEntry}</span>
-        <span className="text-left text-xs/3">
-          STREAK
-          <br />
-          DAY{currentStreakByEntry > 1 ? 'S' : ''}
-        </span>
-      </div>
+      <StreakDisplay currentStreakByEntry={currentStreakByEntry} />
       {children}
     </div>
   );

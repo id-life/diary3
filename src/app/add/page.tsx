@@ -14,7 +14,7 @@ export default function AddPage() {
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
-      <EntryHeader>
+      <EntryHeader layout="centered">
         <span className="mx-auto text-lg font-semibold">Streaks Table</span>
       </EntryHeader>
 
