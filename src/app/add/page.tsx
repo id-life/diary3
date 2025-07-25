@@ -19,7 +19,6 @@ export default function AddPage() {
       </EntryHeader>
 
       <Segmented
-        id="streak-segment"
         options={[
           { label: 'Daily', value: RoutineEnum.daily },
           { label: 'Weekly', value: RoutineEnum.weekly },

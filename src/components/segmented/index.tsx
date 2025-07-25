@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useId } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type OptionType = {
@@ -35,6 +35,7 @@ export const Segmented = ({
   onClick,
 }: SegmentedProps) => {
   const [internalValue, setInternalValue] = useState(() => defaultValue || options[0]?.value || '');
+  const generatedId = useId();
 
   // Effect to update internal state when defaultValue changes
   useEffect(() => {
@@ -90,7 +91,7 @@ export const Segmented = ({
             </div>
             {selected && (
               <motion.div
-                layoutId={`segmented_selected_${id ?? 'default'}`}
+                layoutId={`segmented_selected_${id ?? generatedId}`}
                 className={twMerge('absolute inset-0 rounded bg-white', selectedBgClass)}
               />
             )}
