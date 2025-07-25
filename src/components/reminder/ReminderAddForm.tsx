@@ -301,7 +301,6 @@ export default function ReminderAddForm() {
             </Button>
             {startDate && (
               <AddToCalendarButton
-                id="custom-atcb-button"
                 hideIconButton
                 hideBackground
                 name={form.getValues('title')}
