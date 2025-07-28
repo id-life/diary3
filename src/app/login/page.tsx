@@ -20,6 +20,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
+  useEffect(() => {
+    if (!gitHubAuth.isLoading && gitHubAuth.isAuthenticated) {
+      router.push('/');
+    }
+  }, [gitHubAuth.isAuthenticated, gitHubAuth.isLoading, router]);
+
   const handleGitHubLogin = () => {
     gitHubAuth.login();
   };
@@ -52,6 +58,14 @@ export default function LoginPage() {
   // If user is authenticated, show loading while redirecting
   if (gitHubAuth.isAuthenticated && gitHubAuth.user) {
     return null;
+  }
+
+  if (gitHubAuth.isLoading || gitHubAuth.isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   // Show login/signup form
