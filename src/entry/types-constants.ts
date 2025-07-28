@@ -30,7 +30,7 @@ export interface EntryType {
   createdAt: number;
   updatedAt: number;
 
-  themeColors: string[];
+  themeColor: string;
 }
 
 export enum StreakStatus {
@@ -40,14 +40,16 @@ export enum StreakStatus {
   WARNING = 'warning', // not completed in a cycle, almost failed
 }
 
+export const ENTRY_TYPE_THEME_COLORS = ['1487fc', '0bbd9f', '50ba10', 'ff7b1c', 'ee422b', 'ff4af8', '7f4efa', '4f4fff'];
+
 export const EntryTypeConstructor = ({
   id = '',
   title = '',
   defaultPoints = 0,
   pointStep = 0,
   routine = RoutineEnum.adhoc,
-  themeColors = ['#000000'],
-}) => {
+  themeColor = ENTRY_TYPE_THEME_COLORS[0],
+}): EntryType => {
   const now = Number(new Date());
   return {
     updatedAt: now,
@@ -57,8 +59,8 @@ export const EntryTypeConstructor = ({
     defaultPoints,
     pointStep,
     routine,
-    themeColors,
-  } satisfies EntryType;
+    themeColor,
+  };
 };
 
 export type Year = number;
@@ -107,37 +109,7 @@ export interface EntryDay extends DiaryDate {
   totalPoints: number;
 }
 
-export const EntryTypeThemeColors = [
-  ['FF5912', 'FC3650'],
-  ['FC8D3C', 'FF5912'],
-  ['FCA53C', 'FF8812'],
-  ['FFCF26', 'F9A709'],
-
-  ['89D365', '09BDA0'],
-  ['09BDA0', '3E90FF'],
-  ['3592FF', '6865FF'],
-  ['6865FF', '9E3EEF'],
-
-  ['FDEB71', 'F8D800'],
-  ['ABDCFF', '0396FF'],
-  ['FEB692', 'EA5455'],
-  ['CE9FFC', '7367F0'],
-
-  ['90F7EC', '32CCBC'],
-  ['FFF6B7', 'F6416C'],
-  ['81FBB8', '28C76F'],
-  ['E2B0FF', '9F44D3'],
-
-  ['5EFCE8', '736EFE'],
-  ['FAD7A1', 'E96D71'],
-  ['FEC163', 'DE4313'],
-  ['FFF886', 'F072B6'],
-
-  ['FFF720', '3CD500'],
-  ['FDD819', 'E80505'],
-  ['FFDDE1', 'EE9CA7'],
-  ['6190E8', 'A7BFE8'],
-];
+export const EntryTypeThemeColors = ['1487fc', '0bbd9f', '50ba10', 'ff7b1c', 'ee422b', 'ff4af8', '7f4efa', '4f4fff'];
 
 export type DateRange = 'day' | 'week' | 'month';
 export const barLowValue: { [key: string]: number } = { day: 8, week: 16, month: 32 };

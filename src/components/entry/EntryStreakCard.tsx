@@ -48,7 +48,7 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
     }
   };
 
-  const primaryColor = `#${entryType.themeColors[0]}`;
+  const primaryColor = `#${entryType.themeColor}`;
 
   return (
     <Card className="flex h-full w-full flex-col gap-3 p-3 text-diary-primary" onClick={handleEdit}>
