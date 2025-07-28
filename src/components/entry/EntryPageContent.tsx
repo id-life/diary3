@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import EntryHeader from './EntryHeader';
+import EntryProgressBar from './EntryProgressBar';
 
 export default function EntryPageContent() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,9 @@ export default function EntryPageContent() {
 
   return (
     <div ref={scrollContainerRef} className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
-      <EntryHeader />
+      <EntryHeader>
+        <EntryProgressBar className="grow" />
+      </EntryHeader>
       <EntryChart />
       <EntryInstanceList className="-mt-18" />
       <EntryTypeListForCompletion />

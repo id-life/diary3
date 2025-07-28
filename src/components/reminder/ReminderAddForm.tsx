@@ -17,6 +17,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '../ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Switch } from '../ui/switch';
+import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   title: z.string().trim().min(1, { message: 'This field cannot be empty. Please fill it in.' }),
@@ -32,6 +33,7 @@ const options = [
   { value: ReminderType.since },
 ];
 export default function ReminderAddForm() {
+  const router = useRouter();
   const [type, setType] = useState<ReminderType>(ReminderType.weekly);
 
   const [weekOpt, setWeekOpt] = useState<number>(0);
@@ -91,6 +93,11 @@ export default function ReminderAddForm() {
     }
   }
 
+  const onCancel = useCallback(() => {
+    exitReminderEdit();
+    router.push('/reminder');
+  }, [exitReminderEdit, router]);
+
   const { startDate, recurrenceRule } = useMemo(() => {
     // https://icalendar.org/rrule-tool.html
     // https://add-to-calendar-button.com/examples#case-4
@@ -134,10 +141,9 @@ export default function ReminderAddForm() {
       <>
         {type === ReminderType.weekly && (
           <FormItem>
-            <FormLabel>Week Day</FormLabel>
+            <FormLabel>Week Day:</FormLabel>
             <FormControl>
               <Segmented
-                className="bg-background"
                 value={weekOpt}
                 onChange={(value) => {
                   setWeekOpt(value as number);
@@ -145,7 +151,6 @@ export default function ReminderAddForm() {
                 options={weekOpts}
               />
             </FormControl>
-            <FormDescription>Defaults to 8pm, 15 minute reminder events</FormDescription>
           </FormItem>
         )}
         {type === ReminderType.monthly && (
@@ -225,9 +230,9 @@ export default function ReminderAddForm() {
             name="isSendReminderEmail"
             render={({ field }) => (
               <FormItem className="mt-2 flex flex-col">
-                <FormLabel className="leading-5">Send Reminder Email</FormLabel>
+                <FormLabel className="leading-5">Send Reminder Email:</FormLabel>
                 <FormControl className="mt-2">
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
@@ -239,14 +244,14 @@ export default function ReminderAddForm() {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col gap-5">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                <span className="text-red-500">*</span>Title
+                <span className="text-red-500">*</span>Title:
               </FormLabel>
               <FormControl>
                 <Input placeholder="Enter your title here" {...field} />
@@ -260,7 +265,7 @@ export default function ReminderAddForm() {
           name="content"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Content</FormLabel>
+              <FormLabel>Content:</FormLabel>
               <FormControl>
                 <Input placeholder="Enter your content here" {...field} />
               </FormControl>
@@ -270,10 +275,9 @@ export default function ReminderAddForm() {
         />
         <div className="flex flex-wrap items-start gap-4">
           <FormItem>
-            <FormLabel>Type</FormLabel>
+            <FormLabel>Type:</FormLabel>
             <FormControl>
               <Segmented
-                className="bg-background"
                 options={options}
                 value={type}
                 onChange={(value) => {
@@ -284,29 +288,33 @@ export default function ReminderAddForm() {
           </FormItem>
           {renderPushConfig()}
         </div>
-        <div className="mt-2 flex items-center justify-center gap-2">
-          {updatingReminderId !== null ? (
-            <Button size="large" className="rounded-full" htmlType="button" onClick={() => exitReminderEdit()}>
-              Cancel
+        <div className="mx-6 mb-10 mt-auto space-y-4">
+          <div className="text-center text-xs text-[#8A8998]">Defaults to 8pm, 15 minute reminder events</div>
+          <div className="flex items-center justify-center gap-4">
+            {updatingReminderId !== null ? (
+              <Button size="large" className="flex-1 rounded-[8px]" htmlType="button" onClick={onCancel}>
+                Cancel
+              </Button>
+            ) : null}
+            <Button variant="primary" size="large" className="w-full flex-1 rounded-[8px]" htmlType="submit">
+              {updatingReminderId !== null ? 'Update' : 'Submit'}
             </Button>
-          ) : null}
-          <Button variant="primary" size="large" className="rounded-full" htmlType="submit">
-            {updatingReminderId !== null ? 'Update' : 'Submit'}
-          </Button>
-          {startDate && (
-            <AddToCalendarButton
-              name={form.getValues('title')}
-              description={form.getValues('content')}
-              recurrence={recurrenceRule}
-              startDate={startDate}
-              startTime="12:00"
-              endTime="12:15"
-              buttonStyle="round"
-              options={['Apple', 'Google', 'iCal', 'Microsoft365', 'MicrosoftTeams', 'Outlook.com', 'Yahoo']}
-              hideCheckmark
-              size="5"
-            />
-          )}
+            {startDate && (
+              <AddToCalendarButton
+                hideIconButton
+                hideBackground
+                name={form.getValues('title')}
+                description={form.getValues('content')}
+                recurrence={recurrenceRule}
+                startDate={startDate}
+                startTime="12:00"
+                endTime="12:15"
+                options={['Apple', 'Google', 'iCal', 'Microsoft365', 'MicrosoftTeams', 'Outlook.com', 'Yahoo']}
+                hideCheckmark
+                size="5"
+              />
+            )}
+          </div>
         </div>
       </form>
     </FormProvider>

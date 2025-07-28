@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useId } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 export type OptionType = {
@@ -17,6 +17,8 @@ type SegmentedProps = {
   id?: string;
   className?: string;
   optionClass?: string;
+  selectedClass?: string;
+  selectedBgClass?: string;
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
@@ -28,9 +30,12 @@ export const Segmented = ({
   id,
   className,
   optionClass,
+  selectedClass,
+  selectedBgClass,
   onClick,
 }: SegmentedProps) => {
   const [internalValue, setInternalValue] = useState(() => defaultValue || options[0]?.value || '');
+  const generatedId = useId();
 
   // Effect to update internal state when defaultValue changes
   useEffect(() => {
@@ -67,23 +72,28 @@ export const Segmented = ({
       {options.map((option) => {
         if (!option) return null;
         const { label, value: optionValue, disabled } = option;
+        const selected = isSelected(optionValue);
+
         return (
-          <div className="relative" key={optionValue}>
+          <div className="relative flex-1" key={optionValue}>
             <div
-              className={clsx(
-                'relative z-10 px-3 py-2.5 text-diary-navy first:rounded-l-md last:rounded-r-md',
-                // {
-                //   'text-blue': isSelected(optionValue),
-                // },
-                { 'text-gray-400': disabled },
-                optionClass,
+              className={twMerge(
+                clsx(
+                  'relative z-10 px-3 py-2.5 text-center text-diary-navy first:rounded-l-md last:rounded-r-md',
+                  optionClass,
+                  { [selectedClass || '']: selected },
+                  { 'text-gray-400': disabled, 'cursor-not-allowed': disabled },
+                ),
               )}
               onClick={() => !disabled && select(optionValue)}
             >
               {label ?? optionValue}
             </div>
-            {isSelected(optionValue) && (
-              <motion.div layoutId={`segmented_selected_${id ?? 'default'}`} className="absolute inset-0 rounded bg-white" />
+            {selected && (
+              <motion.div
+                layoutId={`segmented_selected_${id ?? generatedId}`}
+                className={twMerge('absolute inset-0 rounded bg-white', selectedBgClass)}
+              />
             )}
           </div>
         );

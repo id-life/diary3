@@ -1,4 +1,4 @@
-import { EntryType, RoutineEnum, StreakStatus, getEntryInstanceIdFromEntryType } from '@/entry/types-constants';
+import { EntryType, RoutineEnum, StreakStatus, getDatePeriods, getEntryInstanceIdFromEntryType } from '@/entry/types-constants';
 import { entryInstancesMapAtom } from '@/atoms';
 import { useAtomValue } from 'jotai';
 import dayjs from 'dayjs';
@@ -12,8 +12,8 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
     ({ start, end }: { start: string; end: string }) => {
       const s = dayjs(start);
       const e = dayjs(end);
-      if (routine === RoutineEnum.daily) return e.format('MMM\nDD');
-      else if (routine === RoutineEnum.weekly) return `${s.format('MMM DD')}-${e.format('MMM DD')}`;
+      if (routine === RoutineEnum.daily) return e.format('MMM DD');
+      else if (routine === RoutineEnum.weekly) return `${s.format('MMM')}\n${s.format('DD')}-${e.format('DD')}`;
       else if (routine === RoutineEnum.monthly) return e.format('MMM');
     },
     [routine],
@@ -47,7 +47,6 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
           return isLatest ? StreakStatus.WARNING : StreakStatus.INCOMPLETE;
         }
         case RoutineEnum.monthly: {
-          // s~e month have one entry is completed
           if (createAt.isAfter(e)) return StreakStatus.UNCREATED;
           for (let day = s; day.isBefore(e) || day.isSame(e); day = day.add(1, 'day')) {
             const entries = entryInstancesMap[day.format('YYYY-MM-DD')];
@@ -63,9 +62,32 @@ export const useEntryStreakGetters = (routine: RoutineEnum) => {
     },
     [entryInstancesMap, routine],
   );
+
+  const getCurrentStreak = useCallback(
+    (entryType: EntryType): number => {
+      const periods = getDatePeriods(routine, 365);
+      let streakCount = 0;
+
+      for (let i = periods.length - 1; i >= 0; i--) {
+        const period = periods[i];
+        const isLatest = i === periods.length - 1;
+        const status = getStatus(period, entryType, isLatest);
+
+        if (status === StreakStatus.COMPLETED) {
+          streakCount++;
+        } else {
+          break;
+        }
+      }
+      return streakCount;
+    },
+    [getStatus, routine],
+  );
+
   return {
     getHeader,
     getStatus,
+    getCurrentStreak,
   };
 };
 
