@@ -1,4 +1,4 @@
-export const NEW_THEME_COLORS = ['1487fc', '0bbd9f', '50ba10', 'ff7b1c', 'ee422b', 'ff4af8', '7f4efa', '4f4fff'];
+import { ENTRY_TYPE_THEME_COLORS } from '@/entry/types-constants';
 
 function simpleHash(str: string): number {
   let hash = 0;
@@ -11,18 +11,18 @@ function simpleHash(str: string): number {
 }
 
 export function getNewThemeColor(colorData: string[] | string | undefined | null): string {
-  if (typeof colorData === 'string' && NEW_THEME_COLORS.includes(colorData)) {
+  if (typeof colorData === 'string' && ENTRY_TYPE_THEME_COLORS.includes(colorData)) {
     return colorData;
   }
 
   if (Array.isArray(colorData) && colorData.length > 0) {
     const hash = simpleHash(colorData[0]);
-    const index = hash % NEW_THEME_COLORS.length;
-    return NEW_THEME_COLORS[index];
+    const index = hash % ENTRY_TYPE_THEME_COLORS.length;
+    return ENTRY_TYPE_THEME_COLORS[index];
   }
 
-  const randomIndex = Math.floor(Math.random() * NEW_THEME_COLORS.length);
-  return NEW_THEME_COLORS[randomIndex];
+  const randomIndex = Math.floor(Math.random() * ENTRY_TYPE_THEME_COLORS.length);
+  return ENTRY_TYPE_THEME_COLORS[randomIndex];
 }
 
 export function convertEntryTypesToNewColors(entryTypes: any[]): any[] {

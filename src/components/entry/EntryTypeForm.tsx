@@ -3,13 +3,13 @@ import { Form, Input, InputNumber, Radio } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { EntryType, EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '../../entry/types-constants';
+import { EntryType, EntryTypeConstructor, ENTRY_TYPE_THEME_COLORS, RoutineEnum } from '../../entry/types-constants';
 import DiaryIcons from '../icon/DiaryIcons';
 import { Button } from '../ui/button';
 
 const addInitialValues = {
   routine: RoutineEnum.adhoc,
-  themeColors: JSON.stringify(EntryTypeThemeColors[0]),
+  themeColors: JSON.stringify(ENTRY_TYPE_THEME_COLORS[0]),
   defaultPoints: 1,
   pointStep: 0,
   id: '',
@@ -44,7 +44,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
       newEntryType.updatedAt = dayjs().valueOf();
       if (newEntryType.id !== id) {
         // changed title - check if new ID exists (excluding current entry)
-        if (entryTypeIds.filter(existingId => existingId !== id).includes(newEntryType.id)) {
+        if (entryTypeIds.filter((existingId) => existingId !== id).includes(newEntryType.id)) {
           toast.error('id already exists');
           return;
         }
@@ -73,7 +73,7 @@ const EntryTypeForm = (props: { isUpdate: boolean; updatingEntryType?: null | En
   };
   const entryTypeThemeColorsRadios = useMemo(
     () =>
-      EntryTypeThemeColors.map((themeColorPair) => {
+      ENTRY_TYPE_THEME_COLORS.map((themeColorPair) => {
         const value = JSON.stringify(themeColorPair);
         return (
           <Radio.Button

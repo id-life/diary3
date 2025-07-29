@@ -52,9 +52,8 @@ const BackupDialog: FunctionComponent = () => {
     }
   };
 
-  const formatFileName = (fileName: string, index: number) => {
-    const fileNumber = index + 1;
-    return `SaveFile ${fileNumber.toString().padStart(2, '0')}`;
+  const formatFileName = (index: number) => {
+    return `SaveFile ${index.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -71,7 +70,7 @@ const BackupDialog: FunctionComponent = () => {
             <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-2.5">
               {backupList
                 .slice()
-                .reverse()
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                 .map((backup, index) => {
                   const isValid = validateBackupData(backup.content);
                   return (
@@ -83,7 +82,7 @@ const BackupDialog: FunctionComponent = () => {
                     >
                       <LoadFileSVG />
                       <div className="flex flex-col space-y-2">
-                        <span className="text-left text-sm font-semibold">{formatFileName(backup.fileName, index)}</span>
+                        <span className="text-left text-sm font-semibold">{formatFileName(backupList.length - index)}</span>
                         <span className="text-xs">{dayjs(backup.createdAt).format('YYYY/MM/DD HH:mm:ss')}</span>
                       </div>
                     </button>

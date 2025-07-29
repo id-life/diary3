@@ -109,8 +109,6 @@ export interface EntryDay extends DiaryDate {
   totalPoints: number;
 }
 
-export const EntryTypeThemeColors = ['1487fc', '0bbd9f', '50ba10', 'ff7b1c', 'ee422b', 'ff4af8', '7f4efa', '4f4fff'];
-
 export type DateRange = 'day' | 'week' | 'month';
 export const barLowValue: { [key: string]: number } = { day: 8, week: 16, month: 32 };
 export const barHighValue: { [key: string]: number } = { day: 16, week: 32, month: 64 };

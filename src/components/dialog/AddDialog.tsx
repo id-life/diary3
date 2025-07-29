@@ -4,7 +4,7 @@ import { addDialogOpenAtom, entryTypeIdsAtom, entryTypesArrayAtom } from '@/atom
 import { isEntryTypeUpdatingAtom, updatingEntryTypeIdAtom } from '@/atoms/uiState';
 import { Segmented } from '@/components/segmented';
 import { Button } from '@/components/ui/button';
-import { EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '@/entry/types-constants';
+import { EntryTypeConstructor, ENTRY_TYPE_THEME_COLORS, RoutineEnum } from '@/entry/types-constants';
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
@@ -17,7 +17,7 @@ const DEFAULT_VALUES = {
   defaultPoints: 7,
   pointStep: 1,
   routine: RoutineEnum.daily,
-  themeColor: EntryTypeThemeColors[0],
+  themeColor: ENTRY_TYPE_THEME_COLORS[0],
 };
 
 export default function AddDialog() {
@@ -235,7 +235,7 @@ export default function AddDialog() {
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-gray-900">Entry Routine Colors:</label>
             <div className="flex flex-wrap gap-1">
-              {EntryTypeThemeColors.map((color: string) => {
+              {ENTRY_TYPE_THEME_COLORS.map((color: string) => {
                 const isSelected = formData.themeColor === color;
                 return (
                   <button
