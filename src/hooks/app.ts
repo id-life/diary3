@@ -10,6 +10,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect } from 'react';
 import { useGitHubOAuth } from './useGitHubOAuth';
+import { useBackupList } from '@/api/github';
 
 export const useInitGlobalState = () => {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
@@ -18,6 +19,7 @@ export const useInitGlobalState = () => {
   const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
   const currentLoginUser = useAtomValue(currentLoginUserAtom);
   const { isRefreshing } = useGitHubOAuth();
+  const { data: backupList, isLoading: isBackupListLoading } = useBackupList();
 
   useEffect(() => {
     // Run state migration BEFORE atoms are used
@@ -33,7 +35,7 @@ export const useInitGlobalState = () => {
   }, []);
 
   useEffect(() => {
-    if (!currentLoginUser || isRefreshing) {
+    if (!currentLoginUser || isRefreshing || isBackupListLoading) {
       return;
     }
 
@@ -41,7 +43,18 @@ export const useInitGlobalState = () => {
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys?.length ? entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0) : 0;
 
-    const registeredSince = now.diff(dayjs(currentLoginUser.loginTime), 'day');
+    let loginTimeToUse = currentLoginUser.loginTime;
+
+    const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
+
+    if (historicalLoginTime) {
+      console.log(`Using historical login time from the first backup: ${new Date(historicalLoginTime).toLocaleString()}`);
+      loginTimeToUse = historicalLoginTime;
+    } else {
+      console.log(`No historical login time found. Using local login time: ${new Date(loginTimeToUse!).toLocaleString()}`);
+    }
+
+    const registeredSince = now.diff(dayjs(loginTimeToUse), 'day');
 
     const states: GlobalState = {
       registeredSince,
@@ -56,7 +69,16 @@ export const useInitGlobalState = () => {
     const dateStrNow = getDateStringFromNow();
     setInitDateStr({ dateStr: dateStrNow });
     setInitDayEntryInstances({ dateStr: dateStrNow });
-  }, [entryInstancesMap, currentLoginUser, setGlobalState, setInitDateStr, setInitDayEntryInstances, isRefreshing]);
+  }, [
+    entryInstancesMap,
+    currentLoginUser,
+    setGlobalState,
+    setInitDateStr,
+    setInitDayEntryInstances,
+    isRefreshing,
+    isBackupListLoading,
+    backupList,
+  ]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes
