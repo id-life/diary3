@@ -1,4 +1,4 @@
-import { currentLoginUserAtom, entryInstancesMapAtom, initDateStrAtom, initDayEntryInstancesAtom } from '@/atoms';
+import { entryInstancesMapAtom, initDateStrAtom, initDayEntryInstancesAtom } from '@/atoms';
 import { GlobalState, globalStateAtom } from '@/atoms/app';
 import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { StorageKey } from '@/constants/storage';
@@ -17,7 +17,7 @@ export const useInitGlobalState = () => {
   const setGlobalState = useSetAtom(globalStateAtom);
   const setInitDateStr = useSetAtom(initDateStrAtom);
   const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
-  const currentLoginUser = useAtomValue(currentLoginUserAtom);
+  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
   const { isRefreshing } = useGitHubOAuth();
   const { data: backupList, isLoading: isBackupListLoading } = useBackupList();
 
@@ -35,7 +35,7 @@ export const useInitGlobalState = () => {
   }, []);
 
   useEffect(() => {
-    if (!currentLoginUser || isRefreshing || isBackupListLoading) {
+    if (!legacyLoginUser || isRefreshing || isBackupListLoading) {
       return;
     }
 
@@ -43,15 +43,12 @@ export const useInitGlobalState = () => {
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys?.length ? entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0) : 0;
 
-    let loginTimeToUse = currentLoginUser.loginTime;
+    let loginTimeToUse = legacyLoginUser.loginTime;
 
     const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
 
     if (historicalLoginTime) {
-      console.log(`Using historical login time from the first backup: ${new Date(historicalLoginTime).toLocaleString()}`);
       loginTimeToUse = historicalLoginTime;
-    } else {
-      console.log(`No historical login time found. Using local login time: ${new Date(loginTimeToUse!).toLocaleString()}`);
     }
 
     const registeredSince = now.diff(dayjs(loginTimeToUse), 'day');
@@ -71,13 +68,13 @@ export const useInitGlobalState = () => {
     setInitDayEntryInstances({ dateStr: dateStrNow });
   }, [
     entryInstancesMap,
-    currentLoginUser,
+    legacyLoginUser,
+    isRefreshing,
+    backupList,
+    isBackupListLoading,
     setGlobalState,
     setInitDateStr,
     setInitDayEntryInstances,
-    isRefreshing,
-    isBackupListLoading,
-    backupList,
   ]);
 };
 

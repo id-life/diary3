@@ -13,6 +13,7 @@ import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { LoadSVG, SaveSVG } from '../svg';
 import { useQueryClient } from '@tanstack/react-query';
+import { AiOutlineLoading } from 'react-icons/ai';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
@@ -28,9 +29,11 @@ export default function UserProfilePage() {
   const router = useRouter();
   const { user: githubUser, logout } = useGitHubOAuth();
   const globalState = useAtomValue(globalStateAtom);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
   const queryClient = useQueryClient();
+
+  const areStatsLoading = globalState === null;
 
   // Get real user stats
   const userStats = {
@@ -47,14 +50,14 @@ export default function UserProfilePage() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSaving(true);
     try {
       await saveStateToGithub(null, true, githubUser);
       await queryClient.invalidateQueries({ queryKey: ['fetch_backup_list'] });
     } catch (error) {
       console.error('Save failed:', error);
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -96,7 +99,7 @@ export default function UserProfilePage() {
         <Card className="overflow-hidden rounded-lg border border-[#1E1B391A]">
           <button
             onClick={handleSave}
-            disabled={isLoading}
+            disabled={isSaving}
             className="border-diary-card-border flex w-full items-center justify-between border-b px-4 py-4 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
@@ -121,30 +124,42 @@ export default function UserProfilePage() {
 
       {/* Stats Section */}
       <div className="px-4 pb-6">
-        {/* Top Row Stats */}
-        <div className="mb-4 grid grid-cols-3 gap-3">
-          <StateCard title="Signed up" value={userStats.signedUpDays} unit={`Day${userStats.signedUpDays !== 1 ? 's' : ''}`} />
-          <StateCard
-            title="Recorded entries"
-            value={userStats.recordedEntries}
-            unit={`Day${userStats.recordedEntries !== 1 ? 's' : ''}`}
-          />
-          <StateCard title="Recorded in total" value={userStats.totalEntries} unit={`Entries`} />
-        </div>
-
-        {/* Bottom Row Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <StateCard
-            title="Historical longest current streak"
-            value={userStats.longestStreak}
-            unit={`Day${userStats.longestStreak !== 1 ? 's' : ''}`}
-          />
-          <StateCard
-            title="Current streak recorded entries"
-            value={userStats.currentStreak}
-            unit={`Day${userStats.currentStreak !== 1 ? 's' : ''}`}
-          />
-        </div>
+        {areStatsLoading ? (
+          <div className="flex min-h-[200px] items-center justify-center rounded-lg border bg-card text-center">
+            <div className="flex items-center gap-2 text-diary-navy opacity-70">
+              <AiOutlineLoading className="size-5 animate-spin" />
+              <span>Loading Stats...</span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4 grid grid-cols-3 gap-3">
+              <StateCard
+                title="Signed up"
+                value={userStats.signedUpDays}
+                unit={`Day${userStats.signedUpDays !== 1 ? 's' : ''}`}
+              />
+              <StateCard
+                title="Recorded entries"
+                value={userStats.recordedEntries}
+                unit={`Day${userStats.recordedEntries !== 1 ? 's' : ''}`}
+              />
+              <StateCard title="Recorded in total" value={userStats.totalEntries} unit={`Entries`} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <StateCard
+                title="Historical longest current streak"
+                value={userStats.longestStreak}
+                unit={`Day${userStats.longestStreak !== 1 ? 's' : ''}`}
+              />
+              <StateCard
+                title="Current streak recorded entries"
+                value={userStats.currentStreak}
+                unit={`Day${userStats.currentStreak !== 1 ? 's' : ''}`}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Logout Section */}
