@@ -12,6 +12,7 @@ import { HiChevronRight, HiDownload, HiUpload } from 'react-icons/hi';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import { LoadSVG, SaveSVG } from '../svg';
+import { useQueryClient } from '@tanstack/react-query';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
@@ -29,6 +30,7 @@ export default function UserProfilePage() {
   const globalState = useAtomValue(globalStateAtom);
   const [isLoading, setIsLoading] = useState(false);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
+  const queryClient = useQueryClient();
 
   // Get real user stats
   const userStats = {
@@ -48,6 +50,7 @@ export default function UserProfilePage() {
     setIsLoading(true);
     try {
       await saveStateToGithub(null, true, githubUser);
+      await queryClient.invalidateQueries({ queryKey: ['fetch_backup_list'] });
     } catch (error) {
       console.error('Save failed:', error);
     } finally {

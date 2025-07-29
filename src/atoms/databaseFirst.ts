@@ -59,3 +59,5 @@ export const hybridUiStateAtom = atomWithStorage<UIState>('uiState', {
 
 // Legacy loginUser atom for backward compatibility
 export const legacyLoginUserAtom = atomWithStorage<LegacyLoginUser | null>('loginUser', null);
+
+export const userDataMapAtom = atomWithStorage<Record<string, LegacyLoginUser>>('user_data_map', {});

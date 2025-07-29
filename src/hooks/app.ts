@@ -1,4 +1,4 @@
-import { entryInstancesMapAtom, initDateStrAtom, initDayEntryInstancesAtom } from '@/atoms';
+import { currentLoginUserAtom, entryInstancesMapAtom, initDateStrAtom, initDayEntryInstancesAtom } from '@/atoms';
 import { GlobalState, globalStateAtom } from '@/atoms/app';
 import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { StorageKey } from '@/constants/storage';
@@ -9,13 +9,15 @@ import dayjs from 'dayjs';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { useEffect } from 'react';
+import { useGitHubOAuth } from './useGitHubOAuth';
 
 export const useInitGlobalState = () => {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const setGlobalState = useSetAtom(globalStateAtom);
   const setInitDateStr = useSetAtom(initDateStrAtom);
   const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
-  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
+  const currentLoginUser = useAtomValue(currentLoginUserAtom);
+  const { isRefreshing } = useGitHubOAuth();
 
   useEffect(() => {
     // Run state migration BEFORE atoms are used
@@ -31,11 +33,15 @@ export const useInitGlobalState = () => {
   }, []);
 
   useEffect(() => {
+    if (!currentLoginUser || isRefreshing) {
+      return;
+    }
+
     const now = dayjs();
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys?.length ? entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0) : 0;
 
-    const registeredSince = now.diff(dayjs(legacyLoginUser?.loginTime ?? now), 'day');
+    const registeredSince = now.diff(dayjs(currentLoginUser.loginTime), 'day');
 
     const states: GlobalState = {
       registeredSince,
@@ -50,7 +56,7 @@ export const useInitGlobalState = () => {
     const dateStrNow = getDateStringFromNow();
     setInitDateStr({ dateStr: dateStrNow });
     setInitDayEntryInstances({ dateStr: dateStrNow });
-  }, [entryInstancesMap, legacyLoginUser, setGlobalState, setInitDateStr, setInitDayEntryInstances]);
+  }, [entryInstancesMap, currentLoginUser, setGlobalState, setInitDateStr, setInitDayEntryInstances, isRefreshing]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes

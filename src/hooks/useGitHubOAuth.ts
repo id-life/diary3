@@ -1,6 +1,6 @@
 import { getUserProfile, GitHubUser } from '@/api/auth';
 import { githubUserStateAtom } from '@/atoms/user';
-import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
+import { legacyLoginUserAtom, userDataMapAtom } from '@/atoms/databaseFirst';
 import { NEXT_PUBLIC_API_PREFIX } from '@/constants/env';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtom, useSetAtom } from 'jotai';
@@ -13,7 +13,7 @@ const userQueryKey = 'fetch_user_profile';
 export const useGitHubOAuth = () => {
   const queryClient = useQueryClient();
   const [githubUserState, setGithubUserState] = useAtom(githubUserStateAtom);
-  const setLegacyLoginUser = useSetAtom(legacyLoginUserAtom);
+  const [userDataMap, setUserDataMap] = useAtom(userDataMapAtom);
   const { accessToken, setAccessToken } = useAccessToken();
 
   const userQuery = useQuery({
@@ -36,7 +36,6 @@ export const useGitHubOAuth = () => {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       setAccessToken(null);
-      setLegacyLoginUser(null);
       queryClient.removeQueries({ queryKey: [userQueryKey] });
     },
     onSuccess: () => {
@@ -64,14 +63,41 @@ export const useGitHubOAuth = () => {
     const user = userQuery.data || null;
     const isAuthenticated = !!accessToken && !!user;
 
+    if (isAuthenticated && user) {
+      setUserDataMap((prevMap) => {
+        const existingUserData = prevMap[user.id];
+        const now = Date.now();
+
+        if (existingUserData) {
+          if (existingUserData.lastUseTime !== now) {
+            return {
+              ...prevMap,
+              [user.id]: { ...existingUserData, lastUseTime: now },
+            };
+          }
+          return prevMap;
+        } else {
+          console.log(`Creating new user record for ${user.username}`);
+          return {
+            ...prevMap,
+            [user.id]: {
+              uid: user.username,
+              loginTime: now,
+              lastUseTime: now,
+              email: user.email,
+            },
+          };
+        }
+      });
+    }
+
     setGithubUserState({
       isAuthenticated,
       user,
       token: accessToken,
       isLoading,
     });
-  }, [accessToken, userQuery.isLoading, userQuery.data, setGithubUserState]);
-
+  }, [accessToken, userQuery.isLoading, userQuery.data, setGithubUserState, setUserDataMap]);
   const login = useCallback(() => {
     try {
       window.location.href = NEXT_PUBLIC_API_PREFIX + '/auth/github';
