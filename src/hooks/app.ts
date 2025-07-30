@@ -13,69 +13,16 @@ import { useGitHubOAuth } from './useGitHubOAuth';
 import { useBackupList } from '@/api/github';
 
 export const useInitGlobalState = () => {
-  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
-  const setGlobalState = useSetAtom(globalStateAtom);
   const setInitDateStr = useSetAtom(initDateStrAtom);
   const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
-  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
-  const { isRefreshing } = useGitHubOAuth();
-  const { data: backupList, isLoading: isBackupListLoading } = useBackupList();
 
   useEffect(() => {
-    // Run state migration BEFORE atoms are used
-    const runMigrationAndInit = async () => {
-      const migrationSuccess = runStateMigration();
-      if (migrationSuccess || isMigrationCompleted()) {
-        // Force atoms to re-initialize with migrated data
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-    };
-
-    runMigrationAndInit();
-  }, []);
-
-  useEffect(() => {
-    if (!legacyLoginUser || isRefreshing || isBackupListLoading) {
-      return;
-    }
-
-    const now = dayjs();
-    const entryKeys = Object.keys(entryInstancesMap);
-    const totalEntries = entryKeys?.length ? entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0) : 0;
-
-    let loginTimeToUse = legacyLoginUser.loginTime;
-
-    const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
-
-    if (historicalLoginTime) {
-      loginTimeToUse = historicalLoginTime;
-    }
-
-    const registeredSince = now.diff(dayjs(loginTimeToUse), 'day');
-
-    const states: GlobalState = {
-      registeredSince,
-      entryDays: entryKeys?.length ?? 0,
-      totalEntries,
-      historicalLongestStreakByEntry: calcRecordedLongestStreaks(entryInstancesMap),
-      currentStreakByEntry: calcRecordedCurrentStreaks(entryInstancesMap),
-    };
-
-    setGlobalState(states);
+    runStateMigration();
 
     const dateStrNow = getDateStringFromNow();
     setInitDateStr({ dateStr: dateStrNow });
     setInitDayEntryInstances({ dateStr: dateStrNow });
-  }, [
-    entryInstancesMap,
-    legacyLoginUser,
-    isRefreshing,
-    backupList,
-    isBackupListLoading,
-    setGlobalState,
-    setInitDateStr,
-    setInitDayEntryInstances,
-  ]);
+  }, [setInitDateStr, setInitDayEntryInstances]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes

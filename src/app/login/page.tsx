@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DiaryIconSVG } from '@/components/svg';
 import { useAccessToken } from '@/hooks/app';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AiFillApple, AiFillGithub, AiFillGoogleCircle } from 'react-icons/ai';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
@@ -14,11 +14,21 @@ export default function LoginPage() {
   const gitHubAuth = useGitHubOAuth();
   const { setAccessToken } = useAccessToken();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      console.log('Token found in URL, saving to localStorage...');
+      setAccessToken(token);
+      router.push('/settings');
+    }
+  }, [searchParams, setAccessToken, router]);
 
   useEffect(() => {
     if (!gitHubAuth.isLoading && gitHubAuth.isAuthenticated) {

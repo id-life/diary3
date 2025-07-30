@@ -1,9 +1,9 @@
-import { getUserProfile, GitHubUser } from '@/api/auth';
+import { getUserProfile } from '@/api/auth';
 import { githubUserStateAtom } from '@/atoms/user';
 import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { NEXT_PUBLIC_API_PREFIX } from '@/constants/env';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAccessToken } from './app';
@@ -18,18 +18,11 @@ export const useGitHubOAuth = () => {
 
   const userQuery = useQuery({
     queryKey: [userQueryKey, accessToken],
-    queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('No access token');
-      }
-      return await getUserProfile();
-    },
+    queryFn: getUserProfile,
     enabled: !!accessToken,
     retry: (failureCount, error: any) => {
-      if (error?.response?.status === 401) {
-        return false;
-      }
-      return failureCount < 3;
+      if (error?.response?.status === 401) return false;
+      return failureCount < 2;
     },
   });
 
@@ -37,10 +30,13 @@ export const useGitHubOAuth = () => {
     mutationFn: async () => {
       setAccessToken(null);
       setLegacyLoginUser(null);
+      queryClient.setQueryData([userQueryKey, null], null);
       queryClient.removeQueries({ queryKey: [userQueryKey] });
     },
     onSuccess: () => {
-      toast.success('Logout success');
+      if (!toast.isActive('logout-toast')) {
+        toast.success('Logout success', { toastId: 'logout-toast' });
+      }
       setGithubUserState({ isAuthenticated: false, user: null, token: null, isLoading: false });
     },
     onError: (error) => {
@@ -52,19 +48,26 @@ export const useGitHubOAuth = () => {
   const { mutate: logout } = logoutMutation;
 
   useEffect(() => {
-    if (userQuery.isError) {
-      const error = userQuery.error as any;
-      console.error('Get user profile failed:', error);
+    if (userQuery.isError && (userQuery.error as any)?.response?.status === 401) {
       logout();
+      return;
     }
-  }, [userQuery.isError, userQuery.error, logout]);
+
+    const isAuthenticated = !!accessToken;
+    const isLoading = isAuthenticated && userQuery.isLoading;
+    const user = userQuery.data || null;
+
+    setGithubUserState({
+      isAuthenticated,
+      user,
+      token: accessToken,
+      isLoading,
+    });
+  }, [accessToken, userQuery.data, userQuery.isLoading, userQuery.isError, userQuery.error, setGithubUserState, logout]);
 
   useEffect(() => {
-    const isLoading = !!accessToken && userQuery.isLoading;
-    const user = userQuery.data || null;
-    const isAuthenticated = !!accessToken && !!user;
-
-    if (isAuthenticated && user && !legacyLoginUser) {
+    const user = userQuery.data;
+    if (user && !legacyLoginUser) {
       const now = Date.now();
       console.log(`Setting initial local loginTime for user ${user.username}`);
       setLegacyLoginUser({
@@ -74,14 +77,7 @@ export const useGitHubOAuth = () => {
         email: user.email,
       });
     }
-
-    setGithubUserState({
-      isAuthenticated,
-      user,
-      token: accessToken,
-      isLoading,
-    });
-  }, [accessToken, userQuery.isLoading, userQuery.data, legacyLoginUser, setGithubUserState, setLegacyLoginUser]);
+  }, [userQuery.data, legacyLoginUser, setLegacyLoginUser]);
 
   const login = useCallback(() => {
     try {
@@ -96,7 +92,7 @@ export const useGitHubOAuth = () => {
     ...githubUserState,
     login,
     logout,
-    isRefreshing: userQuery.isFetching,
+    isRefreshing: githubUserState.isLoading,
     isError: userQuery.isError,
     error: userQuery.error,
   };
