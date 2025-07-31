@@ -11,7 +11,7 @@ export interface BackupInfo {
   userId: string;
 }
 
-export const saveBackupList = ({ content, fileName }: { content: any; fileName: string }): Promise<boolean> =>
+export const saveBackupList = ({ content, fileName }: { content: any; fileName: string }): Promise<BackupInfo> =>
   instance.post('/github-backups', { content, fileName });
 
 export const getBackupList = (): Promise<BackupInfo[]> => instance.get('/github-backups');

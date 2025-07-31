@@ -15,9 +15,10 @@ import { LoadSVG, SaveSVG } from '../svg';
 import { HiChevronRight } from 'react-icons/hi';
 import { useQueryClient } from '@tanstack/react-query';
 import { AiOutlineLoading } from 'react-icons/ai';
-import { useBackupList } from '@/api/github';
+import { BackupInfo, useBackupList } from '@/api/github';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 import { GlobalState } from '@/atoms/app';
+import { useAccessToken } from '@/hooks/app';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
@@ -37,6 +38,7 @@ export default function UserProfilePage() {
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
   const queryClient = useQueryClient();
+  const { accessToken } = useAccessToken();
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
   const { data: backupList, isLoading: isBackupListLoading } = useBackupList();
@@ -72,15 +74,21 @@ export default function UserProfilePage() {
     if (!githubUser) return;
     setIsSaving(true);
     try {
-      await saveStateToGithub(null, true, githubUser, false);
-      await queryClient.invalidateQueries({ queryKey: ['fetch_backup_list'] });
+      const newBackup = await saveStateToGithub(null, true, githubUser, false);
+
+      queryClient.setQueryData(['fetch_backup_list', accessToken], (oldData: BackupInfo[] | undefined) => {
+        const existingData = oldData || [];
+        const newData = [newBackup, ...existingData];
+
+        return newData;
+      });
     } catch (error) {
       console.error('Save failed:', error);
+      queryClient.invalidateQueries({ queryKey: ['fetch_backup_list', accessToken] });
     } finally {
       setIsSaving(false);
     }
   };
-
   const handleLoad = () => setLoadOpen(true);
   const handleLogout = () => {
     logout();

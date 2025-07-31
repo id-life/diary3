@@ -2,7 +2,7 @@
 
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-import { saveBackupList } from '@/api/github';
+import { BackupInfo, saveBackupList } from '@/api/github';
 import { GitHubUser } from '@/api/auth';
 
 // Collect current Jotai state from localStorage with error handling
@@ -22,12 +22,12 @@ export const saveStateToGithub = async (
   isNew?: boolean,
   newUser?: GitHubUser | null,
   isAutoBackup: boolean = false,
-) => {
+): Promise<BackupInfo> => {
   if (!newUser?.username) {
     if (!isAutoBackup) {
       toast.error('Please login with GitHub OAuth first');
     }
-    return;
+    throw new Error('User not authenticated');
   }
 
   const saveMsg = !isAutoBackup ? toast.loading('Saving...') : null;
@@ -59,17 +59,20 @@ export const saveStateToGithub = async (
 
     const path = `dairy-save-${newUser.username}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
 
-    await saveBackupList({ content: jotaiState, fileName: path });
+    const newBackup = await saveBackupList({ content: jotaiState, fileName: path });
 
     if (saveMsg) {
       toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 });
     }
     console.log('GitHub backup successful.', { auto: isAutoBackup });
+
+    return newBackup;
   } catch (e: any) {
     if (saveMsg) {
       toast.update(saveMsg, { render: e?.message || 'Save failed', type: 'error', isLoading: false, autoClose: 3000 });
     }
     console.error('GitHub backup failed:', e);
+    throw e;
   }
 };
 
