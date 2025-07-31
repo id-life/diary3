@@ -67,17 +67,24 @@ export const useGitHubOAuth = () => {
 
   useEffect(() => {
     const user = userQuery.data;
-    if (user && !legacyLoginUser) {
+    if (user) {
       const now = Date.now();
-      console.log(`Setting initial local loginTime for user ${user.username}`);
-      setLegacyLoginUser({
-        uid: user.username,
-        loginTime: now,
-        lastUseTime: now,
-        email: user.email,
+      setLegacyLoginUser((prev) => {
+        const newLoginTime = prev?.loginTime || now;
+        if (!prev?.loginTime) {
+          console.log(`Setting initial loginTime for user ${user.username}`);
+        }
+
+        return {
+          ...prev,
+          uid: user.username,
+          email: user.email,
+          loginTime: newLoginTime,
+          lastUseTime: now,
+        };
       });
     }
-  }, [userQuery.data, legacyLoginUser, setLegacyLoginUser]);
+  }, [userQuery.data, setLegacyLoginUser]);
 
   const login = useCallback(() => {
     try {
