@@ -7,7 +7,7 @@ import { cn } from '@/utils';
 import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { createElement, FC, SVGProps, useEffect, useMemo } from 'react';
 import { AddCircleSVG, EntrySVG, HomeSVG, ReminderSVG, UserSVG } from '../svg';
 
@@ -21,29 +21,15 @@ export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: s
 
 function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { isAuthenticated, isLoading } = useGitHubOAuth();
-  const searchParams = useSearchParams();
   const setAddDialogOpen = useSetAtom(addDialogOpenAtom);
   const activeKey = useMemo(() => {
     if (!pathname) return '';
     const topLevelPath = pathname.split('/')[1];
     return PAGES.find((page) => page.key === topLevelPath)?.key || '';
   }, [pathname]);
-  const token = searchParams.get('token');
 
   useInitGlobalState();
-  // Redirect to login if not authenticated (all pages require authentication)
-  useEffect(() => {
-    if (token || isLoading) return;
-    // Only allow access to login page without authentication
-    const isLoginPage = pathname === '/login';
-    if (!isAuthenticated && !isLoginPage) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, isLoading, pathname, router, searchParams, token]);
-
-  // Don't render navbar if not authenticated or still loading
   if (!isAuthenticated || isLoading) {
     return null;
   }

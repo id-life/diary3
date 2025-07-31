@@ -65,9 +65,9 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
         }}
       />
       <div
-        className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-transparent to-black"
+        className="absolute inset-y-0 left-0 w-1"
         style={{
-          background: `linear-gradient(90deg, #${entryType.themeColors[0]} 0%, #${entryType.themeColors[1]} 100%)`,
+          backgroundColor: `#${entryType.themeColor}`,
         }}
       />
       <div className="flex justify-between gap-5">

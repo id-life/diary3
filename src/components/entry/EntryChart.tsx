@@ -10,7 +10,6 @@ import {
   DateRange,
   EntryInstance,
   EntryType,
-  EntryTypeThemeColors,
   barHighColor,
   barHighValue,
   barLowColor,
@@ -102,16 +101,15 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
     });
   const areas = [...allKeys.keys(), '_barLow', '_barHigh'].sort().map((entryTypeId: string) => {
     const entryType = entryTypesArray.find((item) => item.id === entryTypeId);
-    const colorId = (entryType?.themeColors?.[0] ?? '') + (entryType?.themeColors?.[1] ?? '');
-    const [startColor] = entryType?.themeColors ?? [];
+    const color = entryType?.themeColor ? `#${entryType.themeColor}` : '#000000';
 
     const props = {
       type: 'linear' as 'linear',
       dataKey: entryTypeId,
       stackId: '3',
-      stroke: `#${startColor || '000000'}`,
-      fill: `url(#${colorId || 'default'})`,
-      // setOpacity(chartColorPanel[colorIdx], 0.36),
+      stroke: color,
+      fill: color,
+      fillOpacity: 0.8,
       dot: false,
       label: {
         formatter: (label: number | string) => {
@@ -247,22 +245,6 @@ function EntryChart() {
       </div>
       <ResponsiveContainer width="95%" height={320}>
         <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 8, right: 12, left: -16, bottom: 8 }}>
-          <defs>
-            <linearGradient id="default" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#FF4AF8" stopOpacity={0.45} />
-              <stop offset="95%" stopColor="#FF4AF8" stopOpacity={0} />
-            </linearGradient>
-            {EntryTypeThemeColors.map((themeColors, idx) => {
-              const [startColor, endColor] = themeColors;
-              const colorId = startColor + endColor;
-              return (
-                <linearGradient key={colorId + idx} id={colorId} x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor={`#${endColor}`} stopOpacity={1} />
-                  <stop offset="100%" stopColor={`#${startColor}`} stopOpacity={0} />
-                </linearGradient>
-              );
-            })}
-          </defs>
           <XAxis dataKey="_date" padding={{ left: 12, right: 12 }} fontSize={12} />
           <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} fontSize={12} />
           <Legend content={<CustomLegend />} wrapperStyle={{ top: '-32px', left: 0, bottom: 'auto' }} />

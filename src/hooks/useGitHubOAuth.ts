@@ -1,9 +1,9 @@
-import { getUserProfile, GitHubUser } from '@/api/auth';
+import { getUserProfile } from '@/api/auth';
 import { githubUserStateAtom } from '@/atoms/user';
 import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { NEXT_PUBLIC_API_PREFIX } from '@/constants/env';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useAccessToken } from './app';
@@ -13,23 +13,16 @@ const userQueryKey = 'fetch_user_profile';
 export const useGitHubOAuth = () => {
   const queryClient = useQueryClient();
   const [githubUserState, setGithubUserState] = useAtom(githubUserStateAtom);
-  const setLegacyLoginUser = useSetAtom(legacyLoginUserAtom);
+  const [legacyLoginUser, setLegacyLoginUser] = useAtom(legacyLoginUserAtom);
   const { accessToken, setAccessToken } = useAccessToken();
 
   const userQuery = useQuery({
     queryKey: [userQueryKey, accessToken],
-    queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('No access token');
-      }
-      return await getUserProfile();
-    },
+    queryFn: getUserProfile,
     enabled: !!accessToken,
     retry: (failureCount, error: any) => {
-      if (error?.response?.status === 401) {
-        return false;
-      }
-      return failureCount < 3;
+      if (error?.response?.status === 401) return false;
+      return failureCount < 2;
     },
   });
 
@@ -37,10 +30,13 @@ export const useGitHubOAuth = () => {
     mutationFn: async () => {
       setAccessToken(null);
       setLegacyLoginUser(null);
+      queryClient.setQueryData([userQueryKey, null], null);
       queryClient.removeQueries({ queryKey: [userQueryKey] });
     },
     onSuccess: () => {
-      toast.success('Logout success');
+      if (!toast.isActive('logout-toast')) {
+        toast.success('Logout success', { toastId: 'logout-toast' });
+      }
       setGithubUserState({ isAuthenticated: false, user: null, token: null, isLoading: false });
     },
     onError: (error) => {
@@ -52,17 +48,14 @@ export const useGitHubOAuth = () => {
   const { mutate: logout } = logoutMutation;
 
   useEffect(() => {
-    if (userQuery.isError) {
-      const error = userQuery.error as any;
-      console.error('Get user profile failed:', error);
+    if (userQuery.isError && (userQuery.error as any)?.response?.status === 401) {
       logout();
+      return;
     }
-  }, [userQuery.isError, userQuery.error, logout]);
 
-  useEffect(() => {
-    const isLoading = !!accessToken && userQuery.isLoading;
+    const isAuthenticated = !!accessToken;
+    const isLoading = isAuthenticated && userQuery.isLoading;
     const user = userQuery.data || null;
-    const isAuthenticated = !!accessToken && !!user;
 
     setGithubUserState({
       isAuthenticated,
@@ -70,7 +63,28 @@ export const useGitHubOAuth = () => {
       token: accessToken,
       isLoading,
     });
-  }, [accessToken, userQuery.isLoading, userQuery.data, setGithubUserState]);
+  }, [accessToken, userQuery.data, userQuery.isLoading, userQuery.isError, userQuery.error, setGithubUserState, logout]);
+
+  useEffect(() => {
+    const user = userQuery.data;
+    if (user) {
+      const now = Date.now();
+      setLegacyLoginUser((prev) => {
+        const newLoginTime = prev?.loginTime || now;
+        if (!prev?.loginTime) {
+          console.log(`Setting initial loginTime for user ${user.username}`);
+        }
+
+        return {
+          ...prev,
+          uid: user.username,
+          email: user.email,
+          loginTime: newLoginTime,
+          lastUseTime: now,
+        };
+      });
+    }
+  }, [userQuery.data, setLegacyLoginUser]);
 
   const login = useCallback(() => {
     try {
@@ -85,7 +99,7 @@ export const useGitHubOAuth = () => {
     ...githubUserState,
     login,
     logout,
-    isRefreshing: userQuery.isFetching,
+    isRefreshing: githubUserState.isLoading,
     isError: userQuery.isError,
     error: userQuery.error,
   };

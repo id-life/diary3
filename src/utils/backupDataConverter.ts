@@ -8,6 +8,7 @@
 
 import { EntryType, EntryInstance, ReminderRecord } from '@/entry/types-constants';
 import { toast } from 'react-toastify';
+import { convertEntryTypesToNewColors } from './colorConverter';
 
 export interface OldReduxBackupData {
   loginUser?: string;
@@ -87,8 +88,10 @@ export const convertOldReduxBackup = (oldBackupData: OldReduxBackupData): NewJot
   try {
     console.log('🔄 Converting old Redux backup to new Jotai format...');
 
+    const entryTypesData = oldBackupData.entryTypes ? JSON.parse(oldBackupData.entryTypes) : { entryTypesArray: [] };
+    const convertedEntryTypesArray = convertEntryTypesToNewColors(entryTypesData.entryTypesArray);
     // Parse Redux persist strings
-    const entryTypes = oldBackupData.entryTypes ? JSON.parse(oldBackupData.entryTypes) : { entryTypesArray: [] };
+    const entryTypes = { entryTypesArray: convertedEntryTypesArray };
     const entryInstances = oldBackupData.entryInstances ? JSON.parse(oldBackupData.entryInstances) : { entryInstancesMap: {} };
     const reminderRecords = oldBackupData.reminderRecords ? JSON.parse(oldBackupData.reminderRecords) : { reminderRecords: [] };
     const loginUser = oldBackupData.loginUser ? JSON.parse(oldBackupData.loginUser) : null;
