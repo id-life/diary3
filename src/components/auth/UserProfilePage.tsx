@@ -72,7 +72,7 @@ export default function UserProfilePage() {
     if (!githubUser) return;
     setIsSaving(true);
     try {
-      await saveStateToGithub(null, true, githubUser);
+      await saveStateToGithub(null, true, githubUser, false);
       await queryClient.invalidateQueries({ queryKey: ['fetch_backup_list'] });
     } catch (error) {
       console.error('Save failed:', error);

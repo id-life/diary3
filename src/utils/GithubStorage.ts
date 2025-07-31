@@ -17,13 +17,20 @@ const safeJsonParse = (value: string | null, fallbackObj: any) => {
 /**
  * Save the entire state to cloud backup via OAuth
  */
-export const saveStateToGithub = async (loginUser: any, isNew?: boolean, newUser?: GitHubUser | null) => {
+export const saveStateToGithub = async (
+  loginUser: any,
+  isNew?: boolean,
+  newUser?: GitHubUser | null,
+  isAutoBackup: boolean = false,
+) => {
   if (!newUser?.username) {
-    toast.error('Please login with GitHub OAuth first');
+    if (!isAutoBackup) {
+      toast.error('Please login with GitHub OAuth first');
+    }
     return;
   }
 
-  const saveMsg = toast.loading('Saving...');
+  const saveMsg = !isAutoBackup ? toast.loading('Saving...') : null;
 
   try {
     const jotaiState = {
@@ -52,12 +59,17 @@ export const saveStateToGithub = async (loginUser: any, isNew?: boolean, newUser
 
     const path = `dairy-save-${newUser.username}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
 
-    // Save to cloud backup via OAuth API
     await saveBackupList({ content: jotaiState, fileName: path });
 
-    toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 });
+    if (saveMsg) {
+      toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 });
+    }
+    console.log('GitHub backup successful.', { auto: isAutoBackup });
   } catch (e: any) {
-    toast.update(saveMsg, { render: e?.message || 'Save failed', type: 'error', isLoading: false, autoClose: 3000 });
+    if (saveMsg) {
+      toast.update(saveMsg, { render: e?.message || 'Save failed', type: 'error', isLoading: false, autoClose: 3000 });
+    }
+    console.error('GitHub backup failed:', e);
   }
 };
 
