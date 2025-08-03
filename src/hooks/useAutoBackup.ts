@@ -1,16 +1,14 @@
 import { useEffect, useCallback, useRef } from 'react';
-import dayjs from 'dayjs';
 import { useGitHubOAuth } from './useGitHubOAuth';
 import { saveStateToGithub } from '@/utils/GithubStorage';
-import { useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 
-const LAST_BACKUP_KEY = 'lastAutoBackupDate';
+const LAST_AUTO_BACKUP_TIMESTAMP_KEY = 'lastAutoBackupTimestamp';
+const TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000;
 
 export const useAutoBackup = () => {
   const { isAuthenticated, user } = useGitHubOAuth();
-  const queryClient = useQueryClient();
   const isBackupInProgress = useRef(false);
   const setLegacyLoginUser = useSetAtom(legacyLoginUserAtom);
 
@@ -21,15 +19,22 @@ export const useAutoBackup = () => {
     }
 
     if (!isAuthenticated || !user) {
-      console.log('Auto backup skipped: User not authenticated.');
+      console.log('Auto backup skipped: User not authenticated or user data not loaded.');
       return;
     }
 
-    const today = dayjs().format('YYYY-MM-DD');
-    const lastBackupDate = localStorage.getItem(LAST_BACKUP_KEY);
+    if (!user.isAutoBackup) {
+      console.log(`Auto backup skipped: Feature is disabled for user ${user.username}.`);
+      return;
+    }
 
-    if (today === lastBackupDate) {
-      console.log('Auto backup skipped: Already backed up today.');
+    const now = Date.now();
+    const lastBackupTimestampStr = localStorage.getItem(LAST_AUTO_BACKUP_TIMESTAMP_KEY);
+    const lastBackupTimestamp = parseInt(lastBackupTimestampStr || '0', 10);
+
+    if (now - lastBackupTimestamp < TWENTY_FOUR_HOURS_IN_MS) {
+      const hoursSinceLast = ((now - lastBackupTimestamp) / (60 * 60 * 1000)).toFixed(1);
+      console.log(`Auto backup skipped: Only ${hoursSinceLast} hours have passed since the last backup.`);
       return;
     }
 
@@ -37,18 +42,18 @@ export const useAutoBackup = () => {
 
     try {
       isBackupInProgress.current = true;
-      console.log(`Performing daily auto backup for ${user.username}...`);
+      console.log(`Performing auto backup for ${user.username}...`);
 
       await saveStateToGithub(null, false, user, true);
-      await queryClient.invalidateQueries({ queryKey: ['fetch_backup_list'] });
-      localStorage.setItem(LAST_BACKUP_KEY, today);
-      console.log('Daily auto backup successful.');
+
+      localStorage.setItem(LAST_AUTO_BACKUP_TIMESTAMP_KEY, Date.now().toString());
+      console.log('Auto backup successful.');
     } catch (error) {
       console.error('Daily auto backup failed:', error);
     } finally {
       isBackupInProgress.current = false;
     }
-  }, [isAuthenticated, user, queryClient]);
+  }, [isAuthenticated, user, setLegacyLoginUser]);
 
   const callbackRef = useRef(performAutoBackup);
   useEffect(() => {
@@ -56,10 +61,14 @@ export const useAutoBackup = () => {
   });
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     callbackRef.current();
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && user) {
         console.log('Tab is visible again, checking for auto backup...');
         callbackRef.current();
       }
@@ -70,5 +79,5 @@ export const useAutoBackup = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [user]);
 };

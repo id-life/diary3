@@ -1,5 +1,7 @@
 'use client';
 
+import { Octokit } from '@octokit/rest';
+import { Buffer } from 'buffer';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { BackupInfo, saveBackupList } from '@/api/github';
@@ -14,20 +16,30 @@ const safeJsonParse = (value: string | null, fallbackObj: any) => {
     return fallbackObj;
   }
 };
+
+const isIncompleteGithubInfo = (user: GitHubUser | null | undefined) => {
+  return !user?.githubSecret || !user?.githubId || !user?.repo;
+};
+
 /**
- * Save the entire state to cloud backup via OAuth
+ * Saves the entire state.
  */
 export const saveStateToGithub = async (
   loginUser: any,
   isNew?: boolean,
   newUser?: GitHubUser | null,
   isAutoBackup: boolean = false,
-): Promise<BackupInfo> => {
+): Promise<BackupInfo | void> => {
   if (!newUser?.username) {
-    if (!isAutoBackup) {
-      toast.error('Please login with GitHub OAuth first');
-    }
+    if (!isAutoBackup) toast.error('Please login with GitHub OAuth first');
     throw new Error('User not authenticated');
+  }
+
+  if (isIncompleteGithubInfo(newUser)) {
+    const message = 'GitHub backup configuration is incomplete. Please set Username, Repository, and a PAT in settings.';
+    if (!isAutoBackup) toast.error(message);
+    else console.warn(message);
+    throw new Error(message);
   }
 
   const saveMsg = !isAutoBackup ? toast.loading('Saving...') : null;
@@ -56,17 +68,38 @@ export const saveStateToGithub = async (
         rehydrated: true,
       },
     };
+    const stateString = JSON.stringify(jotaiState, null, 2);
 
-    const path = `dairy-save-${newUser.username}-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
+    if (saveMsg) toast.update(saveMsg, { render: 'Pushing to GitHub repo...' });
+    const octokit = new Octokit({
+      auth: newUser.githubSecret,
+      userAgent: 'diary-app',
+    });
 
-    const newBackup = await saveBackupList({ content: jotaiState, fileName: path });
+    const path = `diary-backup-${dayjs().format('YYYYMMDD-HHmmss')}.json`;
+
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner: newUser.githubId!,
+      repo: newUser.repo!,
+      path,
+      message: `Diary Backup: ${dayjs().format('YYYY-MM-DD HH:mm:ss')}`,
+      content: Buffer.from(stateString).toString('base64'),
+    });
+
+    console.log('Successfully pushed backup to GitHub repository.');
+
+    let backendBackupResult: BackupInfo | undefined;
+    if (!isAutoBackup) {
+      if (saveMsg) toast.update(saveMsg, { render: 'Saving to cloud backup...' });
+      backendBackupResult = await saveBackupList({ content: jotaiState, fileName: path });
+    }
 
     if (saveMsg) {
       toast.update(saveMsg, { render: 'Save Successfully', type: 'success', isLoading: false, autoClose: 3000 });
     }
-    console.log('GitHub backup successful.', { auto: isAutoBackup });
+    console.log('Backup process complete.', { auto: isAutoBackup, manual: !isAutoBackup });
 
-    return newBackup;
+    return backendBackupResult;
   } catch (e: any) {
     if (saveMsg) {
       toast.update(saveMsg, { render: e?.message || 'Save failed', type: 'error', isLoading: false, autoClose: 3000 });

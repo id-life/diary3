@@ -14,7 +14,7 @@ import { Button } from '../ui/button';
 import { LoadSVG, SaveSVG } from '../svg';
 import { HiChevronRight } from 'react-icons/hi';
 import { useQueryClient } from '@tanstack/react-query';
-import { AiOutlineLoading } from 'react-icons/ai';
+import { AiFillGithub, AiOutlineLoading } from 'react-icons/ai';
 import { BackupInfo, useBackupList } from '@/api/github';
 import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 import { GlobalState } from '@/atoms/app';
@@ -49,24 +49,21 @@ export default function UserProfilePage() {
     }
 
     const now = dayjs();
-    let loginTimeToUse = legacyLoginUser.loginTime;
-    const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
 
-    if (historicalLoginTime) {
-      loginTimeToUse = historicalLoginTime;
-    }
+    const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
+    const loginTime = githubUser?.createdAt ?? historicalLoginTime ?? legacyLoginUser.loginTime;
 
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0);
 
     return {
-      registeredSince: now.diff(dayjs(loginTimeToUse), 'day'),
+      registeredSince: now.diff(dayjs(loginTime), 'day'),
       entryDays: entryKeys.length,
       totalEntries,
       historicalLongestStreakByEntry: calcRecordedLongestStreaks(entryInstancesMap),
       currentStreakByEntry: calcRecordedCurrentStreaks(entryInstancesMap),
     };
-  }, [legacyLoginUser, backupList, entryInstancesMap]);
+  }, [legacyLoginUser, backupList, entryInstancesMap, githubUser?.createdAt]);
 
   const areStatsLoading = isUserLoading || isBackupListLoading;
 
@@ -76,12 +73,13 @@ export default function UserProfilePage() {
     try {
       const newBackup = await saveStateToGithub(null, true, githubUser, false);
 
-      queryClient.setQueryData(['fetch_backup_list', accessToken], (oldData: BackupInfo[] | undefined) => {
-        const existingData = oldData || [];
-        const newData = [newBackup, ...existingData];
-
-        return newData;
-      });
+      if (newBackup) {
+        queryClient.setQueryData(['fetch_backup_list', accessToken], (oldData: BackupInfo[] | undefined) => {
+          const existingData = oldData || [];
+          const newData = [newBackup, ...existingData];
+          return newData;
+        });
+      }
     } catch (error) {
       console.error('Save failed:', error);
       queryClient.invalidateQueries({ queryKey: ['fetch_backup_list', accessToken] });
@@ -132,11 +130,21 @@ export default function UserProfilePage() {
           </button>
           <button
             onClick={handleLoad}
-            className="flex w-full items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50"
+            className="border-diary-card-border flex w-full items-center justify-between border-b px-4 py-4 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
               <LoadSVG />
               <span className="font-medium text-diary-navy">Load</span>
+            </div>
+            <HiChevronRight className="size-5 text-gray" />
+          </button>
+          <button
+            onClick={() => router.push('/settings/github')}
+            className="flex w-full items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-3">
+              <AiFillGithub className="size-[24px] text-[#bbbac3]" />
+              <span className="font-medium text-diary-navy">GitHub Backup Settings</span>
             </div>
             <HiChevronRight className="size-5 text-gray" />
           </button>

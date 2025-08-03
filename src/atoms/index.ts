@@ -11,3 +11,4 @@ export * from './entryTypes';
 export * from './entryInstances';
 export * from './reminderRecords';
 export * from './uiState';
+export * from './githubConfig';

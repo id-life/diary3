@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { createElement, FC, SVGProps, useEffect, useMemo } from 'react';
+import { createElement, FC, SVGProps, useMemo } from 'react';
 import { AddCircleSVG, EntrySVG, HomeSVG, ReminderSVG, UserSVG } from '../svg';
 
 export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: string }[] = [
@@ -21,7 +21,7 @@ export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: s
 
 function Navbar() {
   const pathname = usePathname();
-  const { isAuthenticated, isLoading } = useGitHubOAuth();
+  const { isAuthenticated, isLoading, user } = useGitHubOAuth();
   const setAddDialogOpen = useSetAtom(addDialogOpenAtom);
   const activeKey = useMemo(() => {
     if (!pathname) return '';
@@ -29,7 +29,10 @@ function Navbar() {
     return PAGES.find((page) => page.key === topLevelPath)?.key || '';
   }, [pathname]);
 
+  console.log('Navbar rendered. IsAuthenticated:', isAuthenticated, 'User:', user?.username);
+
   useInitGlobalState();
+
   if (!isAuthenticated || isLoading) {
     return null;
   }
