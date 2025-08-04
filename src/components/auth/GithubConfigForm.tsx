@@ -13,6 +13,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescripti
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import Loading from '../loading';
+import { Octokit } from '@octokit/rest';
 
 const FormSchema = z.object({
   githubId: z.string().optional(),
@@ -83,8 +84,44 @@ export default function GitHubConfigForm() {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    updateProfileMutation.mutate(data);
+  const onSubmit = async (data: FormData) => {
+    if (data.isAutoBackup && data.githubSecret) {
+      const toastId = toast.loading('Verifying GitHub permissions...');
+      try {
+        const octokit = new Octokit({ auth: data.githubSecret });
+        const response = await octokit.rest.repos.get({
+          owner: data.githubId!,
+          repo: data.repo!,
+        });
+
+        const permissions = response.data.permissions;
+        if (permissions && (permissions.push || permissions.admin)) {
+          toast.update(toastId, { render: 'Verification successful!', type: 'success', isLoading: false, autoClose: 2000 });
+          updateProfileMutation.mutate(data);
+        } else {
+          toast.update(toastId, {
+            render: 'The provided token does not have push permission for this repository.',
+            type: 'error',
+            isLoading: false,
+            autoClose: 5000,
+          });
+        }
+      } catch (error: any) {
+        console.error('GitHub permission check failed:', error);
+        let errorMessage;
+        if (error.status === 404) {
+          errorMessage = 'The repository was not found. Please check whether the username or repository name is correct.';
+        } else if (error.status === 401) {
+          errorMessage = 'The Personal Access Token is invalid or has expired';
+        } else {
+          errorMessage = 'Please check the network connection or token permission settings';
+        }
+        toast.update(toastId, { render: errorMessage, type: 'error', isLoading: false, autoClose: 5000 });
+        return;
+      }
+    } else {
+      updateProfileMutation.mutate(data);
+    }
   };
 
   if (isUserLoading) {
