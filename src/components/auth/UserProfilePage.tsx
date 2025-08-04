@@ -1,17 +1,24 @@
 'use client';
 
-import { backupDialogOpenAtom, globalStateAtom } from '@/atoms/app';
+import { backupDialogOpenAtom, globalStateAtom, entryInstancesMapAtom } from '@/atoms';
+import { legacyLoginUserAtom } from '@/atoms/databaseFirst';
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { safeNumberValue } from '@/utils';
 import { saveStateToGithub } from '@/utils/GithubStorage';
 import dayjs from 'dayjs';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { HiChevronRight, HiDownload, HiUpload } from 'react-icons/hi';
-import { Button } from '../ui/button';
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from '../ui/card';
+import { Button } from '../ui/button';
 import { LoadSVG, SaveSVG } from '../svg';
+import { HiChevronRight } from 'react-icons/hi';
+import { useQueryClient } from '@tanstack/react-query';
+import { AiFillGithub, AiOutlineLoading } from 'react-icons/ai';
+import { BackupInfo, useBackupList } from '@/api/github';
+import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
+import { GlobalState } from '@/atoms/app';
+import { useAccessToken } from '@/hooks/app';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
@@ -25,47 +32,67 @@ function StateCard({ title, value, unit }: { title: string; value: number; unit:
 
 export default function UserProfilePage() {
   const router = useRouter();
-  const { user: githubUser, logout } = useGitHubOAuth();
-  const globalState = useAtomValue(globalStateAtom);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user: githubUser, logout, isRefreshing: isUserLoading } = useGitHubOAuth();
+
+  const [isSaving, setIsSaving] = useState(false);
   const setLoadOpen = useSetAtom(backupDialogOpenAtom);
 
-  // Get real user stats
-  const userStats = {
-    signedUpDays: safeNumberValue(globalState?.registeredSince),
-    recordedEntries: safeNumberValue(globalState?.entryDays),
-    totalEntries: safeNumberValue(globalState?.totalEntries),
-    currentStreak: safeNumberValue(globalState?.currentStreakByEntry),
-    longestStreak: safeNumberValue(globalState?.historicalLongestStreakByEntry),
-  };
+  const queryClient = useQueryClient();
+  const { accessToken } = useAccessToken();
+  const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
+  const legacyLoginUser = useAtomValue(legacyLoginUserAtom);
+  const { data: backupList, isLoading: isBackupListLoading } = useBackupList();
+
+  const userStats: GlobalState | null = useMemo(() => {
+    if (!legacyLoginUser || !backupList || !entryInstancesMap) {
+      return null;
+    }
+
+    const now = dayjs();
+
+    const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
+    const loginTime = githubUser?.createdAt ?? historicalLoginTime ?? legacyLoginUser.loginTime;
+
+    const entryKeys = Object.keys(entryInstancesMap);
+    const totalEntries = entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0);
+
+    return {
+      registeredSince: now.diff(dayjs(loginTime), 'day'),
+      entryDays: entryKeys.length,
+      totalEntries,
+      historicalLongestStreakByEntry: calcRecordedLongestStreaks(entryInstancesMap),
+      currentStreakByEntry: calcRecordedCurrentStreaks(entryInstancesMap),
+    };
+  }, [legacyLoginUser, backupList, entryInstancesMap, githubUser?.createdAt]);
+
+  const areStatsLoading = isUserLoading || isBackupListLoading;
 
   const handleSave = async () => {
-    if (!githubUser) {
-      console.error('No GitHub user found');
-      return;
-    }
-
-    setIsLoading(true);
+    if (!githubUser) return;
+    setIsSaving(true);
     try {
-      await saveStateToGithub(null, true, githubUser);
+      const newBackup = await saveStateToGithub(null, true, githubUser, false);
+
+      if (newBackup) {
+        queryClient.setQueryData(['fetch_backup_list', accessToken], (oldData: BackupInfo[] | undefined) => {
+          const existingData = oldData || [];
+          const newData = [newBackup, ...existingData];
+          return newData;
+        });
+      }
     } catch (error) {
       console.error('Save failed:', error);
+      queryClient.invalidateQueries({ queryKey: ['fetch_backup_list', accessToken] });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
-
-  const handleLoad = () => {
-    // Open data export dialog for loading data
-    setLoadOpen(true);
-  };
-
+  const handleLoad = () => setLoadOpen(true);
   const handleLogout = () => {
     logout();
     router.push('/login');
   };
 
-  // Get user display info
   const displayName = githubUser?.name || githubUser?.username || 'User';
   const userAvatar = githubUser?.avatar || '/api/placeholder/80/80';
   const lastUseTime = dayjs().format('h:mm A YYYY/MM/DD dddd');
@@ -74,7 +101,6 @@ export default function UserProfilePage() {
     <div className="flex h-full flex-col overflow-auto px-4 pb-10">
       {/* Header */}
       <div className="-mx-4 bg-[#FDFEFE] px-4 py-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
-        {/* User Info */}
         <div className="flex items-center gap-4">
           <div className="size-20 overflow-hidden rounded-full bg-gray-200">
             <img src={userAvatar} alt="User avatar" className="size-full object-cover" />
@@ -93,7 +119,7 @@ export default function UserProfilePage() {
         <Card className="overflow-hidden rounded-lg border border-[#1E1B391A]">
           <button
             onClick={handleSave}
-            disabled={isLoading}
+            disabled={isSaving}
             className="border-diary-card-border flex w-full items-center justify-between border-b px-4 py-4 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
@@ -102,14 +128,23 @@ export default function UserProfilePage() {
             </div>
             <HiChevronRight className="h-5 w-5 text-gray" />
           </button>
-
           <button
             onClick={handleLoad}
-            className="flex w-full items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50"
+            className="border-diary-card-border flex w-full items-center justify-between border-b px-4 py-4 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
               <LoadSVG />
               <span className="font-medium text-diary-navy">Load</span>
+            </div>
+            <HiChevronRight className="size-5 text-gray" />
+          </button>
+          <button
+            onClick={() => router.push('/settings/github')}
+            className="flex w-full items-center justify-between px-4 py-4 transition-colors hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-3">
+              <AiFillGithub className="size-[24px] text-[#bbbac3]" />
+              <span className="font-medium text-diary-navy">GitHub Backup Settings</span>
             </div>
             <HiChevronRight className="size-5 text-gray" />
           </button>
@@ -118,30 +153,42 @@ export default function UserProfilePage() {
 
       {/* Stats Section */}
       <div className="px-4 pb-6">
-        {/* Top Row Stats */}
-        <div className="mb-4 grid grid-cols-3 gap-3">
-          <StateCard title="Signed up" value={userStats.signedUpDays} unit={`Day${userStats.signedUpDays !== 1 ? 's' : ''}`} />
-          <StateCard
-            title="Recorded entries"
-            value={userStats.recordedEntries}
-            unit={`Day${userStats.recordedEntries !== 1 ? 's' : ''}`}
-          />
-          <StateCard title="Recorded in total" value={userStats.totalEntries} unit={`Entries`} />
-        </div>
-
-        {/* Bottom Row Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <StateCard
-            title="Historical longest current streak"
-            value={userStats.longestStreak}
-            unit={`Day${userStats.longestStreak !== 1 ? 's' : ''}`}
-          />
-          <StateCard
-            title="Current streak recorded entries"
-            value={userStats.currentStreak}
-            unit={`Day${userStats.currentStreak !== 1 ? 's' : ''}`}
-          />
-        </div>
+        {areStatsLoading ? (
+          <div className="flex min-h-[200px] items-center justify-center rounded-lg border bg-card text-center">
+            <div className="flex items-center gap-2 text-diary-navy opacity-70">
+              <AiOutlineLoading className="size-5 animate-spin" />
+              <span>Loading Stats...</span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mb-4 grid grid-cols-3 gap-3">
+              <StateCard
+                title="Signed up"
+                value={safeNumberValue(userStats?.registeredSince)}
+                unit={`Day${safeNumberValue(userStats?.registeredSince) !== 1 ? 's' : ''}`}
+              />
+              <StateCard
+                title="Recorded entries"
+                value={safeNumberValue(userStats?.entryDays)}
+                unit={`Day${safeNumberValue(userStats?.entryDays) !== 1 ? 's' : ''}`}
+              />
+              <StateCard title="Recorded in total" value={safeNumberValue(userStats?.totalEntries)} unit={`Entries`} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <StateCard
+                title="Historical longest current streak"
+                value={safeNumberValue(userStats?.historicalLongestStreakByEntry)}
+                unit={`Day${safeNumberValue(userStats?.historicalLongestStreakByEntry) !== 1 ? 's' : ''}`}
+              />
+              <StateCard
+                title="Current streak recorded entries"
+                value={safeNumberValue(userStats?.currentStreakByEntry)}
+                unit={`Day${safeNumberValue(userStats?.currentStreakByEntry) !== 1 ? 's' : ''}`}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Logout Section */}

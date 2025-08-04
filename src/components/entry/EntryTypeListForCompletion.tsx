@@ -36,7 +36,7 @@ const EntrySimpleCard = ({
   className?: string;
   isDone?: boolean;
 }) => {
-  const { title, themeColors } = entryType;
+  const { title, themeColor } = entryType;
   const { createEntryInstanceWithDefaults } = useCreateNewEntryInstance(entryType);
   const selectedDay = useAtomValue(selectedChartDateAtom);
   return (
@@ -45,11 +45,7 @@ const EntrySimpleCard = ({
         'relative flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-xs/3 font-medium text-white transition duration-300 hover:scale-105',
         className,
       )}
-      style={
-        isDone
-          ? { background: `#${themeColors[0]}33`, color: `#${themeColors[0]}` }
-          : { background: `linear-gradient(90deg, #${themeColors[0]} 0%, #${themeColors[1]} 100%)` }
-      }
+      style={isDone ? { background: `#${themeColor}33`, color: `#${themeColor}` } : { backgroundColor: `#${themeColor}` }}
       onClick={() => createEntryInstanceWithDefaults(selectedDay)}
     >
       {title}

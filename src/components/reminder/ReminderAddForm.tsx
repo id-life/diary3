@@ -91,6 +91,8 @@ export default function ReminderAddForm() {
     } else {
       updateReminder(submitData);
     }
+
+    router.push('/reminder');
   }
 
   const onCancel = useCallback(() => {

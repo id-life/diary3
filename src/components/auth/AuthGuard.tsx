@@ -3,6 +3,7 @@
 import { useGitHubOAuth } from '@/hooks/useGitHubOAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import AutoBackupManager from '../app/AutoBackupManager';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useGitHubOAuth();
@@ -23,7 +24,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (isAuthenticated) {
-    return <>{children}</>;
+    return (
+      <>
+        <AutoBackupManager />
+        {children}
+      </>
+    );
   }
 
   return null;

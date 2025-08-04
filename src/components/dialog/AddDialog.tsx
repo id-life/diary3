@@ -4,7 +4,7 @@ import { addDialogOpenAtom, entryTypeIdsAtom, entryTypesArrayAtom } from '@/atom
 import { isEntryTypeUpdatingAtom, updatingEntryTypeIdAtom } from '@/atoms/uiState';
 import { Segmented } from '@/components/segmented';
 import { Button } from '@/components/ui/button';
-import { EntryTypeConstructor, EntryTypeThemeColors, RoutineEnum } from '@/entry/types-constants';
+import { EntryTypeConstructor, ENTRY_TYPE_THEME_COLORS, RoutineEnum } from '@/entry/types-constants';
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
@@ -17,7 +17,7 @@ const DEFAULT_VALUES = {
   defaultPoints: 7,
   pointStep: 1,
   routine: RoutineEnum.daily,
-  themeColors: EntryTypeThemeColors[0],
+  themeColor: ENTRY_TYPE_THEME_COLORS[0],
 };
 
 export default function AddDialog() {
@@ -43,7 +43,7 @@ export default function AddDialog() {
         defaultPoints: updatingEntryType.defaultPoints,
         pointStep: updatingEntryType.pointStep,
         routine: updatingEntryType.routine,
-        themeColors: updatingEntryType.themeColors,
+        themeColor: updatingEntryType.themeColor,
       });
     } else {
       setFormData(DEFAULT_VALUES);
@@ -76,9 +76,8 @@ export default function AddDialog() {
     setFormData((prev) => ({ ...prev, routine }));
   }, []);
 
-  const handleColorSelect = useCallback((colorIndex: number) => {
-    const selectedColor = EntryTypeThemeColors[colorIndex];
-    setFormData((prev) => ({ ...prev, themeColors: selectedColor }));
+  const handleColorSelect = useCallback((color: string) => {
+    setFormData((prev) => ({ ...prev, themeColor: color }));
   }, []);
 
   const handleSubmit = useCallback(() => {
@@ -105,7 +104,7 @@ export default function AddDialog() {
 
       if (newEntryType.id !== originalId) {
         // Changed title/id - check if new ID exists (excluding current entry)
-        if (entryTypeIds.filter(id => id !== originalId).includes(newEntryType.id)) {
+        if (entryTypeIds.filter((id) => id !== originalId).includes(newEntryType.id)) {
           toast.error('ID already exists');
           return;
         }
@@ -235,25 +234,21 @@ export default function AddDialog() {
           {/* Entry Routine Colors */}
           <div className="flex flex-col gap-3">
             <label className="text-sm font-medium text-gray-900">Entry Routine Colors:</label>
-            <div className="flex flex-wrap gap-3">
-              {EntryTypeThemeColors.map((themeColorPair: string[], index: number) => {
-                const [color1, color2] = themeColorPair;
-                const isSelected = formData.themeColors[0] === color1 && formData.themeColors[1] === color2;
+            <div className="flex flex-wrap gap-1">
+              {ENTRY_TYPE_THEME_COLORS.map((color: string) => {
+                const isSelected = formData.themeColor === color;
                 return (
                   <button
-                    key={`${themeColorPair[0]}-${themeColorPair[1]}`}
+                    key={color}
                     type="button"
-                    onClick={() => handleColorSelect(index)}
-                    className={`flex-center size-6.5 rounded transition duration-300 ${isSelected ? 'border' : ''}`}
+                    onClick={() => handleColorSelect(color)}
+                    className={`flex size-[26px] items-center justify-center rounded-[4px] border`}
                     style={{
-                      borderColor: isSelected ? `#${color1}` : 'transparent',
-                      backgroundColor: isSelected ? `#${color1}33` : 'transparent',
+                      backgroundColor: isSelected ? `#${color}33` : 'transparent',
+                      borderColor: isSelected ? `#${color}` : 'transparent',
                     }}
                   >
-                    <div
-                      className="size-5 rounded-[3px] transition duration-300"
-                      style={{ background: `linear-gradient(90deg, #${themeColorPair[0]} 0%, #${themeColorPair[1]} 100%)` }}
-                    ></div>
+                    <div className="size-5 rounded-[4px]" style={{ backgroundColor: `#${color}` }} />
                   </button>
                 );
               })}
