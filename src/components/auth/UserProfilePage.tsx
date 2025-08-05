@@ -51,7 +51,7 @@ export default function UserProfilePage() {
     const now = dayjs();
 
     const historicalLoginTime = backupList?.[0]?.content?.loginUser?.loginTime;
-    const loginTime = githubUser?.createdAt ?? historicalLoginTime ?? legacyLoginUser.loginTime;
+    const loginTime = historicalLoginTime ?? githubUser?.createdAt ?? legacyLoginUser.loginTime;
 
     const entryKeys = Object.keys(entryInstancesMap);
     const totalEntries = entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0);
