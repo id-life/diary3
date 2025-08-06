@@ -6,6 +6,7 @@ import { useCreateNewEntryInstance } from '@/hooks/entryType';
 import { cn } from '@/utils';
 import { sortEntryTypesArray } from '@/utils/entry';
 import { getHiddenEntryTypes, hideEntryType, unhideEntryType } from '@/utils/hiddenEntryTypes';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
 import { AiOutlineEye } from 'react-icons/ai';
@@ -88,6 +89,7 @@ const EntryTypeListForCompletion = () => {
   const [segmentedValue, setSegmentedValue] = useState<'all' | RoutineEnum>('all');
   const [hiddenEntryTypes, setHiddenEntryTypes] = useState(() => getHiddenEntryTypes());
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { doneList, restList, hiddenList } = useMemo(() => {
     let doneEntryTypes = new Set(
@@ -148,27 +150,46 @@ const EntryTypeListForCompletion = () => {
     >
       <div className="h-15 shrink-0 cursor-pointer overflow-hidden" onClick={toggleExpanded}>
         <div className="flex-center">
-          <BiSolidUpArrow className={cn('size-3 text-[#838190] transition duration-300', { 'rotate-180': isExpanded })} />
+          <BiSolidUpArrow
+            className={cn('h-[10px] w-[14px] text-[#838190] transition duration-300', { 'rotate-180': isExpanded })}
+          />
         </div>
         {/* Filter Section */}
-        <div className="mt-2 flex items-center justify-between gap-2 overflow-auto">
-          <Segmented
-            onClick={(e) => e.stopPropagation()}
-            defaultValue={segmentedValue}
-            onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
-            options={options}
-          />
+        <div className="mt-2 flex items-center gap-2">
+          <AnimatePresence>
+            {!isSearchFocused && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0, marginRight: -8 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <Segmented
+                  optionClass="px-1.5"
+                  onClick={(e) => e.stopPropagation()}
+                  defaultValue={segmentedValue}
+                  onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
+                  options={options}
+                  className="whitespace-nowrap"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex h-10 items-center gap-1 rounded border border-gray-300 bg-white px-1.5 py-2"
+            className="flex h-10 flex-1 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3"
           >
             <input
-              className="border-none bg-transparent text-xs/3 font-medium placeholder:text-[#8A8998]"
-              placeholder="Search..."
+              className="w-full border-none bg-transparent text-xs placeholder:text-[#8A8998] focus:outline-none"
+              placeholder="Search"
               value={inputValue}
               onChange={onInputChange}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
             />
-            <SearchSVG className="size-6 fill-diary-navy opacity-30" />
+            <SearchSVG className="size-[24px] shrink-0 fill-diary-primary/30" />
           </div>
         </div>
       </div>

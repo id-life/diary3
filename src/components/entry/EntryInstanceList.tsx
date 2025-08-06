@@ -6,7 +6,7 @@ import EntryInstanceForm from './EntryInstanceForm';
 const EntryInstanceList = ({ className }: { className?: string }) => {
   const entryInstancesArray = useAtomValue(selectedEntryInstancesArrayAtom);
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div className={cn('mx-4 mt-5 flex flex-col gap-3', className)}>
       {entryInstancesArray?.length
         ? entryInstancesArray.map((item) => <EntryInstanceForm key={item.id} entryInstance={item} />)
         : null}

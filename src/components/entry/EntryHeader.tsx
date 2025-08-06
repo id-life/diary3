@@ -42,7 +42,7 @@ export default function EntryHeader({ children, layout = 'flow', backLink }: IPr
 
   if (layout === 'centered') {
     return (
-      <div className="relative sticky top-0 z-10 -mx-4 flex items-center justify-center bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
+      <div className="z-20 relative sticky top-0 -mx-4 flex items-center justify-center bg-background px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 pt-1">
           <LeftContent backLink={backLink} currentStreakByEntry={currentStreakByEntry} />
         </div>
@@ -52,8 +52,7 @@ export default function EntryHeader({ children, layout = 'flow', backLink }: IPr
   }
 
   return (
-    <div className="sticky top-0 z-10 -mx-4 flex items-center gap-2 bg-[#FDFEFE] px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
-      <LeftContent currentStreakByEntry={currentStreakByEntry} />
+<div className="sticky top-0 z-30 flex items-center gap-2 bg-white px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">      <LeftContent currentStreakByEntry={currentStreakByEntry} />
       {children}
     </div>
   );
