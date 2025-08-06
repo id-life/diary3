@@ -5,7 +5,7 @@ import { getEntryInstanceDateRange } from '@/utils/entry';
 import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Area, AreaChart, Brush, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, Brush, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   DateRange,
   EntryInstance,
@@ -17,21 +17,20 @@ import {
 } from '../../entry/types-constants';
 import Segmented from '../segmented';
 import { DatePicker } from '../ui/date-picker';
-import EntryChartTooltip, { TooltipPayload } from './EntryChartTooltip';
+import EntryChartTooltip from './EntryChartTooltip';
 
-// Custom Legend Component for horizontal scrolling
 const CustomLegend = ({ payload }: { payload?: any[] }) => {
   if (!payload?.length) return null;
 
   return (
-    <div className="chart-legend-scroll ml-6 max-w-full overflow-x-auto overflow-y-hidden whitespace-nowrap">
-      <ul className="inline-flex list-none items-center gap-4 p-0">
+    <div className="chart-legend-scroll mx-6 w-full overflow-x-auto overflow-y-hidden whitespace-nowrap">
+      <ul className="inline-flex list-none items-center gap-5 p-0">
         {payload
-          .filter((entry) => entry.dataKey !== '_barLow' && entry.dataKey !== '_barHigh')
+          .filter((entry) => !entry.dataKey.startsWith('_'))
           .map((entry, index) => (
-            <li key={`item-${index}`} className="flex items-center gap-2 whitespace-nowrap">
-              <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: entry.color }} />
-              <span className="text-sm text-gray-700">{entry.value}</span>
+            <li key={`item-${index}`} className="flex items-center gap-2 whitespace-nowrap text-xs">
+              <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: entry.color }} />
+              <span className="opacity-50">{entry.value}</span>
             </li>
           ))}
       </ul>
@@ -39,9 +38,9 @@ const CustomLegend = ({ payload }: { payload?: any[] }) => {
   );
 };
 const options = [
-  { label: 'By Day', value: 'day' },
-  { label: 'By Week', value: 'week' },
-  { label: 'By Month', value: 'month' },
+  { label: 'Daily', value: 'day' },
+  { label: 'Weekly', value: 'week' },
+  { label: 'Monthly', value: 'month' },
 ];
 const getChartDataAndAreasFromDaysAndEntriesDateMap = (
   dateRange: string[],
@@ -57,7 +56,7 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
         _date: date,
         _barLow: barLowValue[selectedRange],
         _barHigh: barHighValue[selectedRange],
-        Sum: 0,
+        _totalPoints: 0,
       };
       let entries: EntryInstance[] = [];
       const startDate = dayjs(date);
@@ -88,9 +87,10 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
         const { entryTypeId, points } = entry;
         allKeys.add(entryTypeId);
         let nowPoints = points;
-        if (typeof points === 'string') nowPoints = parseFloat(points); // because points string old data
+        if (typeof points === 'string') nowPoints = parseFloat(points);
         res[entryTypeId] = res[entryTypeId] ? Number(res[entryTypeId]) + nowPoints : nowPoints;
       });
+      res._totalPoints = [...allKeys].reduce((total, key) => total + (Number(res[key]) || 0), 0);
       return res;
     })
     .map((dataPoint) => {
@@ -99,7 +99,7 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
       });
       return dataPoint;
     });
-  const areas = [...allKeys.keys(), '_barLow', '_barHigh'].sort().map((entryTypeId: string) => {
+  const areas = [...allKeys.keys()].sort().map((entryTypeId: string) => {
     const entryType = entryTypesArray.find((item) => item.id === entryTypeId);
     const color = entryType?.themeColor ? `#${entryType.themeColor}` : '#000000';
 
@@ -111,46 +111,45 @@ const getChartDataAndAreasFromDaysAndEntriesDateMap = (
       fill: color,
       fillOpacity: 0.8,
       dot: false,
-      label: {
-        formatter: (label: number | string) => {
-          if (Number(label) === 0) {
-            return null;
-          }
-          return Number(label);
-        },
-        position: 'right',
-      },
     };
-    if (entryTypeId === '_barLow') {
-      Object.assign(props, {
-        stackId: '1',
-        stroke: barLowColor,
-        fill: 'transparent',
-        dot: false,
-        strokeWidth: 2,
-        strokeDasharray: '5 4',
-        strokeOpacity: 0.8,
-        label: false,
-        activeDot: false,
-      });
-    } else if (entryTypeId === '_barHigh') {
-      Object.assign(props, {
-        stackId: '2',
-        stroke: barHighColor,
-        fill: 'transparent',
-        dot: false,
-        strokeWidth: 2,
-        strokeDasharray: '5 4',
-        strokeOpacity: 0.8,
-        label: false,
-        activeDot: false,
-      });
-    }
     return <Area key={entryTypeId} {...props} />;
   });
   return { areas, chartData };
 };
 
+const TotalPointsLabel = (props: any) => {
+  const { x, y, value } = props;
+
+  if (value <= 0) {
+    return null;
+  }
+
+  const tooltipWidth = 40;
+  const tooltipHeight = 20;
+  const triangleHeight = 5;
+
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <foreignObject
+        x={-tooltipWidth / 2}
+        y={-(tooltipHeight + triangleHeight)}
+        width={tooltipWidth}
+        height={tooltipHeight + triangleHeight}
+        style={{ overflow: 'visible' }}
+      >
+        <div className="flex h-full w-full flex-col items-center">
+          <div
+            className="flex items-center justify-center rounded-[2px] bg-[#1E1B39] px-2 py-0.5"
+            style={{ height: `${tooltipHeight}px` }}
+          >
+            <span className="text-xs font-medium text-white">{value.toFixed(1)}</span>
+          </div>
+          <div className="tooltip-arrow-down" />
+        </div>
+      </foreignObject>
+    </g>
+  );
+};
 function EntryChart() {
   const entryInstancesMap = useAtomValue(entryInstancesMapAtom);
   const [selectedRange, setSelectedRange] = useState<DateRange>('day');
@@ -163,8 +162,9 @@ function EntryChart() {
     entryTypesArray,
   );
   const [selectedChartDate, setSelectedChartDate] = useAtom(selectedChartDateAtom);
-  // Initialize selectedChartDate to today's date on client mount if it's null
   const isMounted = useIsMounted();
+
+  const dateTicks = useMemo(() => chartData.map((item) => item._date), [chartData]);
 
   useEffect(() => {
     if (isMounted) {
@@ -231,50 +231,107 @@ function EntryChart() {
     };
   }, [chartData, selectedChartDate, selectedRange]);
 
+  const entryTypesWithData = useMemo(() => {
+    const uniqueIds = new Set(areas.map((area) => area.key as string).filter((key) => !key.startsWith('_')));
+    return entryTypesArray.filter((et) => uniqueIds.has(et.id));
+  }, [areas, entryTypesArray]);
+
   return (
-    <div>
-      <div className="mb-8 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-3">
+    <div className="mt-4">
+      <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 px-4 py-1">
         <div className="flex-1">
           <Segmented
             defaultValue={selectedRange}
             onChange={(value) => setSelectedRange(value as DateRange)}
             options={options}
+            className="bg-transparent p-0 text-sm"
+            optionClass="px-[9px] py-3 text-[#8C8A99]"
+            selectedClass="font-semibold !text-diary-primary"
+            selectedBgClass="bg-[#e4e4e7] rounded-[8px]"
           />
         </div>
         <DatePicker value={selectedChartDate} onChange={setSelectedChartDate} />
       </div>
-      <ResponsiveContainer width="95%" height={320}>
-        <AreaChart onClick={handleChartClick} data={chartData} margin={{ top: 8, right: 12, left: -16, bottom: 8 }}>
-          <XAxis dataKey="_date" padding={{ left: 12, right: 12 }} fontSize={12} />
-          <YAxis padding={{ top: 0, bottom: 0 }} type="number" domain={[0, 18]} fontSize={12} />
-          <Legend content={<CustomLegend />} wrapperStyle={{ top: '-32px', left: 0, bottom: 'auto' }} />
+      <ResponsiveContainer width="100%" height={320}>
+        <AreaChart
+          onClick={handleChartClick}
+          data={chartData}
+          margin={{
+            top: 5,
+            right: 24,
+            left: -24,
+            bottom: -10,
+          }}
+        >
+          <defs>
+            {entryTypesWithData.map((entryType) => (
+              <linearGradient key={`gradient-${entryType.id}`} id={`gradient-${entryType.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={`#${entryType.themeColor}`} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={`#${entryType.themeColor}`} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
+          <XAxis
+            dataKey="_date"
+            fontSize={12}
+            axisLine={{ stroke: '#CECDD3' }}
+            tickLine={false}
+            tickFormatter={(date) => dayjs(date).format('MM-DD')}
+            ticks={dateTicks}
+            textAnchor="middle"
+            dy={10}
+            angle={0}
+            interval="preserveStartEnd"
+          />
+          <YAxis
+            padding={{ top: 0, bottom: 0 }}
+            type="number"
+            domain={[0, 18]}
+            fontSize={12}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Legend
+            verticalAlign="top"
+            content={<CustomLegend />}
+            wrapperStyle={{ paddingBottom: '20px', paddingLeft: '16px', paddingRight: '16px' }}
+          />
           <Tooltip
             itemStyle={{
               paddingTop: 0,
               paddingBottom: 0,
               height: '18px',
+              fontSize: '12px',
+              fontWeight: 500,
+              textAlign: 'left',
             }}
             wrapperStyle={{
-              padding: '0 8px',
+              padding: '12px',
               overflow: 'hidden',
-              maxHeight: '180px',
+              maxHeight: '200px',
             }}
             cursor={true}
-            content={(props) => (
-              <EntryChartTooltip
-                {...props}
-                filter={(data: TooltipPayload) => {
-                  if (data.name === '_barLow' || data.name === '_barHigh' || data.value === 0) {
-                    return false;
-                  }
-                  return true;
-                }}
-              />
-            )}
+            content={(props) => <EntryChartTooltip {...props} />}
           />
           <Brush className="hidden" dataKey="_date" height={30} startIndex={startIndex} endIndex={endIndex} stroke="#8884d8" />
-          <CartesianGrid strokeDasharray="3 3" />
-          {areas}
+          <CartesianGrid stroke="#1E1B39" strokeOpacity={0.1} horizontal={true} vertical={false} strokeDasharray="3 3" />
+          {entryTypesWithData.map((entryType) => (
+            <Area
+              key={entryType.id}
+              type="linear"
+              dataKey={entryType.id}
+              stackId="3"
+              stroke={`#${entryType.themeColor}`}
+              fill={`url(#gradient-${entryType.id})`}
+              fillOpacity={1}
+              dot={false}
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+          ))}
+          <Area isAnimationActive={false} type="linear" dataKey="_totalPoints" stroke="none" fill="none" stackId="3" hide>
+            <LabelList dataKey="_totalPoints" content={<TotalPointsLabel />} />
+          </Area>
         </AreaChart>
       </ResponsiveContainer>
     </div>

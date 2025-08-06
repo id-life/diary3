@@ -41,12 +41,12 @@ export default function EntryPageContent() {
   }, [todayInstancesCount, prevCount, scrollToBottom]);
 
   return (
-    <div ref={scrollContainerRef} className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
+    <div ref={scrollContainerRef} className="flex h-full flex-col overflow-auto pb-40 text-center">
       <EntryHeader>
         <EntryProgressBar className="grow" />
       </EntryHeader>
       <EntryChart />
-      <EntryInstanceList className="-mt-18" />
+      <EntryInstanceList />
       <EntryTypeListForCompletion />
     </div>
   );

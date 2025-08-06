@@ -8,7 +8,7 @@ import { EntryTypeConstructor, ENTRY_TYPE_THEME_COLORS, RoutineEnum } from '@/en
 import { useJotaiActions } from '@/hooks/useJotaiMigration';
 import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
-import { useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import Dialog from './index';
 
@@ -20,12 +20,71 @@ const DEFAULT_VALUES = {
   themeColor: ENTRY_TYPE_THEME_COLORS[0],
 };
 
+interface NumberStepperProps {
+  value: number;
+  onChange: (newValue: number) => void;
+  pointStep?: number;
+}
+
+const NumberStepper: FC<NumberStepperProps> = ({ value, onChange, pointStep = 1 }) => {
+  const handleManualChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let rawValue = e.target.value;
+
+    if (!/^\d*$/.test(rawValue)) {
+      return;
+    }
+
+    if (rawValue.length > 1 && rawValue.startsWith('0')) {
+      rawValue = String(parseInt(rawValue, 10));
+    }
+
+    const numValue = rawValue === '' ? 0 : Number(rawValue);
+    onChange(numValue);
+  };
+
+  const handleStepChange = (increment: boolean) => {
+    const step = increment ? pointStep : -pointStep;
+    const newValue = value + step;
+    onChange(Math.max(0, newValue));
+  };
+
+  return (
+    <div className="flex h-10 w-[140px] items-center rounded-lg bg-gray-100">
+      <button
+        type="button"
+        onClick={() => handleStepChange(false)}
+        className="ml-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
+        disabled={value <= 0}
+      >
+        −
+      </button>
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="\d*"
+        value={String(value)}
+        onChange={handleManualChange}
+        className="hide-number-spinners w-full bg-transparent text-center font-semibold text-gray-900 focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={() => handleStepChange(true)}
+        className="mr-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
+      >
+        +
+      </button>
+    </div>
+  );
+};
+
 export default function AddDialog() {
   const [open, setOpen] = useAtom(addDialogOpenAtom);
   const isUpdate = useAtomValue(isEntryTypeUpdatingAtom);
   const updatingEntryTypeId = useAtomValue(updatingEntryTypeIdAtom);
   const entryTypesArray = useAtomValue(entryTypesArrayAtom);
   const entryTypeIds = useAtomValue(entryTypeIdsAtom);
+  const defaultPointsInputRef = useRef<HTMLInputElement>(null);
+  const pointStepInputRef = useRef<HTMLInputElement>(null);
 
   // Find the updating entry type
   const updatingEntryType = updatingEntryTypeId ? entryTypesArray.find((et) => et.id === updatingEntryTypeId) || null : null;
@@ -145,6 +204,18 @@ export default function AddDialog() {
     onClose();
   }, [isUpdate, exitEntryTypeEdit, onClose]);
 
+  useEffect(() => {
+    if (defaultPointsInputRef.current && defaultPointsInputRef.current.value !== String(formData.defaultPoints)) {
+      defaultPointsInputRef.current.value = String(formData.defaultPoints);
+    }
+  }, [formData.defaultPoints]);
+
+  useEffect(() => {
+    if (pointStepInputRef.current && pointStepInputRef.current.value !== String(formData.pointStep)) {
+      pointStepInputRef.current.value = String(formData.pointStep);
+    }
+  }, [formData.pointStep]);
+
   return (
     <Dialog
       open={open}
@@ -171,23 +242,10 @@ export default function AddDialog() {
             <label className="text-sm font-medium text-gray-900">
               <span className="text-red-500">*</span>Default Points:
             </label>
-            <div className="flex h-10 w-[140px] items-center rounded-lg bg-gray-100">
-              <button
-                type="button"
-                onClick={() => handlePointsChange('defaultPoints', false)}
-                className="ml-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
-              >
-                −
-              </button>
-              <div className="flex-1 text-center font-semibold text-gray-900">{formData.defaultPoints}</div>
-              <button
-                type="button"
-                onClick={() => handlePointsChange('defaultPoints', true)}
-                className="mr-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
-              >
-                +
-              </button>
-            </div>
+            <NumberStepper
+              value={formData.defaultPoints}
+              onChange={(newValue) => handleInputChange('defaultPoints', newValue)}
+            />
           </div>
 
           {/* Point Step */}
@@ -195,23 +253,7 @@ export default function AddDialog() {
             <label className="text-sm font-medium text-gray-900">
               <span className="text-red-500">*</span>PointStep:
             </label>
-            <div className="flex h-10 w-[140px] items-center rounded-lg bg-gray-100">
-              <button
-                type="button"
-                onClick={() => handlePointsChange('pointStep', false)}
-                className="ml-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
-              >
-                −
-              </button>
-              <div className="flex-1 text-center font-semibold text-gray-900">{formData.pointStep}</div>
-              <button
-                type="button"
-                onClick={() => handlePointsChange('pointStep', true)}
-                className="mr-2 flex h-6 w-6 items-center justify-center text-gray-600 hover:text-gray-800"
-              >
-                +
-              </button>
-            </div>
+            <NumberStepper value={formData.pointStep} onChange={(newValue) => handleInputChange('pointStep', newValue)} />
           </div>
 
           {/* Entry Routine */}
