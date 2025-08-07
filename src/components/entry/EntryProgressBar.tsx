@@ -16,7 +16,7 @@ function EntryProgressBar({ className }: { className?: string }) {
   };
 
   return (
-    <div className={cn('relative flex w-full gap-2 text-xs/3', className)}>
+    <div className={cn('relative flex w-full gap-2 text-xs font-semibold', className)}>
       <div className="absolute left-0 top-[0.4rem] z-[1] flex flex-col items-center gap-2">
         <i className="block rounded-full border-2 border-white bg-transparent p-1" />
         <span>0</span>
@@ -35,10 +35,16 @@ function EntryProgressBar({ className }: { className?: string }) {
       </div>
       <Progress className="flex-grow" status="active" strokeColor={gradient} showInfo={false} percent={percent} />
       <div
-        className="clip-path-message absolute top-10 z-10 w-fit -translate-y-[85%] rotate-180 bg-black px-1 pb-1.5 pt-0.5 text-[#FAFAFA]"
-        style={{ left: `calc(${Math.min(percent, 100)}% - 0.4rem)` }}
+        className="absolute z-10 flex w-fit -translate-x-1/2 flex-col items-center"
+        style={{
+          left: `calc(${Math.min(percent, 100)}%)`,
+          top: '20px',
+        }}
       >
-        <span className="block rotate-180 text-xs">{points}</span>
+        <div className="tooltip-arrow-up" />
+        <div className="rounded-[4px] bg-black px-[2.5px] py-0.5 text-white">
+          <span className="text-xs font-medium">{points}</span>
+        </div>
       </div>
     </div>
   );

@@ -150,6 +150,7 @@ export default function ReminderAddForm() {
                 onChange={(value) => {
                   setWeekOpt(value as number);
                 }}
+                optionClass="w-10 px-0"
                 options={weekOpts}
               />
             </FormControl>

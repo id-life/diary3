@@ -23,7 +23,7 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-1 bg-background px-[9px] py-3">
+        <Button variant="outline" className="flex items-center gap-1 whitespace-nowrap bg-background px-[9px] py-3">
           <CalendarIcon className="size-5" />
           {value}
           <span className="sr-only">Select date</span>

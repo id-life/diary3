@@ -52,7 +52,8 @@ export default function EntryHeader({ children, layout = 'flow', backLink }: IPr
   }
 
   return (
-<div className="sticky top-0 z-30 flex items-center gap-2 bg-white px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">      <LeftContent currentStreakByEntry={currentStreakByEntry} />
+    <div className="z-20 sticky top-0 flex align-start gap-[9px] bg-background px-4 pb-4 pt-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
+      <LeftContent currentStreakByEntry={currentStreakByEntry} />
       {children}
     </div>
   );

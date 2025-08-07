@@ -66,7 +66,10 @@ export const Segmented = ({
 
   return (
     <div
-      className={twMerge('flex w-fit cursor-pointer items-center rounded bg-[#F1F1F2] p-1 text-xs/3 font-medium', className)}
+      className={twMerge(
+        'flex w-fit cursor-pointer items-center rounded-[8px] bg-[#F1F1F2] p-1 text-xs/3 font-medium',
+        className,
+      )}
       onClick={onClick}
     >
       {options.map((option) => {
@@ -79,7 +82,7 @@ export const Segmented = ({
             <div
               className={twMerge(
                 clsx(
-                  'relative z-10 px-3 py-2.5 text-center text-diary-navy first:rounded-l-md last:rounded-r-md',
+                  'relative z-10 px-3 py-2.5 text-center text-diary-navy first:rounded-l-[8px] last:rounded-r-[8px]',
                   optionClass,
                   { [selectedClass || '']: selected },
                   { 'text-gray-400': disabled, 'cursor-not-allowed': disabled },
@@ -92,7 +95,7 @@ export const Segmented = ({
             {selected && (
               <motion.div
                 layoutId={`segmented_selected_${id ?? generatedId}`}
-                className={twMerge('absolute inset-0 rounded bg-white', selectedBgClass)}
+                className={twMerge('absolute inset-0 rounded-[8px] bg-white', selectedBgClass)}
               />
             )}
           </div>

@@ -102,23 +102,23 @@ export default function LoginPage() {
               placeholder={isSignUp ? 'Email or Phone Number' : 'User Name or Phone Number'}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="bg-diary-input-bg h-14 w-full rounded-lg px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="h-14 w-full rounded-lg bg-diary-primary/5 px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
             />
           </div>
 
           {/* Password Input */}
-          <div className="relative">
+          <div className="relative pb-5">
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-diary-input-bg h-14 w-full rounded-lg border-0 px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="h-14 w-full rounded-lg border-0 bg-diary-primary/5 px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-diary-navy opacity-30 hover:opacity-60"
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-diary-navy opacity-30 hover:opacity-60"
             >
               {showPassword ? <HiEyeOff className="h-4 w-4" /> : <HiEye className="h-4 w-4" />}
             </button>
@@ -126,7 +126,7 @@ export default function LoginPage() {
 
           {/* Submit Button */}
           <Button
-            className="mt-4 h-14 w-full rounded-lg border-diary-navy bg-diary-navy text-white"
+            className="mt-5 h-14 w-full rounded-lg border-diary-navy bg-diary-navy text-white"
             onClick={handleUsernamePasswordLogin}
             variant="primary"
             disabled={!username || !password || isLoggingIn}
@@ -136,7 +136,7 @@ export default function LoginPage() {
 
           {/* Sign up toggle and forgot password */}
           {!isSignUp && (
-            <div className="mt-4 flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between pt-5 text-sm">
               <button className="text-purple hover:brightness-110">Forget password?</button>
               <button onClick={() => setIsSignUp(true)} className="text-diary-navy hover:text-diary-navy-light">
                 sign up
@@ -153,16 +153,16 @@ export default function LoginPage() {
 
           {/* Social Login Buttons */}
           <div className="flex justify-center gap-9">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-shadow hover:shadow-lg">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-diary-primary/5 transition-shadow hover:shadow-lg">
               <AiFillGoogleCircle className="h-6 w-6 text-red-500" />
             </button>
             <button
               onClick={handleGitHubLogin}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-shadow hover:shadow-lg"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-diary-primary/5 transition-shadow hover:shadow-lg"
             >
               <AiFillGithub className="h-6 w-6 text-gray-900" />
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transition-shadow hover:shadow-lg">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-diary-primary/5 transition-shadow hover:shadow-lg">
               <AiFillApple className="h-6 w-6 text-gray-900" />
             </button>
           </div>
