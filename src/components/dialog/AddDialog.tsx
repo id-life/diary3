@@ -220,7 +220,7 @@ export default function AddDialog() {
     <Dialog
       open={open}
       onClose={handleCancel}
-      title={isUpdate ? 'Edit Entry' : 'Add Entry'}
+      title={<span className="text-lg font-semibold">{isUpdate ? 'Edit Entry' : 'Add Entry'}</span>}
       render={({ close }) => (
         <div className="flex flex-col gap-6 px-1">
           {/* Entry Name */}

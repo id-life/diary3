@@ -6,15 +6,7 @@ import dayjs from 'dayjs';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Area, AreaChart, Brush, CartesianGrid, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import {
-  DateRange,
-  EntryInstance,
-  EntryType,
-  barHighColor,
-  barHighValue,
-  barLowColor,
-  barLowValue,
-} from '../../entry/types-constants';
+import { DateRange, EntryInstance, EntryType, barHighValue, barLowValue } from '../../entry/types-constants';
 import Segmented from '../segmented';
 import { DatePicker } from '../ui/date-picker';
 import EntryChartTooltip from './EntryChartTooltip';
@@ -127,12 +119,13 @@ const TotalPointsLabel = (props: any) => {
   const tooltipWidth = 40;
   const tooltipHeight = 20;
   const triangleHeight = 5;
+  const verticalOffset = 5; // Desplazamiento vertical hacia arriba
 
   return (
     <g transform={`translate(${x}, ${y})`}>
       <foreignObject
         x={-tooltipWidth / 2}
-        y={-(tooltipHeight + triangleHeight)}
+        y={-(tooltipHeight + triangleHeight + verticalOffset)}
         width={tooltipWidth}
         height={tooltipHeight + triangleHeight}
         style={{ overflow: 'visible' }}
@@ -252,15 +245,15 @@ function EntryChart() {
         </div>
         <DatePicker value={selectedChartDate} onChange={setSelectedChartDate} />
       </div>
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height={218}>
         <AreaChart
           onClick={handleChartClick}
           data={chartData}
           margin={{
-            top: 5,
+            top: -12,
             right: 24,
             left: -24,
-            bottom: -10,
+            bottom: -20,
           }}
         >
           <defs>
@@ -279,8 +272,8 @@ function EntryChart() {
             tickFormatter={(date) => dayjs(date).format('MM-DD')}
             ticks={dateTicks}
             textAnchor="middle"
-            dy={10}
-            angle={0}
+            dy={8}
+            height={30}
             interval="preserveStartEnd"
           />
           <YAxis
@@ -294,7 +287,7 @@ function EntryChart() {
           <Legend
             verticalAlign="top"
             content={<CustomLegend />}
-            wrapperStyle={{ paddingBottom: '20px', paddingLeft: '16px', paddingRight: '16px' }}
+            wrapperStyle={{ paddingLeft: '16px', paddingRight: '16px', paddingBottom: '20px' }}
           />
           <Tooltip
             itemStyle={{
@@ -329,7 +322,7 @@ function EntryChart() {
               connectNulls={false}
             />
           ))}
-          <Area isAnimationActive={false} type="linear" dataKey="_totalPoints" stroke="none" fill="none" stackId="3" hide>
+          <Area isAnimationActive={false} type="linear" dataKey="_totalPoints" stroke="none" fill="none" stackId="total">
             <LabelList dataKey="_totalPoints" content={<TotalPointsLabel />} />
           </Area>
         </AreaChart>

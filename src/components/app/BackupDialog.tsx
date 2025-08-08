@@ -61,13 +61,13 @@ const BackupDialog: FunctionComponent = () => {
       open={isOpen}
       onOpenChange={(open) => setOpen(open)}
       title={<span className="text-lg font-semibold">Load</span>}
-      className="px-6 py-4"
+      className="px-5 py-4"
       render={() => (
         <div className="pt-1">
           {isLoading ? (
             <div className="py-8 text-center text-gray-500">Loading backups...</div>
           ) : backupList?.length ? (
-            <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-2.5">
+            <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto">
               {backupList
                 .slice()
                 .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())

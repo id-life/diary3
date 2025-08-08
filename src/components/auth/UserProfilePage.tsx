@@ -22,7 +22,7 @@ import { useAccessToken } from '@/hooks/app';
 
 function StateCard({ title, value, unit }: { title: string; value: number; unit: string }) {
   return (
-    <Card className="flex-center flex-col px-2 pb-3 pt-5 text-center">
+    <Card className="flex-center flex-col px-2 pb-3 pt-5 text-center shadow-none">
       <p className="text-xs/3.5 text-diary-navy">{title}</p>
       <p className="mt-5 text-3xl/8 font-bold text-diary-navy">{value}</p>
       <p className="mt-5 text-xs text-diary-navy opacity-50">{unit}</p>
@@ -115,8 +115,8 @@ export default function UserProfilePage() {
       </div>
 
       {/* Save/Load Section */}
-      <div className="px-4 py-6">
-        <Card className="overflow-hidden rounded-lg border border-[#1E1B391A]">
+      <div className="px-1 py-5">
+        <Card className="overflow-hidden rounded-lg border border-[#1E1B391A] shadow-none">
           <button
             onClick={handleSave}
             disabled={isSaving}
@@ -152,7 +152,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Stats Section */}
-      <div className="px-4 pb-6">
+      <div className="px-1">
         {areStatsLoading ? (
           <div className="flex min-h-[200px] items-center justify-center rounded-lg border bg-card text-center">
             <div className="flex items-center gap-2 text-diary-navy opacity-70">
