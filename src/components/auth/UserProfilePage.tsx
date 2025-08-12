@@ -98,7 +98,7 @@ export default function UserProfilePage() {
   const lastUseTime = dayjs().format('h:mm A YYYY/MM/DD dddd');
 
   return (
-    <div className="flex h-full flex-col overflow-auto px-4 pb-10">
+    <div className="flex h-full flex-col overflow-auto px-4">
       {/* Header */}
       <div className="-mx-4 bg-[#FDFEFE] px-4 py-5 drop-shadow-[0px_4px_8px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-4">
@@ -152,7 +152,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Stats Section */}
-      <div className="px-1">
+      <div className="mb-5 px-1">
         {areStatsLoading ? (
           <div className="flex min-h-[200px] items-center justify-center rounded-lg border bg-card text-center">
             <div className="flex items-center gap-2 text-diary-navy opacity-70">
@@ -192,7 +192,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Logout Section */}
-      <div className="mt-auto">
+      <div className="mb-7 mt-auto">
         <Button
           variant="outline"
           onClick={handleLogout}

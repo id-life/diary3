@@ -41,7 +41,8 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
     enterEntryTypeEdit({ entryTypeId: entryType.id });
   };
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 防止点击事件冒泡到卡片上
     if (window.confirm(`Are you sure you want to delete "${entryType.title}" and all its records?`)) {
       deleteEntryType(entryType.id);
       deleteEntryInstanceByEntryTypeId(entryType.id);
@@ -52,20 +53,22 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
 
   return (
     <Card className="flex h-full w-full flex-col gap-3 p-3 text-diary-primary" onClick={handleEdit}>
-      <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 text-xs">
-        <span className="mr-auto rounded-[4px] px-1.5 py-1 font-medium text-white" style={{ backgroundColor: primaryColor }}>
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 text-xs">
+        {/* Tag */}
+        <span
+          className="mr-auto inline-flex h-5 items-center rounded-[4px] px-1.5 font-medium text-white"
+          style={{ backgroundColor: primaryColor }}
+        >
           {entryType.title}
         </span>
-        <span className="flex items-center gap-0.5 ">
-          <ClockSVG className="opacity-50" />
-          {dayjs().format('ddd YYYY MMM DD')}
-        </span>
-        <div className="inline-flex items-center rounded-[4px] border border-gray-200 p-0.5 text-sm text-xs">
+
+        {/* Point Display */}
+        <div className="inline-flex h-5 items-center rounded-[4px] border border-gray-200 p-0.5 text-sm text-xs">
           <span className="pl-1.5 pr-1 text-gray-500">Point</span>
-          <span className="rounded-[4px] bg-gray-100 px-1.5 py-0.5 font-semibold text-diary-navy">
-            {entryType.defaultPoints}
-          </span>
+          <span className="h-4 rounded-[4px] bg-gray-100 px-1.5 font-semibold text-diary-navy">{entryType.defaultPoints}</span>
         </div>
+
+        {/* Delete Button */}
         <Button
           onClick={handleDelete}
           variant="ghost"
@@ -96,15 +99,23 @@ export function EntryStreakCard({ entryType, routine }: EntryStreakCardProps) {
       )}
 
       <div className="flex items-end justify-between">
-        <div className="space-x-1">
-          <span className="text-xl font-semibold">{currentStreak}</span>
-          <span className="text-[0.625rem] opacity-50">Combo</span>
+        <div className="flex items-baseline space-x-1">
+          <span className="text-xl font-semibold leading-none">{currentStreak}</span>
+          <span className="text-[0.625rem] font-medium opacity-50">Combo</span>
+
+          {entryType.routine !== RoutineEnum.adhoc && (
+            <div className="flex items-baseline space-x-1">
+              <span className="h-2 w-px bg-[#E9E8EB]"></span>
+              <span className="text-[0.625rem] font-medium opacity-50">
+                Total ({currentStreak}/{longestStreak})
+              </span>
+            </div>
+          )}
         </div>
-        {entryType.routine !== RoutineEnum.adhoc && (
-          <div className="text-[0.625rem] opacity-50">
-            Total ({currentStreak}/{longestStreak})
-          </div>
-        )}
+        <span className="flex items-center gap-0.5 text-xs">
+          <ClockSVG className="opacity-50" />
+          {dayjs().format('ddd YYYY MMM DD')}
+        </span>
       </div>
     </Card>
   );

@@ -51,12 +51,15 @@ function Navbar() {
                 key={key.toUpperCase()}
                 className={clsx(
                   'flex flex-grow items-center justify-center rounded-t-lg py-2',
-                  'text-[#BBBAC3] hover:text-blue',
+                  'text-[#BBBAC3] hover:text-primary',
                 )}
                 onClick={() => setAddDialogOpen(true)}
               >
                 {createElement(icon, {
-                  className: cn('text-2xl/6 size-6 transition-all hover:brightness-90 duration-300 hover:fill-blue', className),
+                  className: cn(
+                    'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300 hover:fill-primary',
+                    className,
+                  ),
                 })}
               </button>
             );
@@ -67,14 +70,14 @@ function Navbar() {
               key={key.toUpperCase()}
               className={clsx(
                 'flex flex-grow items-center justify-center rounded-t-lg py-2',
-                isActive || isInHomePage ? 'text-blue' : 'text-[#BBBAC3]',
+                isActive || isInHomePage ? 'text-primary' : 'text-[#BBBAC3]',
               )}
               href={`/${key.toLowerCase()}`}
             >
               {createElement(icon, {
                 className: cn(
                   'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300',
-                  (isActive || isInHomePage) && 'fill-blue hover:fill-blue',
+                  (isActive || isInHomePage) && 'fill-primary hover:fill-primary',
                   className,
                 ),
               })}

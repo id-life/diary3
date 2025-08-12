@@ -222,7 +222,7 @@ export default function AddDialog() {
       onClose={handleCancel}
       title={<span className="text-lg font-semibold">{isUpdate ? 'Edit Entry' : 'Add Entry'}</span>}
       render={({ close }) => (
-        <div className="flex flex-col gap-6 px-1">
+        <div className="flex flex-col gap-6">
           {/* Entry Name */}
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-900">
@@ -233,7 +233,7 @@ export default function AddDialog() {
               placeholder="Title"
               value={formData.title}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              className="focus:ring-blue-500 h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2"
+              className="h-10 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-diary-navy"
             />
           </div>
 
@@ -262,6 +262,8 @@ export default function AddDialog() {
               <span className="text-red-500">*</span>Entry Routine:
             </label>
             <Segmented
+              className="h-10 w-full xs:w-[248px]"
+              optionClass="flex items-center justify-center h-8 w-full p-0"
               options={[
                 { label: 'Daily', value: RoutineEnum.daily },
                 { label: 'Weekly', value: RoutineEnum.weekly },
@@ -296,18 +298,18 @@ export default function AddDialog() {
               })}
             </div>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <Button variant="primary" size="large" className="flex-1" onClick={handleSubmit}>
-              {isUpdate ? 'Update' : 'Create'}
+        </div>
+      )}
+      renderFooter={() => (
+        <div className="flex gap-3">
+          <Button variant="primary" size="large" className="flex-1 py-[13px]" onClick={handleSubmit}>
+            {isUpdate ? 'Update' : 'Create'}
+          </Button>
+          {isUpdate && (
+            <Button variant="secondary" size="large" onClick={handleCancel}>
+              Cancel
             </Button>
-            {isUpdate && (
-              <Button variant="secondary" size="large" onClick={handleCancel}>
-                Cancel
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       )}
     />

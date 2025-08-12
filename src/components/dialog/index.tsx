@@ -77,10 +77,10 @@ function Dialog({
     if (renderHeader) return renderHeader?.({ close: () => onClose(false) });
     if (!title && !showCloseButton) return null;
     return (
-      <div className="relative mb-4 h-auto text-center text-xl font-medium leading-[22px]">
+      <div className="relative mb-4 h-auto px-5 text-center text-xl font-medium leading-[22px]">
         {title}
         {showCloseButton && (
-          <div className="absolute right-0 top-0 flex h-4 w-4 cursor-pointer items-center justify-center">
+          <div className="absolute right-5 top-0 flex h-4 w-4 cursor-pointer items-center justify-center">
             <RiCloseFill
               className="stroke-white transition-all duration-300 hover:rotate-180"
               width={14}
@@ -111,8 +111,8 @@ function Dialog({
               <FloatingFocusManager context={context}>
                 <motion.div
                   className={cn(
-                    `relative flex h-fit max-h-[85vh] w-[calc(100%_-_3.75rem)] max-w-2xl flex-col rounded-[10px] bg-white`,
-                    renderFooter ? 'p-5 pb-20' : ' p-5',
+                    `relative flex h-fit max-h-[85vh] w-[calc(100%_-_2.5rem)] max-w-2xl flex-col rounded-[10px] bg-white`,
+                    renderFooter ? 'pb-20 pt-5' : 'py-5',
                     className,
                   )}
                   initial={{ opacity: 0, scale: 0.85 }}
@@ -123,14 +123,14 @@ function Dialog({
                 >
                   {_renderHeader()}
                   <main
-                    className={clsx('flex-grow', {
+                    className={clsx('flex-grow px-5', {
                       'overflow-auto': scroll,
                     })}
                   >
                     {render({ close: () => onClose(false) })}
                   </main>
                   {renderFooter && (
-                    <footer className="absolute bottom-0 left-0 right-0 rounded-b-[10px] px-6 py-6">
+                    <footer className="absolute bottom-0 left-0 right-0 rounded-b-[10px] px-5 py-5">
                       {renderFooter?.({ close: () => onClose(false) })}
                     </footer>
                   )}
