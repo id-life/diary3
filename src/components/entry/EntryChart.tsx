@@ -231,7 +231,7 @@ function EntryChart() {
 
   return (
     <div className="mt-4">
-      <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/50 px-4 py-1">
+      <div className="mb-5 flex items-center justify-between gap-4 px-4 py-1">
         <div className="flex-1">
           <Segmented
             defaultValue={selectedRange}

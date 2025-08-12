@@ -5,8 +5,7 @@ import dayjs from 'dayjs';
 import { useAtomValue } from 'jotai';
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { EntryInstance } from '../../entry/types-constants';
-import { CloseSVG, EditDateSVG, PointStepSVG } from '../svg';
-import { MinusIcon, PlusIcon } from 'lucide-react';
+import { CloseSVG, EditDateSVG, MinusSvg, PlusSvg, PointStepSVG } from '../svg';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) => {
@@ -91,31 +90,31 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
             </div>
           </div>
         </div>
-        <div className="mt-auto flex w-[72px] shrink-0 flex-col items-center justify-between rounded bg-diary-navy/[0.04] pt-1.5">
+        <div className="mt-auto flex size-[68px] flex-shrink-0 flex-col items-center justify-between rounded-[4px] bg-diary-navy/[0.04] pt-1">
           {/* Top: "Point" Label */}
-          <div className="mb-1.5 text-xs font-medium text-[#8a8898]">Point</div>
+          <div className="mb-1.5 text-xs font-medium leading-[16px] text-[#8a8898]">Point</div>
 
           {/* Middle: Point Value */}
-          <div className="text-lg font-semibold leading-4 text-[#1e1b39]">{points}</div>
+          <div className="text-base font-semibold leading-[16px] text-[#1e1b39]">{points}</div>
 
           {/* Bottom: Controls */}
-          <div className="flex w-full items-center justify-between">
+          <div className="mt-0.5 flex w-full items-center justify-between">
             <button
-              className="flex h-6 w-6 items-center justify-center transition-opacity hover:opacity-70 disabled:opacity-40"
+              className="flex flex-shrink-0 transition-opacity hover:opacity-70 disabled:opacity-40"
               disabled={points <= 0}
               onClick={() => handlePointsChange(points - (entryType.pointStep || 0.5))}
             >
-              <MinusIcon className="size-4 cursor-pointer text-[#8a8898]" />
+              <MinusSvg className="size-6 cursor-pointer text-[#8a8898]" />
             </button>
-            <div className="flex items-center gap-0.5">
+            <div className="flex flex-grow items-center justify-center gap-0.5">
               <PointStepSVG className="size-2 fill-diary-navy opacity-50" />
-              <div className="text-[10px] font-semibold text-[#8a8898]">{entryType.pointStep || 0.5}</div>
+              <div className="text-[10px] font-semibold leading-[10px] text-[#8a8898]">{entryType.pointStep || 0.5}</div>
             </div>
             <button
-              className="flex h-6 w-6 items-center justify-center transition-opacity hover:opacity-70"
+              className="flex flex-shrink-0 transition-opacity hover:opacity-70"
               onClick={() => handlePointsChange(points + (entryType.pointStep || 0.5))}
             >
-              <PlusIcon className="size-4 cursor-pointer text-[#8a8898]" />
+              <PlusSvg className="size-6 cursor-pointer text-[#8a8898]" />
             </button>
           </div>
         </div>

@@ -102,7 +102,7 @@ export default function LoginPage() {
               placeholder={isSignUp ? 'Email or Phone Number' : 'User Name or Phone Number'}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="h-14 w-full rounded-lg bg-diary-primary/5 px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="h-14 w-full rounded-lg bg-diary-primary/5 px-4 py-5 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
 
@@ -113,7 +113,7 @@ export default function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-14 w-full rounded-lg border-0 bg-diary-primary/5 px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-diary-navy"
+              className="h-14 w-full rounded-lg border-0 bg-diary-primary/5 px-4 py-5 pr-12 text-diary-navy placeholder:text-diary-navy placeholder:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <button
               type="button"

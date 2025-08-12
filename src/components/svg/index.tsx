@@ -14,6 +14,10 @@ import ClockSVG from '@/../public/svgs/icons/clock.svg?component';
 import TrashSVG from '@/../public/svgs/icons/trash.svg?component';
 import BellSVG from '@/../public/svgs/icons/bell.svg?component';
 import LoadFileSVG from '@/../public/svgs/icons/load-file.svg?component';
+import PlusSvg from '@/../public/svgs/icons/plus.svg?component';
+import MinusSvg from '@/../public/svgs/icons/minus.svg?component';
+import FillEyeSvg from '@/../public/svgs/icons/fill-eye.svg?component';
+import FillEyeInvisibleSvg from '@/../public/svgs/icons/fill-eye-invisible.svg?component';
 
 export {
   AddCircleSVG,
@@ -32,4 +36,8 @@ export {
   TrashSVG,
   BellSVG,
   LoadFileSVG,
+  PlusSvg,
+  MinusSvg,
+  FillEyeSvg,
+  FillEyeInvisibleSvg,
 };
