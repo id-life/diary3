@@ -118,8 +118,8 @@ const TotalPointsLabel = (props: any) => {
 
   const tooltipWidth = 40;
   const tooltipHeight = 20;
-  const triangleHeight = 5;
-  const verticalOffset = 5; // Desplazamiento vertical hacia arriba
+  const triangleHeight = 3;
+  const verticalOffset = 5;
 
   return (
     <g transform={`translate(${x}, ${y})`}>
@@ -132,7 +132,7 @@ const TotalPointsLabel = (props: any) => {
       >
         <div className="flex h-full w-full flex-col items-center">
           <div
-            className="flex items-center justify-center rounded-[2px] bg-[#1E1B39] px-2 py-0.5"
+            className="flex items-center justify-center rounded-[4px] bg-[#1E1B39] px-[2.5px] py-0.5"
             style={{ height: `${tooltipHeight}px` }}
           >
             <span className="text-xs font-medium text-white">{value.toFixed(1)}</span>
@@ -231,7 +231,7 @@ function EntryChart() {
 
   return (
     <div className="mt-4">
-      <div className="mb-5 flex items-center justify-between gap-4 px-4 py-1">
+      <div className="mb-5 flex items-center justify-between gap-2 px-4 py-1">
         <div className="flex-1">
           <Segmented
             defaultValue={selectedRange}

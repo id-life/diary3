@@ -33,7 +33,7 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --ring: 240 10% 3.9%;
+    --ring: 245 37% 16.3%;
 
     --radius: 0.625rem;
 
@@ -204,9 +204,9 @@ add-to-calendar-button#custom-atcb-button::part(atcb-button-text)::before {
   .tooltip-arrow-down {
     width: 0;
     height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #1e1b39;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 3px solid #1e1b39;
   }
   .tooltip-arrow-up {
     width: 0;

@@ -70,11 +70,13 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
         }}
       />
       <div className="flex justify-between gap-5">
-        <div className="flex shrink-0 grow flex-col">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm/3.5 font-semibold">{entryType.title}</h3>
-            <div className="rounded bg-[#BCBBC4] px-1.5 py-1 text-xs/3 font-medium text-white">{entryType.routine}</div>
-          </div>
+        <div className="flex min-w-0 grow flex-col">
+          <h3 className="break-words text-start align-middle text-sm/3.5 font-semibold leading-[20px]">
+            <span className="mr-2">{entryType.title}</span>
+            <span className="inline-flex rounded bg-[#BCBBC4] px-1.5 py-1 align-baseline text-xs/3 font-medium text-white">
+              {entryType.routine}
+            </span>
+          </h3>
           <div className="mt-[11px]">
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-0.5 border-gray-100 text-xs text-diary-primary">
@@ -107,7 +109,7 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
               <MinusSvg className="size-6 cursor-pointer text-[#8a8898]" />
             </button>
             <div className="flex flex-grow items-center justify-center gap-0.5">
-              <PointStepSVG className="size-2 fill-diary-navy opacity-50" />
+              {entryType.pointStep.toString().length < 2 && <PointStepSVG className="size-2 fill-diary-navy opacity-50" />}
               <div className="text-[10px] font-semibold leading-[10px] text-[#8a8898]">{entryType.pointStep || 0.5}</div>
             </div>
             <button
