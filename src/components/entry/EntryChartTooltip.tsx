@@ -17,12 +17,16 @@ export default function EntryChartTooltip({ active, payload, label }: EntryChart
       .reduce((sum, item) => sum + (Number(item.value) || 0), 0);
   }, [payload, active]);
 
+  const stopPropagation = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
+
   if (!active || !payload || !payload.length) {
     return null;
   }
 
   return (
-    <div className="flex min-w-[150px] flex-col space-y-3 rounded-[8px] border border-gray-200 bg-white p-3 text-sm shadow-lg">
+    <div className="z-[60] flex min-w-[150px] max-w-xs flex-col space-y-3 rounded-[8px] border border-gray-200 bg-white p-3 text-sm shadow-lg">
       <span className="text-left text-xs font-medium">{label}</span>
 
       <div className="flex items-baseline space-x-1">
@@ -30,8 +34,13 @@ export default function EntryChartTooltip({ active, payload, label }: EntryChart
         <span className="text-xs opacity-50">Total Point</span>
       </div>
 
-      <div className="max-h-[150px] overflow-auto pr-2">
-        <ul className="list-none space-y-2 font-medium">
+      <div
+        className="max-h-16 overflow-auto pr-2"
+        onWheel={stopPropagation}
+        onMouseDown={stopPropagation}
+        onTouchStart={stopPropagation}
+      >
+        <ul className="list-none space-y-2 pb-2 font-medium">
           {payload
             .filter(
               (item) =>
@@ -39,7 +48,7 @@ export default function EntryChartTooltip({ active, payload, label }: EntryChart
             )
             .sort((a, b) => b.value - a.value)
             .map((item, index) => (
-              <li key={index} className="flex text-xs" style={{ color: item.color }}>
+              <li key={index} className="flex break-words text-xs" style={{ color: item.color }}>
                 <span>{item.name}</span>
                 <span className="mx-1">:</span>
                 <span>{item.value}</span>

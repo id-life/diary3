@@ -6,7 +6,6 @@ import { useCreateNewEntryInstance } from '@/hooks/entryType';
 import { cn } from '@/utils';
 import { sortEntryTypesArray } from '@/utils/entry';
 import { getHiddenEntryTypes, hideEntryType, unhideEntryType } from '@/utils/hiddenEntryTypes';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { useMemo, useState } from 'react';
 import { BiSolidUpArrow } from 'react-icons/bi';
@@ -160,40 +159,47 @@ const EntryTypeListForCompletion = () => {
         </div>
         {/* Filter Section */}
         <div className="mt-2 flex items-center gap-2">
-          <AnimatePresence>
-            {!isSearchFocused && (
-              <motion.div
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0, marginRight: -8 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <Segmented
-                  optionClass="px-1.5"
-                  onClick={(e) => e.stopPropagation()}
-                  defaultValue={segmentedValue}
-                  onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
-                  options={options}
-                  className="whitespace-nowrap"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div
+            className={cn('transition-all duration-300', {
+              'w-0 opacity-0': isSearchFocused,
+            })}
+          >
+            <Segmented
+              optionClass="px-1.5"
+              onClick={(e) => e.stopPropagation()}
+              defaultValue={segmentedValue}
+              onChange={(value) => setSegmentedValue(value as 'all' | RoutineEnum)}
+              options={options}
+              className="whitespace-nowrap"
+            />
+          </div>
 
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="flex h-10 flex-1 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3"
+            onClick={(e) => {
+              e.stopPropagation();
+              document.getElementById('search-input')?.focus();
+            }}
+            className={cn(
+              'flex h-10 min-w-0 flex-1 items-center gap-[5px] rounded-[8px] border border-primary/10 px-1 py-2 pl-1.5 transition-all duration-300',
+            )}
           >
-            <input
-              className="w-full border-none bg-transparent text-xs placeholder:text-[#8A8998] focus:outline-none"
-              placeholder="Search"
-              value={inputValue}
-              onChange={onInputChange}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-            />
-            <SearchSVG className="size-[24px] shrink-0 fill-diary-primary/30" />
+            <div className="relative flex h-full min-w-0 flex-1 items-center">
+              <input
+                id="search-input"
+                className="absolute inset-0 z-10 h-full w-full border-none bg-transparent text-xs font-medium opacity-0 focus:outline-none"
+                value={inputValue}
+                onChange={onInputChange}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+              />
+              {!isSearchFocused && !inputValue && (
+                <span className="w-full truncate text-left text-xs font-medium text-[#8A8998]">Search</span>
+              )}
+              {(isSearchFocused || inputValue) && (
+                <span className="w-full truncate text-left text-xs font-medium text-current">{inputValue || ''}</span>
+              )}
+            </div>
+            <SearchSVG className="size-6 shrink-0 fill-diary-primary/30" />
           </div>
         </div>
       </div>
@@ -219,18 +225,6 @@ const EntryTypeListForCompletion = () => {
               </div>
             </div>
           )}
-
-          {/* Completed Tasks */}
-          {/* {doneList?.length > 0 && (
-            <div className="mb-6">
-              <h3 className="mb-3 text-lg font-semibold text-green-600">Completed</h3>
-              <div className="flex flex-wrap gap-2.5 gap-y-3">
-                {doneList.map((item) => (
-                  <EntrySimpleCard key={item.id} entryType={item} onHide={handleHideEntryType} isDone />
-                ))}
-              </div>
-            </div>
-          )} */}
 
           {/* Hidden Tasks */}
           {hiddenList?.length > 0 && (

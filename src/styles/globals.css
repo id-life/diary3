@@ -216,3 +216,79 @@ add-to-calendar-button#custom-atcb-button::part(atcb-button-text)::before {
     border-bottom: 3px solid black;
   }
 }
+
+add-to-calendar-button#custom-atcb-button::part(atcb-button) {
+  /* 应用Tailwind类来满足设计稿要求 */
+  @apply bg-white text-primary border border-primary/10 rounded-lg w-full;
+  
+  /* 精确的字体和内外边距 */
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 22px;
+  box-shadow: none; /* 移除默认阴影 */
+  transition: all 0.2s ease-in-out; /* 添加悬停效果 */
+}
+
+/* 悬停效果 */
+add-to-calendar-button#custom-atcb-button::part(atcb-button):hover {
+  @apply bg-gray-50;
+}
+
+/* --- 2. 隐藏默认图标 --- */
+add-to-calendar-button#custom-atcb-button::part(atcb-button-icon) {
+  display: none;
+}
+
+/* --- 3. 添加我们自己的日历图标 --- */
+/* 我们使用::before伪元素将SVG图标添加到按钮文本前面 */
+add-to-calendar-button#custom-atcb-button::part(atcb-button-text)::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231E1B39' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='4' rx='2' ry='2'/%3E%3Cline x1='16' x2='16' y1='2' y2='6'/%3E%3Cline x1='8' x2='8' y1='2' y2='6'/%3E%3Cline x1='3' x2='21' y1='10' y2='10'/%3E%3Cpath d='M8 14h.01'/%3E%3Cpath d='M12 14h.01'/%3E%3Cpath d='M16 14h.01'/%3E%3Cpath d='M8 18h.01'/%3E%3Cpath d='M12 18h.01'/%3E%3Cpath d='M16 18h.01'/%3E%3C/svg%3E");
+  margin-right: 8px; /* 图标和文字之间的间距 */
+  vertical-align: middle; /* 垂直居中对齐 */
+  display: inline-block;
+}
+
+/* --- 4. 自定义弹出的列表样式 --- */
+/* 
+  重要提示: 当listStyle为"modal"时, 列表会被渲染到页面顶层的一个新的 <div id="atcb-btn-YOUR_ID-modal-host"> 中。
+  所以我们需要使用这个更复杂的选择器来定位它。
+*/
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list) {
+  @apply bg-white rounded-lg;
+  margin-top: 12px; /* 按钮和列表之间的12px间距 */
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 添加一点柔和的阴影 */
+}
+
+/* --- 5. 自定义列表项 --- */
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list-item) {
+  padding: 13px 10px;
+  border-bottom: 1px solid #f0f0f1; /* 如果需要，可以添加分隔线 */
+}
+/* 移除最后一项的底部分隔线 */
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list-item):last-child {
+  border-bottom: none;
+}
+
+/* --- 6. 自定义列表项的悬停效果 --- */
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list-item):hover {
+  background-color: #F6F6F7; /* 设计稿要求的悬停颜色 */
+}
+
+/* --- 7. 确保遮罩层按预期工作 --- */
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-modal-box) {
+  /* 默认的遮罩层样式应该可以，如果需要可以调整 */
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* --- 8. 调整列表项内部图标和文字的样式 (如果需要) --- */
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list-icon) {
+  /* 库会自动处理Apple, Google等图标，这里可以微调 */
+  width: 20px;
+  height: 20px;
+}
+
+#atcb-btn-custom-atcb-button-modal-host::part(atcb-list-text) {
+  font-size: 14px;
+  font-weight: 500;
+}
