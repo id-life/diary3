@@ -3,10 +3,11 @@ import { cn } from '@/utils';
 import { useJotaiSelectors, useJotaiActions } from '@/hooks/useJotaiMigration';
 import { formatDate } from '@/utils/date';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AddToCalendarButton } from 'add-to-calendar-button-react';
+import { AddToCalendarButton, atcb_action } from 'add-to-calendar-button-react';
+// import 'add-to-calendar-button/unstyle';
 import dayjs from 'dayjs';
 import { range } from 'lodash-es';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiFillCalendar } from 'react-icons/ai';
 import { z } from 'zod';
@@ -18,6 +19,7 @@ import { Input } from '../ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Switch } from '../ui/switch';
 import { useRouter } from 'next/navigation';
+import { CalendarSvg } from '../svg';
 
 const FormSchema = z.object({
   title: z.string().trim().min(1, { message: 'This field cannot be empty. Please fill it in.' }),
@@ -34,6 +36,7 @@ const options = [
 ];
 export default function ReminderAddForm() {
   const router = useRouter();
+  const addToCalendarButtonRef = useRef<HTMLButtonElement>(null);
   const [type, setType] = useState<ReminderType>(ReminderType.weekly);
 
   const [weekOpt, setWeekOpt] = useState<number>(0);
@@ -122,8 +125,6 @@ export default function ReminderAddForm() {
       };
     return {};
   }, [monthDayOpt, type, weekOpt, yearMonthOpt]);
-
-  console.log({ startDate, recurrenceRule });
 
   const renderPushConfig = useCallback(() => {
     const weekOpts = range(0, 7).map((value) => ({
@@ -245,6 +246,67 @@ export default function ReminderAddForm() {
     );
   }, [form.control, monthDayOpt, type, weekOpt, yearMonthOpt]);
 
+  const handleAddToCalendar = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // Prevent form submission if it's inside the form
+
+    const config = {
+      name: form.getValues('title') || 'Reminder',
+      description: form.getValues('content') || '',
+      startDate: startDate,
+      recurrence: recurrenceRule,
+      startTime: '20:00',
+      endTime: '20:15',
+      options: ['Apple', 'Google', 'iCal'] as (
+        | 'Google'
+        | 'iCal'
+        | 'Apple'
+        | 'Microsoft365'
+        | 'MicrosoftTeams'
+        | 'Outlook.com'
+        | 'Yahoo'
+      )[],
+      listStyle: 'overlay' as 'modal' | 'overlay' | undefined,
+      // hideBranding: true,
+      // forceOverlay: true, // 解决遮罩覆盖问题
+      // hideBranding: "true",
+      // hideBackground: false,
+
+      // 您可以覆盖默认的 CSS 变量来自定义弹窗列表
+      styleLight: `
+        --list-background: #FFFFFF;
+        --list-hover-background: #F6F6F7;
+        --btn-background: #F6F6F7;
+        --btn-hover-background: #F6F6F7;
+        --list-border-radius: 8px;
+        --list-padding: 13px 10px;
+        
+        --list-min-width: 100px; 
+        --list-font-weight: 600;
+        --base-font-size-l: 14px;
+        --base-font-size-m: 14px;
+        --base-font-size-s: 14px;
+      `,
+      // hideCheckmark: true,
+    };
+
+    // Ensure the ref is connected to a DOM element before calling
+    if (addToCalendarButtonRef.current) {
+      atcb_action(config, addToCalendarButtonRef.current);
+    }
+  };
+
+  // const addToCalendarConfig = useMemo(
+  //   () => ({
+  //     name: form.getValues('title'),
+  //     description: form.getValues('content'),
+  //     startDate: startDate,
+  //     recurrence: recurrenceRule,
+  //   }),
+  //   [form, recurrenceRule, startDate],
+  // );
+
+  console.log({ startDate });
+
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col gap-5">
@@ -293,29 +355,30 @@ export default function ReminderAddForm() {
         </div>
         <div className="mx-6 mb-10 mt-auto space-y-4">
           <div className="text-center text-xs text-[#8A8998]">Defaults to 8pm, 15 minute reminder events</div>
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center">
             {updatingReminderId !== null ? (
-              <Button size="large" className="flex-1 rounded-[8px]" htmlType="button" onClick={onCancel}>
+              <Button size="large" className="mr-4 flex-1 rounded-[8px]" htmlType="button" onClick={onCancel}>
                 Cancel
               </Button>
             ) : null}
-            <Button variant="primary" size="large" className="w-full flex-1 rounded-[8px]" htmlType="submit">
+            <Button
+              variant="primary"
+              size="large"
+              className="w-full flex-1 rounded-[8px] py-[13px] leading-[14px]"
+              htmlType="submit"
+            >
               {updatingReminderId !== null ? 'Update' : 'Submit'}
             </Button>
+
             {startDate && (
-              <AddToCalendarButton
-                hideIconButton
-                hideBackground
-                name={form.getValues('title')}
-                description={form.getValues('content')}
-                recurrence={recurrenceRule}
-                startDate={startDate}
-                startTime="12:00"
-                endTime="12:15"
-                options={['Apple', 'Google', 'iCal', 'Microsoft365', 'MicrosoftTeams', 'Outlook.com', 'Yahoo']}
-                hideCheckmark
-                size="5"
-              />
+              <button
+                className="px-5.5 ml-4 flex flex-auto items-center justify-center gap-1 rounded-[8px] border border-primary/10 bg-white py-[10px] text-sm font-semibold leading-[14px]"
+                ref={addToCalendarButtonRef}
+                onClick={handleAddToCalendar}
+              >
+                <CalendarSvg className="size-5" />
+                <span>Add to Calendar</span>
+              </button>
             )}
           </div>
         </div>
