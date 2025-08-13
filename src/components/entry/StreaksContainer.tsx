@@ -4,6 +4,7 @@ import { entryInstancesMapAtom } from '@/atoms';
 import { EntryType, RoutineEnum } from '@/entry/types-constants';
 import { calcEntryTypeLongestStreaks } from '@/utils/entry';
 import { EntryStreakCard } from './EntryStreakCard';
+import { EmptyBoxSvg } from '../svg';
 
 type StreaksContainerProps = {
   entryTypesArray: EntryType[];
@@ -30,7 +31,14 @@ export function StreaksContainer({ entryTypesArray, routine }: StreaksContainerP
   }, [entryInstancesMap, entryTypesArray, routine]);
 
   if (sortedEntryTypes.length === 0) {
-    return <div className="py-8 text-center text-gray-500">No {routine} habits found.</div>;
+    return (
+      <div className="grid flex-grow grid-rows-[35fr_auto_65fr]">
+        <div className="row-start-2 flex flex-col items-center gap-4">
+          <EmptyBoxSvg className="w-16" />
+          <p className="text-center text-sm font-medium text-[#8C8A99]">No {routine} habits found.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

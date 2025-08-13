@@ -18,6 +18,7 @@ import PlusSvg from '@/../public/svgs/icons/plus.svg?component';
 import MinusSvg from '@/../public/svgs/icons/minus.svg?component';
 import FillEyeSvg from '@/../public/svgs/icons/fill-eye.svg?component';
 import FillEyeInvisibleSvg from '@/../public/svgs/icons/fill-eye-invisible.svg?component';
+import EmptyBoxSvg from '@/../public/svgs/icons/empty-box.svg?component';
 
 export {
   AddCircleSVG,
@@ -40,4 +41,5 @@ export {
   MinusSvg,
   FillEyeSvg,
   FillEyeInvisibleSvg,
+  EmptyBoxSvg,
 };

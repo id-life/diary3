@@ -13,7 +13,7 @@ export default function AddPage() {
   const [selectedRoutine, setSelectedRoutine] = useState<RoutineEnum>(RoutineEnum.daily);
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-auto px-4 pb-40 text-center">
+    <div className="flex h-full flex-col gap-3 overflow-auto px-4 pb-4 text-center">
       <EntryHeader layout="centered">
         <span className="mx-auto text-lg font-semibold">Streaks Table</span>
       </EntryHeader>

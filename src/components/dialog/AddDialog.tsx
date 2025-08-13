@@ -262,7 +262,7 @@ export default function AddDialog() {
               <span className="text-red-500">*</span>Entry Routine:
             </label>
             <Segmented
-              className="h-10 w-full xs:w-[248px]"
+              className="h-10 w-full max-w-[248px]"
               optionClass="flex items-center justify-center h-8 w-full p-0"
               options={[
                 { label: 'Daily', value: RoutineEnum.daily },
