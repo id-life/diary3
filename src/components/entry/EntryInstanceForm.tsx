@@ -112,7 +112,7 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
             <div className="flex flex-grow items-center justify-center gap-0.5">
               <PointStepSVG
                 className={cn('size-2 fill-diary-navy opacity-50', {
-                  hidden: !Number.isInteger(entryType.pointStep),
+                  hidden: !Number.isInteger(entryType.pointStep || 0.5),
                 })}
               />
               <div className="text-[10px] font-semibold leading-[10px] text-[#8a8898]">{entryType.pointStep || 0.5}</div>
