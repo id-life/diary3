@@ -7,6 +7,7 @@ import { useCallback, useMemo, useState, useEffect } from 'react';
 import { EntryInstance } from '../../entry/types-constants';
 import { CloseSVG, EditDateSVG, MinusSvg, PlusSvg, PointStepSVG } from '../svg';
 import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/utils';
 
 const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) => {
   const { updateEntryInstance, deleteEntryInstance } = useJotaiActions();
@@ -109,7 +110,11 @@ const EntryInstanceForm = ({ entryInstance }: { entryInstance: EntryInstance }) 
               <MinusSvg className="size-6 cursor-pointer text-[#8a8898]" />
             </button>
             <div className="flex flex-grow items-center justify-center gap-0.5">
-              {entryType.pointStep.toString().length < 2 && <PointStepSVG className="size-2 fill-diary-navy opacity-50" />}
+              <PointStepSVG
+                className={cn('size-2 fill-diary-navy opacity-50', {
+                  hidden: !Number.isInteger(entryType.pointStep),
+                })}
+              />
               <div className="text-[10px] font-semibold leading-[10px] text-[#8a8898]">{entryType.pointStep || 0.5}</div>
             </div>
             <button
