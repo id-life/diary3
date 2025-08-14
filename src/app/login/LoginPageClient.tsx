@@ -83,15 +83,15 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-[url('/imgs/login-bg.png')] bg-cover bg-center bg-no-repeat px-6 py-8">
       <div className="w-full max-w-[327px]">
         {/* Logo */}
-        <div className="mb-8 text-center">
-          <div className="mb-2 flex items-center justify-center gap-2">
+        <div className="mb-10 text-center">
+          <div className="flex items-center justify-center gap-1.5">
             <DiaryIconSVG className="size-6" />
-            <h1 className="text-2xl font-bold text-diary-navy">Diary</h1>
+            <h1 className="font-belanosima text-[32px] text-diary-navy">Diary</h1>
           </div>
         </div>
 
         {/* Form Title */}
-        <h2 className="mb-8 text-center text-xl font-semibold text-diary-navy">{isSignUp ? 'Sign up' : 'Login or Sign up'}</h2>
+        <h2 className="mb-10 text-center text-xl font-semibold text-diary-navy">{isSignUp ? 'Sign up' : 'Login or Sign up'}</h2>
 
         {/* Form */}
         <div className="space-y-2">
@@ -126,7 +126,7 @@ export default function LoginPage() {
 
           {/* Submit Button */}
           <Button
-            className="mt-5 h-14 w-full rounded-lg border-diary-navy bg-diary-navy text-white"
+            className="!mt-7 h-14 w-full rounded-lg border-diary-navy bg-diary-navy text-white"
             onClick={handleUsernamePasswordLogin}
             variant="primary"
             disabled={!username || !password || isLoggingIn}

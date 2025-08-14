@@ -1,4 +1,4 @@
-import { Poppins } from 'next/font/google';
+import { Belanosima, Poppins } from 'next/font/google';
 import localFont from 'next/font/local';
 
 const poppins = Poppins({
@@ -13,4 +13,10 @@ const ddin = localFont({
   weight: '700',
 });
 
-export { poppins, ddin };
+const belanosima = Belanosima({
+  weight: ['400'],
+  subsets: ['latin'],
+  variable: '--font-belanosima',
+});
+
+export { poppins, ddin, belanosima };
