@@ -135,6 +135,10 @@
     -webkit-clip-path: polygon(50% 100%, 0 0, 100% 0);
     clip-path: polygon(50% 100%, 0 0, 100% 0);
   }
+
+  input[type='password']::-ms-reveal {
+    display: none;
+  }
 }
 
 @layer utilities {
