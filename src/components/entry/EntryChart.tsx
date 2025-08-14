@@ -251,8 +251,8 @@ function EntryChart() {
           data={chartData}
           margin={{
             top: -12,
-            right: 24,
-            left: -24,
+            right: 16,
+            left: -25,
             bottom: -20,
           }}
         >

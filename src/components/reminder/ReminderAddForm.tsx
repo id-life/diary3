@@ -3,11 +3,10 @@ import { cn } from '@/utils';
 import { useJotaiSelectors, useJotaiActions } from '@/hooks/useJotaiMigration';
 import { formatDate } from '@/utils/date';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AddToCalendarButton, atcb_action } from 'add-to-calendar-button-react';
-// import 'add-to-calendar-button/unstyle';
+import 'add-to-calendar-button-react';
 import dayjs from 'dayjs';
 import { range } from 'lodash-es';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiFillCalendar } from 'react-icons/ai';
 import { z } from 'zod';
@@ -19,7 +18,6 @@ import { Input } from '../ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Switch } from '../ui/switch';
 import { useRouter } from 'next/navigation';
-import { CalendarSvg } from '../svg';
 
 const FormSchema = z.object({
   title: z.string().trim().min(1, { message: 'This field cannot be empty. Please fill it in.' }),
@@ -34,15 +32,15 @@ const options = [
   { value: ReminderType.annual },
   { value: ReminderType.since },
 ];
+
 export default function ReminderAddForm() {
   const router = useRouter();
-  const addToCalendarButtonRef = useRef<HTMLButtonElement>(null);
   const [type, setType] = useState<ReminderType>(ReminderType.weekly);
 
   const [weekOpt, setWeekOpt] = useState<number>(0);
   const [monthDayOpt, setMonthDayOpt] = useState<number>(0);
   const [yearMonthOpt, setYearMonthOpt] = useState<number>(0);
-  // TODO: Replace with direct atom usage
+
   const { uiState, reminderRecords } = useJotaiSelectors();
   const { createReminder, updateReminder, exitReminderEdit } = useJotaiActions();
   const updatingReminderId = uiState.addPage.updatingReminderId;
@@ -50,6 +48,7 @@ export default function ReminderAddForm() {
     () => reminderRecords.find((reminder: any) => reminder.id === updatingReminderId),
     [reminderRecords, updatingReminderId],
   );
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -68,8 +67,7 @@ export default function ReminderAddForm() {
     form.setValue('title', updatingReminder?.title ?? '');
     form.setValue('content', updatingReminder?.content);
     form.setValue('sinceStartTime', updatingReminder?.sinceStartTime ? new Date(updatingReminder.sinceStartTime) : undefined);
-    if (updatingReminder?.isSendReminderEmail) form.setValue('isSendReminderEmail', true);
-    else form.setValue('isSendReminderEmail', false);
+    form.setValue('isSendReminderEmail', !!updatingReminder?.isSendReminderEmail);
     setWeekOpt(updatingReminder?.weekDay ?? 0);
     setMonthDayOpt(updatingReminder?.monthDay ?? 0);
     setYearMonthOpt(updatingReminder?.month ?? 0);
@@ -87,8 +85,6 @@ export default function ReminderAddForm() {
       sinceStartTime: type === ReminderType.since ? data?.sinceStartTime?.valueOf() : undefined,
     });
 
-    console.log('submit:', submitData);
-
     if (!updatingReminderId) {
       createReminder(submitData);
     } else {
@@ -104,8 +100,6 @@ export default function ReminderAddForm() {
   }, [exitReminderEdit, router]);
 
   const { startDate, recurrenceRule } = useMemo(() => {
-    // https://icalendar.org/rrule-tool.html
-    // https://add-to-calendar-button.com/examples#case-4
     if (type === ReminderType.weekly)
       return {
         startDate: dayjs().day(weekOpt).format('YYYY-MM-DD'),
@@ -246,67 +240,6 @@ export default function ReminderAddForm() {
     );
   }, [form.control, monthDayOpt, type, weekOpt, yearMonthOpt]);
 
-  const handleAddToCalendar = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault(); // Prevent form submission if it's inside the form
-
-    const config = {
-      name: form.getValues('title') || 'Reminder',
-      description: form.getValues('content') || '',
-      startDate: startDate,
-      recurrence: recurrenceRule,
-      startTime: '20:00',
-      endTime: '20:15',
-      options: ['Apple', 'Google', 'iCal'] as (
-        | 'Google'
-        | 'iCal'
-        | 'Apple'
-        | 'Microsoft365'
-        | 'MicrosoftTeams'
-        | 'Outlook.com'
-        | 'Yahoo'
-      )[],
-      listStyle: 'overlay' as 'modal' | 'overlay' | undefined,
-      // hideBranding: true,
-      // forceOverlay: true, // 解决遮罩覆盖问题
-      // hideBranding: "true",
-      // hideBackground: false,
-
-      // 您可以覆盖默认的 CSS 变量来自定义弹窗列表
-      styleLight: `
-        --list-background: #FFFFFF;
-        --list-hover-background: #F6F6F7;
-        --btn-background: #F6F6F7;
-        --btn-hover-background: #F6F6F7;
-        --list-border-radius: 8px;
-        --list-padding: 13px 10px;
-        
-        --list-min-width: 100px; 
-        --list-font-weight: 600;
-        --base-font-size-l: 14px;
-        --base-font-size-m: 14px;
-        --base-font-size-s: 14px;
-      `,
-      // hideCheckmark: true,
-    };
-
-    // Ensure the ref is connected to a DOM element before calling
-    if (addToCalendarButtonRef.current) {
-      atcb_action(config, addToCalendarButtonRef.current);
-    }
-  };
-
-  // const addToCalendarConfig = useMemo(
-  //   () => ({
-  //     name: form.getValues('title'),
-  //     description: form.getValues('content'),
-  //     startDate: startDate,
-  //     recurrence: recurrenceRule,
-  //   }),
-  //   [form, recurrenceRule, startDate],
-  // );
-
-  console.log({ startDate });
-
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col gap-5">
@@ -357,28 +290,70 @@ export default function ReminderAddForm() {
           <div className="text-center text-xs text-[#8A8998]">Defaults to 8pm, 15 minute reminder events</div>
           <div className="flex items-center justify-center">
             {updatingReminderId !== null ? (
-              <Button size="large" className="mr-4 flex-1 rounded-[8px]" htmlType="button" onClick={onCancel}>
+              <Button
+                size="large"
+                className="mr-4 h-[40px] flex-1 rounded-[8px] border-primary/10"
+                htmlType="button"
+                onClick={onCancel}
+              >
                 Cancel
               </Button>
             ) : null}
             <Button
               variant="primary"
               size="large"
-              className="w-full flex-1 rounded-[8px] py-[13px] leading-[14px]"
+              className="h-[40px] w-full flex-1 rounded-[8px] py-0 leading-[14px]"
               htmlType="submit"
             >
               {updatingReminderId !== null ? 'Update' : 'Submit'}
             </Button>
 
             {startDate && (
-              <button
-                className="px-5.5 ml-4 flex flex-auto items-center justify-center gap-1 rounded-[8px] border border-primary/10 bg-white py-[10px] text-sm font-semibold leading-[14px]"
-                ref={addToCalendarButtonRef}
-                onClick={handleAddToCalendar}
-              >
-                <CalendarSvg className="size-5" />
-                <span>Add to Calendar</span>
-              </button>
+              <add-to-calendar-button
+                name={form.getValues('title') || 'Reminder'}
+                description={form.getValues('content') || ''}
+                startDate={startDate}
+                recurrence={recurrenceRule}
+                startTime="20:00"
+                endTime="20:15"
+                options="'Apple','Google','iCal'"
+                identifier="reminder-calendar-btn"
+                listStyle="dropup-static"
+                hideBranding={true}
+                hideBackground={false}
+                hideIconButton
+                // hideIconList
+                styleLight={`
+                  --btn-background: #fff;
+                  --btn-padding-x: 22px;
+                  --btn-padding-y: 0;
+                  --btn-border: #1E1B391A;
+                  --btn-border-radius: 8px;
+                  --btn-shadow: none !important;
+                  --btn-hover-shadow: none !important;
+                  --btn-active-shadow: none !important;
+
+                  --list-background: #fff;
+                  --list-hover-background: #f6f6f7;
+                  --list-border-radius: 8px;
+                  --list-padding: 10px;
+                  --list-width: 100px; 
+                  --list-font-weight: 600;
+                  --list-shadow: none !important;
+                  --list-modal-shadow: none !important;
+                  --list-text: #1E1B39;
+
+                  --base-font-size-l: 14px;
+                  --base-font-size-m: 14px;
+                  --base-font-size-s: 14px;
+                  
+                  --modal-btn-shadow: none !important;
+                  --modal-btn-hover-shadow: none !important;
+
+                  --overlay-background: #00000099;
+                  --wrapper-padding: 0;
+                `}
+              ></add-to-calendar-button>
             )}
           </div>
         </div>
