@@ -7,9 +7,10 @@ import { cn } from '@/utils';
 import clsx from 'clsx';
 import { useSetAtom } from 'jotai';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { createElement, FC, SVGProps, useMemo } from 'react';
 import { AddCircleSVG, EntrySVG, HomeSVG, ReminderSVG, UserSVG } from '../svg';
+import { useJotaiSelectors } from '@/hooks/useJotaiMigration';
 
 export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: string }[] = [
   { key: 'entry', icon: HomeSVG },
@@ -21,11 +22,14 @@ export const PAGES: { key: string; icon: FC<SVGProps<SVGElement>>; className?: s
 
 function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { reminderRecords } = useJotaiSelectors();
   const { isAuthenticated, isLoading, user } = useGitHubOAuth();
   const setAddDialogOpen = useSetAtom(addDialogOpenAtom);
   const activeKey = useMemo(() => {
     if (!pathname) return '';
     const topLevelPath = pathname.split('/')[1];
+    if (topLevelPath === 'reminder') return 'reminder';
     return PAGES.find((page) => page.key === topLevelPath)?.key || '';
   }, [pathname]);
 
@@ -36,6 +40,14 @@ function Navbar() {
   if (!isAuthenticated || isLoading) {
     return null;
   }
+
+  const handleReminderClick = () => {
+    if (reminderRecords && reminderRecords.length > 0) {
+      router.push('/reminder');
+    } else {
+      router.push('/reminder/add');
+    }
+  };
 
   return (
     <>
@@ -58,6 +70,27 @@ function Navbar() {
                 {createElement(icon, {
                   className: cn(
                     'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300 hover:fill-primary',
+                    className,
+                  ),
+                })}
+              </button>
+            );
+          }
+
+          if (key === 'reminder') {
+            return (
+              <button
+                key={key.toUpperCase()}
+                className={clsx(
+                  'flex flex-grow items-center justify-center rounded-t-lg py-2',
+                  isActive ? 'text-primary' : 'text-[#BBBAC3]',
+                )}
+                onClick={handleReminderClick}
+              >
+                {createElement(icon, {
+                  className: cn(
+                    'text-2xl/6 size-6 transition-all hover:brightness-90 duration-300',
+                    isActive && 'fill-primary hover:fill-primary',
                     className,
                   ),
                 })}
