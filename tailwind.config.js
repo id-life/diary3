@@ -90,6 +90,7 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         DDin: ['D-DIN'],
+        belanosima: ['var(--font-belanosima)', ...fontFamily.sans],
       },
       borderRadius: {
         lg: 'var(--radius)',
