@@ -14,15 +14,13 @@ import { useBackupList } from '@/api/github';
 
 export const useInitGlobalState = () => {
   const setInitDateStr = useSetAtom(initDateStrAtom);
-  const setInitDayEntryInstances = useSetAtom(initDayEntryInstancesAtom);
 
   useEffect(() => {
     runStateMigration();
 
     const dateStrNow = getDateStringFromNow();
     setInitDateStr({ dateStr: dateStrNow });
-    setInitDayEntryInstances({ dateStr: dateStrNow });
-  }, [setInitDateStr, setInitDayEntryInstances]);
+  }, [setInitDateStr]);
 };
 
 // new - Custom storage for token to avoid JSON double quotes

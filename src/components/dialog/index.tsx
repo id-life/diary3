@@ -77,14 +77,14 @@ function Dialog({
     if (renderHeader) return renderHeader?.({ close: () => onClose(false) });
     if (!title && !showCloseButton) return null;
     return (
-      <div className="relative mb-4 h-auto px-5 text-center text-xl font-medium leading-[22px]">
+      <div className="relative mb-4 h-auto px-[22px] text-center text-xl font-medium leading-[22px]">
         {title}
         {showCloseButton && (
-          <div className="absolute right-5 top-0 flex h-4 w-4 cursor-pointer items-center justify-center">
+          <div className="absolute right-[18px] top-1.5 flex cursor-pointer items-center justify-center">
             <RiCloseFill
               className="stroke-white transition-all duration-300 hover:rotate-180"
-              width={14}
-              height={14}
+              width={12}
+              height={12}
               onClick={() => onClose(false)}
             />
           </div>

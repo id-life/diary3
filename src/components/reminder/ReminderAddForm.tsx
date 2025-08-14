@@ -308,7 +308,7 @@ export default function ReminderAddForm() {
               {updatingReminderId !== null ? 'Update' : 'Submit'}
             </Button>
 
-            {startDate && (
+            {startDate && form.getValues('title') && (
               <add-to-calendar-button
                 name={form.getValues('title') || 'Reminder'}
                 description={form.getValues('content') || ''}
@@ -323,6 +323,12 @@ export default function ReminderAddForm() {
                 hideBackground={false}
                 hideIconButton
                 // hideIconList
+                // customLabels={`{
+                //   "apple": "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KPHJlY3RhbmdlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgc3R5bGU9ImZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg==' alt='Apple icon' /> Apple is 1212ok for me",
+                //   "google": "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KPHJlY3RhbmdlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgc3R5bGU9ImZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg==' alt='Google icon' /> Add to 111222Google Cal",
+                //   "ical": "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4KPHJlY3RhbmdlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIgc3R5bGU9ImZpbGw9Im5vbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg==' alt='iCal icon' /> iCall ftw!"
+                // }`}
+                trigger="click"
                 styleLight={`
                   --btn-background: #fff;
                   --btn-padding-x: 22px;

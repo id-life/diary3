@@ -1,6 +1,6 @@
 /**
  * State Migration Utility
- * 
+ *
  * This utility helps migrate from Redux persist storage to Jotai atoms
  * while preserving all existing data structure and compatibility.
  */
@@ -41,28 +41,30 @@ export interface ReduxPersistedState {
  */
 export const migrateReduxToJotai = () => {
   try {
-    // Get the Redux persist data
-    const reduxData = localStorage.getItem('persist:diary');
-    if (!reduxData) {
-      console.log('No Redux persist data found, starting fresh');
+    const reduxDataString = localStorage.getItem('persist:diary');
+    if (!reduxDataString) {
+      console.log('No Redux persist data found. Migration not needed.');
+      localStorage.setItem('__jotai_migration_completed', 'true');
       return false;
     }
 
-    const parsedReduxData: any = JSON.parse(reduxData);
-    console.log('Found Redux persist data:', parsedReduxData);
+    if (localStorage.getItem('entryInstances.entryInstancesMap')) {
+      console.log('Jotai data already exists. Migration skipped to prevent overwrite.');
+      localStorage.setItem('__jotai_migration_completed', 'true');
+      return false;
+    }
+
+    console.log('Found Redux persist data. Starting migration...');
+    const parsedReduxData: any = JSON.parse(reduxDataString);
 
     // Migrate entryTypes - Redux persist double-stringifies data
     if (parsedReduxData.entryTypes) {
       try {
-        const entryTypesData = typeof parsedReduxData.entryTypes === 'string' 
-          ? JSON.parse(parsedReduxData.entryTypes) 
-          : parsedReduxData.entryTypes;
-        
+        const entryTypesData =
+          typeof parsedReduxData.entryTypes === 'string' ? JSON.parse(parsedReduxData.entryTypes) : parsedReduxData.entryTypes;
+
         if (entryTypesData?.entryTypesArray) {
-          localStorage.setItem(
-            'entryTypes.entryTypesArray',
-            JSON.stringify(entryTypesData.entryTypesArray)
-          );
+          localStorage.setItem('entryTypes.entryTypesArray', JSON.stringify(entryTypesData.entryTypesArray));
           console.log('Migrated entryTypes:', entryTypesData.entryTypesArray.length, 'items');
         }
       } catch (error) {
@@ -73,15 +75,13 @@ export const migrateReduxToJotai = () => {
     // Migrate entryInstances
     if (parsedReduxData.entryInstances) {
       try {
-        const entryInstancesData = typeof parsedReduxData.entryInstances === 'string' 
-          ? JSON.parse(parsedReduxData.entryInstances) 
-          : parsedReduxData.entryInstances;
-        
+        const entryInstancesData =
+          typeof parsedReduxData.entryInstances === 'string'
+            ? JSON.parse(parsedReduxData.entryInstances)
+            : parsedReduxData.entryInstances;
+
         if (entryInstancesData?.entryInstancesMap) {
-          localStorage.setItem(
-            'entryInstances.entryInstancesMap',
-            JSON.stringify(entryInstancesData.entryInstancesMap)
-          );
+          localStorage.setItem('entryInstances.entryInstancesMap', JSON.stringify(entryInstancesData.entryInstancesMap));
           const entryCount = Object.keys(entryInstancesData.entryInstancesMap).length;
           console.log('Migrated entryInstances:', entryCount, 'date entries');
         }
@@ -93,15 +93,13 @@ export const migrateReduxToJotai = () => {
     // Migrate reminderRecords
     if (parsedReduxData.reminderRecords) {
       try {
-        const reminderRecordsData = typeof parsedReduxData.reminderRecords === 'string' 
-          ? JSON.parse(parsedReduxData.reminderRecords) 
-          : parsedReduxData.reminderRecords;
-        
+        const reminderRecordsData =
+          typeof parsedReduxData.reminderRecords === 'string'
+            ? JSON.parse(parsedReduxData.reminderRecords)
+            : parsedReduxData.reminderRecords;
+
         if (reminderRecordsData?.reminderRecords) {
-          localStorage.setItem(
-            'reminderRecords.reminderRecords',
-            JSON.stringify(reminderRecordsData.reminderRecords)
-          );
+          localStorage.setItem('reminderRecords.reminderRecords', JSON.stringify(reminderRecordsData.reminderRecords));
           console.log('Migrated reminderRecords:', reminderRecordsData.reminderRecords.length, 'items');
         }
       } catch (error) {
@@ -112,14 +110,10 @@ export const migrateReduxToJotai = () => {
     // Migrate uiState
     if (parsedReduxData.uiState) {
       try {
-        const uiStateData = typeof parsedReduxData.uiState === 'string' 
-          ? JSON.parse(parsedReduxData.uiState) 
-          : parsedReduxData.uiState;
-        
-        localStorage.setItem(
-          'uiState',
-          JSON.stringify(uiStateData)
-        );
+        const uiStateData =
+          typeof parsedReduxData.uiState === 'string' ? JSON.parse(parsedReduxData.uiState) : parsedReduxData.uiState;
+
+        localStorage.setItem('uiState', JSON.stringify(uiStateData));
         console.log('Migrated uiState');
       } catch (error) {
         console.error('Failed to migrate uiState:', error);
@@ -133,6 +127,7 @@ export const migrateReduxToJotai = () => {
     return true;
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    localStorage.setItem('__jotai_migration_completed', 'true');
     return false;
   }
 };
@@ -183,7 +178,7 @@ export const runStateMigration = (): boolean => {
 
   // Run migration
   const migrationSuccess = migrateReduxToJotai();
-  
+
   if (migrationSuccess) {
     console.log('🎉 State migration completed successfully!');
   } else {

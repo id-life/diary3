@@ -20,10 +20,12 @@ export const createEntryInstanceAtom = atom(null, (get, set, entryInstance: Entr
   const dateStr = getDateStringFromTimestamp(entryInstance.createdAt);
   const current = get(entryInstancesMapAtom);
 
-  set(entryInstancesMapAtom, {
+  const newState = {
     ...current,
     [dateStr]: current[dateStr] ? [...current[dateStr], entryInstance] : [entryInstance],
-  });
+  };
+
+  set(entryInstancesMapAtom, newState);
 });
 
 export const updateEntryInstanceAtom = atom(null, (get, set, entryInstance: EntryInstance) => {
