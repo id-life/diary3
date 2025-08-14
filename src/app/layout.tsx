@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import DialogComponents from '@/components/dialog/DialogComponents';
 import Navbar from '@/components/layout/Navbar';
 import Providers from '@/providers/root';
-import { ddin, poppins } from '@/styles/fonts';
+import { belanosima, ddin, poppins } from '@/styles/fonts';
 import { cn } from '@/utils';
 import { clsx } from 'clsx';
 import type { Metadata, Viewport } from 'next';
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={clsx(poppins.variable, ddin.variable)} suppressHydrationWarning>
+      <body className={clsx(poppins.variable, ddin.variable, belanosima.variable)} suppressHydrationWarning>
         <Providers>
           <div className={cn('flex h-[100dvh] flex-col overflow-hidden')}>
             <ErrorBoundary>
