@@ -61,7 +61,7 @@ const BackupDialog: FunctionComponent = () => {
       open={isOpen}
       onOpenChange={(open) => setOpen(open)}
       title={<span className="text-lg font-semibold">Load</span>}
-      className="px-5 py-4"
+      className="px-1 py-4"
       render={() => (
         <div className="pt-1">
           {isLoading ? (
