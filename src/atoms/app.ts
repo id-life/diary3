@@ -1,4 +1,8 @@
 import { atom } from 'jotai';
+import dayjs from 'dayjs';
+import { legacyLoginUserAtom } from './databaseFirst';
+import { entryInstancesMapAtom } from './entryInstances';
+import { calcRecordedCurrentStreaks, calcRecordedLongestStreaks } from '@/utils/entry';
 
 export const selectedChartDateAtom = atom<string | null>(null);
 
@@ -11,7 +15,32 @@ export type GlobalState = {
   historicalLongestStreakByEntry: number;
   currentStreakByEntry: number;
 };
-export const globalStateAtom = atom<GlobalState | null>(null);
+
+export const globalStateAtom = atom<GlobalState | null>((get) => {
+  const entryInstancesMap = get(entryInstancesMapAtom);
+  const legacyLoginUser = get(legacyLoginUserAtom);
+
+  if (!legacyLoginUser || !entryInstancesMap) {
+    return null;
+  }
+
+  const now = dayjs();
+  const loginTime = legacyLoginUser.loginTime;
+
+  const entryKeys = Object.keys(entryInstancesMap);
+  const totalEntries = entryKeys.reduce((pre, cur) => pre + (entryInstancesMap[cur]?.length ?? 0), 0);
+
+  const currentStreak = calcRecordedCurrentStreaks(entryInstancesMap);
+  const longestStreak = calcRecordedLongestStreaks(entryInstancesMap);
+
+  return {
+    registeredSince: loginTime ? now.diff(dayjs(loginTime), 'day') : 0,
+    entryDays: entryKeys.length,
+    totalEntries,
+    historicalLongestStreakByEntry: longestStreak,
+    currentStreakByEntry: currentStreak,
+  };
+});
 
 export const chartDateRangeAtom = atom<string[]>([]);
 
